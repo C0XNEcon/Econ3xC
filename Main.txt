@@ -29,7 +29,7 @@ end
 
 local t = tostring
 
-local z = 'https://raw.githubusercontent.com/ConePartyy/Econ/refs/heads/main/'
+local z = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/'
 
 local spactivate = stb(splits[1])--false
 local silactive = stb(splits[2])
