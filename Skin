@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local animlib = loadstring(game:HttpGet('https://raw.githubusercontent.com/ConePartyy/Econ/refs/heads/main/Anim'))()
+local animlib = loadstring(game:HttpGet('https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/Anim'))()
 
 local mod = {
 	viewmodels = {},
