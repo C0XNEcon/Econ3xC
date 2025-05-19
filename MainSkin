@@ -56,35 +56,35 @@ _G.lt = tick()
 local skinmodx = not load and _G.skinmod
 if not skinmodx then
 	task.spawn(function()
-		skinmodx = loadstring(game:HttpGet('https://raw.githubusercontent.com/ConePartyy/Econ/refs/heads/main/Skin'))()
+		skinmodx = loadstring(game:HttpGet('https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/Skin'))()
 	end)
 end
 
 local utility = not load2 and _G.utility
 if not utility then
 	task.spawn(function()
-		utility = loadstring(game:HttpGet('https://raw.githubusercontent.com/ConePartyy/Econ/refs/heads/main/UtilityFake'))()
+		utility = loadstring(game:HttpGet('https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/UtilityFake'))()
 	end)
 end
 
 local skinfo = not load3 and _G.skinfo
 if not skinfo then
 	task.spawn(function()
-		skinfo = loadstring(game:HttpGet('https://raw.githubusercontent.com/ConePartyy/Econ/refs/heads/main/SkinInfo'))()
+		skinfo = loadstring(game:HttpGet('https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/SkinInfo'))()
 	end)
 end
 
 local bakedSoundInfo = not load4 and _G.bakeds
 if not bakedSoundInfo then
 	task.spawn(function()
-		bakedSoundInfo = loadstring(game:HttpGet('https://raw.githubusercontent.com/ConePartyy/Econ/refs/heads/main/AnimSound'))()
+		bakedSoundInfo = loadstring(game:HttpGet('https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/AnimSound'))()
 	end)
 end
 
 local weapontypes = not load5 and _G.wpt
 if not weapontypes then
 	task.spawn(function()
-		weapontypes = loadstring(game:HttpGet('https://raw.githubusercontent.com/ConePartyy/Econ/refs/heads/main/WeaponTypes'))()
+		weapontypes = loadstring(game:HttpGet('https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/WeaponTypes'))()
 	end)
 end
 
@@ -112,7 +112,7 @@ playSound()
 
 local icoToSikn = skinmodx.its
 
-local z = 'https://raw.githubusercontent.com/ConePartyy/Econ/refs/heads/main/'
+local z = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/'
 local ui = loadstring(game:HttpGet(z..'Econ%20UI.txt'))()
 
 local Window = ui:CreateWindow({
