@@ -500,6 +500,88 @@ task.spawn(function()
 	game:GetService('ContentProvider'):PreloadAsync(prelo)
 end)
 
+_G.toskin = toskin
+ui.LoadConfiguration()
+
+-- // EquipmentScene Weapons Changer
+
+function findSkin(name)
+	for _, v in pairs(skins:GetChildren()) do
+		for _, v in pairs(v:GetChildren()) do
+			if v.Name == name then return v end
+		end
+	end
+end
+
+--if not _G.selectChanged then
+--	local function handle(v)
+--		if v.Name == 'SDSDSD' then return end
+--		local vw = findSkin(v.Name)
+--		if not vw then return end
+		
+--		local vpos = v:IsA('Model') and v:GetPivot().Position
+--		local indist = v:IsA('Model') and (vpos-vw:GetPivot().Position).Magnitude < 1
+--		--local ec = workspace:FindFirstChild('EquipmentScene')
+
+--		if indist then
+--			local tog = skinfo.skinToOg[v.Name] or v.Name
+--		    local tocur = toskin[tog]
+
+--			if tocur and tocur ~= 'Dont Change' then
+--				v:ClearAllChildren()
+
+--				local skin = findSkin(tocur):Clone()
+--				skin:PivotTo(v:GetPivot())
+--				skin.Parent = v
+--			end
+--		end
+--	end
+	
+--	_G.h = handle
+
+--	for _, v in pairs(workspace:GetChildren()) do
+--		_G.h(v)
+--	end
+
+--	workspace.ChildAdded:Connect(function(v)
+--		_G.h(v)
+--	end)
+--end
+
+-- // Weapons UI Changer
+
+if not _G.selectChanged then
+	task.spawn(function()
+		local ui = plr.PlayerGui:WaitForChild('MainGui').MainFrame.Equipment.Weapons.Container.List.Container
+
+		local function handle(v)
+			local b = v:FindFirstChild('Button')
+			b = b and b:FindFirstChild('Icon')
+
+			local xico = b and b:FindFirstChild('UICorner')
+			if v.Name == 'EquipmentWeaponSlot' and b and not xico then
+				local function calc()
+					local ts = icoToSikn[b.Image]
+					local tog = skinfo.skinToOg[ts] or ts
+					local tocur = toskin[tog]
+					if tocur and tocur ~= 'Dont Change' then
+						b.Image = skinmodx.viewmodels[tocur].image
+					end
+				end
+
+				calc()
+				b:GetPropertyChangedSignal('Image'):Connect(calc)
+			end
+		end
+
+		for _, v in pairs(ui:GetChildren()) do
+			handle(v)
+		end
+
+		ui.ChildAdded:Connect(handle)
+	end)
+end
+
 -- // Weapon Selection Changer
 
 if not _G.selectChanged then
@@ -591,7 +673,7 @@ if not _G.selectChanged then
 		if pages:FindFirstChild('PickWeapons') then
 			checkfor(pages.PickWeapons)
 		end
-		
+
 		pages.ChildAdded:Connect(checkfor)
 		--table.insert(initConnections, pages.ChildAdded:Connect(checkfor))
 	end)
@@ -640,7 +722,7 @@ function test(v, skinName, spl, vm)
 			_muzzle:Destroy()
 
 			other.Position = p
-			
+
 			local ogk = muzzles:FindFirstChild(spl[2]) or muzzles[toMuzzle[spl[2]]]
 			local muzzleClone = muzzles:FindFirstChild(skinName) or ogk
 			if spl[2] ~= 'Flamethrower' then
@@ -650,7 +732,7 @@ function test(v, skinName, spl, vm)
 					v:Clone().Parent = other
 				end
 			end
-			
+
 			if not other:FindFirstChildWhichIsA('Light', true) then
 				for _, v in pairs(ogk:GetDescendants()) do
 					if v:IsA('Light') then
@@ -666,17 +748,17 @@ function test(v, skinName, spl, vm)
 			Katana = function()
 				local myactive = deflectiveactive:FindFirstChild(skinName) or deflectiveactive.Default
 				local myhit = deflecthit:FindFirstChild(skinName) or deflecthit.Default
-				
+
 				local active = vm:FindFirstChild('_katana_deflect_active', true)
 				local hit = vm:FindFirstChild('_katana_deflect_hit', true)
-				
+
 				active:ClearAllChildren()
 				hit:ClearAllChildren()
-				
+
 				for _, v in pairs(myactive.Attachment:GetChildren()) do
 					v:Clone().Parent = active
 				end
-				
+
 				for _, v in pairs(myhit:GetChildren()) do
 					v:Clone().Parent = hit
 				end
@@ -685,14 +767,6 @@ function test(v, skinName, spl, vm)
 
 		if funcs[spl[2]] then
 			funcs[spl[2]]()
-		end
-	end
-end
-
-function findSkin(name)
-	for _, v in pairs(skins:GetChildren()) do
-		for _, v in pairs(v:GetChildren()) do
-			if v.Name == name then return v end
 		end
 	end
 end
@@ -1202,8 +1276,6 @@ function applySkin(skinName, cs)
 end
 
 _G.ac = applySkin
-
-ui.LoadConfiguration()
 
 queue_on_teleport(game:HttpGet(z..'MainSkin'))
 
