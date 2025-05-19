@@ -1,0 +1,146 @@
+local SoundService_upvr = game:GetService("SoundService")
+local ut = {}
+
+function debris(thing, dur)
+	task.delay(dur, function()
+		if thing then
+			thing:Destroy()
+		end
+	end)
+end
+
+local animlib = _G.animLib
+
+local plr = game:GetService('Players').LocalPlayer
+local scripts = plr.PlayerScripts
+local weaponSounds = scripts.Modules.ClientReplicatedClasses.ClientFighter.ClientItem
+
+_G.durr = .92
+
+_G.ffunc = function(name, anim, dur)
+	if anim then
+		local stopped = false
+		
+		local z = anim.Stopped:Once(function()
+			stopped = true
+		end)
+		
+		task.wait(dur*_G.durr)
+		if z then z:Disconnect() end
+		return anim and anim.IsPlaying and not stopped
+	end
+end
+
+function ut:_AnimationWait(name, anim, dur)
+	return _G.ffunc(name, anim, dur)
+end
+
+if not _G.si then
+	_G.si = {}
+end
+
+if not _G.soundToWeapon then
+	_G.soundToWeapon = {}
+end
+
+function ut:CreateSound(id, vol, speed, pos, play, dur, mind, maxd, soundserv, extra)
+	--if typeof(pos) == "Vector3" then
+	--	local p = Instance.new("Part")
+	--	p.CFrame = CFrame.new(pos)
+	--	p.Size = Vector3.one
+	--	p.Transparency = 1
+	--	p.CastShadow = false
+	--	p.CanCollide = false
+	--	p.CanTouch = false
+	--	p.CanQuery = false
+	--	p.Anchored = true
+	--	p.Parent = workspace
+	--	pos = p
+	--	debris(p, dur or 60)
+	--else
+	--	pos = weaponSounds
+	--end
+
+	--pos = pos or weaponSounds
+
+	local s = Instance.new("Sound")
+	s.SoundId = typeof(id) == 'table' and id.id or id
+	s.Volume = vol or 1
+	s.PlaybackSpeed = speed or 1
+	s.RollOffMinDistance = mind and typeof(mind) == 'number' and mind or 50
+	s.RollOffMaxDistance = maxd or 400
+	s.RollOffMode = Enum.RollOffMode.Inverse
+	s.SoundGroup = SoundService_upvr[soundserv or 'Other']
+
+	if extra then
+		for i, v in pairs(extra) do
+			s[i] = v
+		end
+	end
+	
+	_G.soundToWeapon[s] = id.model
+	
+	s:AddTag('IsOurs')
+	s.Parent = weaponSounds
+
+    s:Play()
+	
+	s.Ended:Once(function()
+		wait(1)
+		s:Destroy()
+	end)
+
+	return s
+end
+
+function ut:CreateSpectatorSound(id, vol, speed, pos, play, dur, mind, maxd, soundserv, extra)
+	--if typeof(pos) == "Vector3" then
+	--	local p = Instance.new("Part")
+	--	p.CFrame = CFrame.new(pos)
+	--	p.Size = Vector3.one
+	--	p.Transparency = 1
+	--	p.CastShadow = false
+	--	p.CanCollide = false
+	--	p.CanTouch = false
+	--	p.CanQuery = false
+	--	p.Anchored = true
+	--	p.Parent = workspace
+	--	pos = p
+	--	debris(p, dur or 60)
+	--else
+	--	pos = weaponSounds
+	--end
+
+	--pos = pos or weaponSounds
+
+	local s = Instance.new("Sound")
+	s.SoundId = typeof(id) == 'table' and id.id or id
+	s.Volume = vol or 1
+	s.PlaybackSpeed = speed or 1
+	s.RollOffMinDistance = mind and typeof(mind) == 'number' and mind or 50
+	s.RollOffMaxDistance = maxd or 400
+	s.RollOffMode = Enum.RollOffMode.Inverse
+	s.SoundGroup = SoundService_upvr[soundserv or 'Other']
+
+	if extra then
+		for i, v in pairs(extra) do
+			s[i] = v
+		end
+	end
+
+	_G.soundToWeapon[s] = id.model
+
+	s:AddTag('IsOurs')
+	s.Parent = weaponSounds
+
+	s:Play()
+
+	s.Ended:Once(function()
+		wait(1)
+		s:Destroy()
+	end)
+
+	return s
+end
+
+return ut
