@@ -211,10 +211,284 @@ local toskin = {}
 
 local initConnections = {}
 
+-- // CHARACTER CHANGER
+
+local p = game:GetService('Players')
+
+local cid = nil
+
+local loadedids = {}
+
+if not _G.ourrrs then
+	_G.ourrrs = {}
+end
+
+local ltagcon = nil
+local lll = nil
+
+local function cchar(id)
+	task.spawn(function()
+		local id = typeof(id) == 'number' and id or cid
+		if not id then return end
+
+		local lid = loadedids[id]
+		local ap = lid and lid.ap or p:GetHumanoidDescriptionFromUserId(id)
+
+		if not ap then return end
+
+		local face = ap.Face
+		local faceid = "rbxthumb://type=Asset&w=768&h=432&id="..face
+
+		-- // REST
+
+		local cha = lid and lid.apr or p:GetCharacterAppearanceAsync(id)
+		local char = plr.Character
+		
+		local inff = nil
+		task.spawn(function()
+			-- // VISUALS
+
+			local inf = lid and lid.inff or game:GetService('UserService'):GetUserInfosByUserIdsAsync({id})
+			inff = inf
+			loadedids[id] = {
+				inff = inf,
+				apr = cha,
+				ap = ap
+			}
+			
+			if ltagcon then
+				for _, v in pairs(ltagcon) do
+					v:Disconnect()
+				end
+			end
+
+			if lll then
+				lll:Disconnect()
+			end
+
+			if inf and inf[1] then
+				inf = inf[1]
+
+				local root = char:WaitForChild('HumanoidRootPart')
+
+				local function tagfunc(tag)
+					if not tag or tag.Name ~= 'Nametag' then return end
+
+					if ltagcon then
+						for _, v in pairs(ltagcon) do
+							v:Disconnect()
+						end
+					end
+
+					local frame = tag.Frame or tag:WaitForChild('Frame')
+					local ff = frame.Player
+					local un = ff.Username
+
+					local function hn()
+						ff.Text = (tostring(inf.DisplayName) or inf.Username)..(inf.HasVerifiedBadge and ' '..utf8.char(0xE000) or '')
+						un.Text = inf.DisplayName and '@'..inf.Username or ''
+					end
+
+					hn()
+
+					ltagcon = {}
+
+					table.insert(ltagcon, ff:GetPropertyChangedSignal('Text'):Connect(hn))
+					table.insert(ltagcon, tag:GetPropertyChangedSignal('Parent'):Once(function()
+						for _, v in pairs(ltagcon) do
+							v:Disconnect()
+						end
+					end))
+
+					for _, v in pairs(ltagcon) do
+						table.insert(initConnections, v)
+					end
+				end
+
+				tagfunc(root:FindFirstChild('Nametag'))
+				lll = root.ChildAdded:Connect(tagfunc)
+				table.insert(initConnections, lll)
+			end
+		end)
+
+		loadedids[id] = {
+			apr = cha,
+			ap = ap,
+			inff = inff
+		}
+
+		task.spawn(function()
+			local head = char:WaitForChild('Head')
+			if head:FindFirstChild('face') then
+				head.face:Destroy()
+			end
+
+			local newface = Instance.new('Decal', head)
+			newface.Name = 'face'
+			newface.Texture = face ~= 0 and faceid or 'rbxasset://textures/face.png'
+		end)
+
+		local function caa(characterModel, accessory)
+			task.spawn(function()
+				local accessoryAttachment = accessory:FindFirstChildWhichIsA("Attachment", true)
+				if not accessoryAttachment then
+					warn("No attachments found in accessory. Accessory was not attached.")
+					return
+				end
+
+				local attachmentName = accessoryAttachment.Name
+				local attachTo = nil
+
+				local st = tick()
+				repeat run.Stepped:Wait() attachTo = characterModel:FindFirstChild(attachmentName, true) until attachTo
+
+				if not attachTo or not attachTo:IsA("Attachment") then
+					warn(string.format("No attachment named %s found in character. Accessory was not attached.", attachmentName))
+					return
+				end
+
+				local Handle = accessory:FindFirstChild("Handle")
+				if not Handle then
+					warn("Attachment has no handle. Accessory was not attached.")
+					return
+				end
+
+				Handle.CFrame = attachTo.WorldCFrame * accessoryAttachment.CFrame:Inverse()
+
+				local nc = Instance.new('WeldConstraint', Handle)
+				nc.Part0 = Handle
+				nc.Part1 = attachTo.Parent
+
+				accessory.Parent = characterModel
+			end)
+		end
+
+		local names = {'Shirt', 'Pants', 'ShirtGraphic', 'Accessory'}
+
+		local function hand(v)
+			if table.find(names, v.ClassName) then
+				task.defer(function()
+					v:Destroy()
+				end)
+			elseif v.ClassName == 'BodyColors' then
+				local bc = cha:FindFirstChild('Body Colors') :: BodyColors
+				if bc then
+					v.HeadColor3 = bc.HeadColor3
+					v.TorsoColor3 = bc.TorsoColor3
+					v.LeftArmColor3 = bc.LeftArmColor3
+					v.LeftLegColor3 = bc.LeftLegColor3
+					v.RightArmColor3 = bc.RightArmColor3
+					v.RightLegColor3 = bc.RightLegColor3
+
+					local to = {
+						RightUpperArm = bc.RightArmColor3,
+						RightLowerArm = bc.RightArmColor3,
+						RightHand = bc.RightArmColor3,
+
+						LeftUpperArm = bc.LeftArmColor3,
+						LeftLowerArm = bc.LeftArmColor3,
+						LeftHand = bc.LeftArmColor3,
+
+						Head = bc.HeadColor3,
+						UpperTorso = bc.TorsoColor3,
+						LowerTorso = bc.TorsoColor3,
+
+						RightUpperLeg = bc.RightLegColor3,
+						RightLowerLeg = bc.RightLegColor3,
+						RightFoot = bc.RightLegColor3,
+
+						LeftUpperLeg = bc.LeftLegColor3,
+						LeftLowerLeg = bc.LeftLegColor3,
+						LeftFoot = bc.LeftLegColor3,
+					}
+
+					for piece, colr in pairs(to) do
+						task.spawn(function()
+							char:WaitForChild(piece).Color = colr
+						end)
+					end
+				end
+			end
+		end
+
+		for _, v : BodyColors in pairs(char:GetChildren()) do
+			hand(v)
+		end
+
+		local con2
+		local con = char.ChildAdded:Connect(function(v)
+			if not table.find(_G.ourrrs, v) then
+				hand(v)
+			end
+		end)
+
+		table.insert(initConnections, con)
+		table.insert(initConnections, char:GetPropertyChangedSignal('Parent'):Once(function()
+			if con then
+				con:Disconnect()
+			end
+
+			if con2 then
+				con2:Disconnect()
+			end
+		end))
+
+		local function h2(v)
+			if table.find(names, v.ClassName) then
+				if v:IsA('Accessory') then
+					local v = v:Clone()
+					for _, v in pairs(v:GetChildren()) do
+						if v:IsA('BasePart') then
+							v.CanCollide = false
+							v.CanQuery = false
+							v.CanTouch = false
+							v.CollisionGroup = 'Players'
+							v.Massless = true
+						end
+					end
+
+					table.insert(_G.ourrrs, v)
+					caa(char, v)
+				else 
+					local cl = v:Clone() :: BodyColors
+					table.insert(_G.ourrrs, cl)
+					cl.Parent = char
+				end
+			end
+		end
+
+		for _, v in pairs(cha:GetChildren()) do
+			h2(v)
+		end
+
+		con2 = cha.ChildAdded:Connect(h2)
+		table.insert(initConnections, con2)
+	end)
+end
+
+-- // REST
+
 for t, weapons in pairs(weapontypes.typeToWeapons) do
 	local gameplayTab = Window:CreateTab(to[t], nil)
 
 	if t == 1 then
+		local sec = gameplayTab:CreateSection('Character Changer')
+		
+		local charchanger = gameplayTab:CreateInput({
+			Name = 'Player ID / Name',
+			CurrentValue = '',
+			PlaceholderText = 'ConePartyy',
+			RemoveTextAfterFocusLost = false,
+			Flag = 'appearancechangerid',
+			Callback = function(t)
+				local id = tonumber(t) or tonumber(p:GetUserIdFromNameAsync(t))
+				if id then
+					cid = id
+					cchar(id)
+				end
+			end,
+		})
+
 		local visualSection = gameplayTab:CreateSection('Wrap Changer - Hold a weapon')
 
 		local selectedWrap = 'None'
@@ -780,7 +1054,7 @@ function applySkin(skinName, cs)
 		if not ogitem then return end
 
 		local char = plr.Character
-		local hum = char and char:FindFirstChild('Humanoid')
+		local hum = char and char:FindFirstChild('Humanoid') :: Humanoid
 
 		local main = plr.PlayerGui.MainGui.MainFrame
 		local ui = main.FighterInterfaces:FindFirstChild(plr.Name)
@@ -1311,6 +1585,8 @@ function applySkin(skinName, cs)
 	end)
 end
 
+cchar()
+table.insert(initConnections, plr.CharacterAdded:Connect(cchar))
 _G.ac = applySkin
 
 queue_on_teleport(game:HttpGet(z..'MainSkin'))
