@@ -319,8 +319,10 @@ local function cchar(id)
 
 		task.spawn(function()
 			local head = char:WaitForChild('Head')
-			if head:FindFirstChild('face') then
-				head.face:Destroy()
+			for _, v in pairs(head:GetChildren()) do
+				if v.Name == 'face' then
+					v:Destroy()
+				end
 			end
 
 			local newface = Instance.new('Decal', head)
