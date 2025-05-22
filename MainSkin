@@ -831,6 +831,42 @@ function applySkin(skinName, cs)
 					vm.Name = spl[1]..' - '..spl[2].. ' - '..skinName
 
 					local itemint = plr.PlayerGui.MainGui.MainFrame.ItemInterfaces[plr.Name.. ' - '..spl[2]]
+					
+					local function set(arg1)
+						local scope = itemint.Mouse.Scope
+						local tbl = {
+							BlurImage = scope.Blur.ImageLabel,
+							CircleImage = scope.Circle.ImageLabel,
+							ReticleDotUICorner = scope.Reticle.Container.Dot.UICorner,
+							_dont_rotate_scope_while_sliding = false
+						}
+						
+						arg1 = tbl
+						
+						if skinName == "Pixel Sniper" then
+							arg1.BlurImage.Image = "rbxassetid://18171031143"
+							arg1.BlurImage.ResampleMode = Enum.ResamplerMode.Pixelated
+							arg1.CircleImage.Image = "rbxassetid://18171045114"
+							arg1.CircleImage.ResampleMode = Enum.ResamplerMode.Pixelated
+							arg1.ReticleDotUICorner:Destroy()
+						else
+							if skinName == "Keyper" then
+								arg1.BlurImage.Image = "rbxassetid://129335242148588"
+								arg1.BlurImage.Size = UDim2.new(1.25, 0, 1.25, 0)
+								arg1.CircleImage.Image = "rbxassetid://81498448678518"
+								arg1.CircleImage.Size = UDim2.new(1.25, 0, 1.25, 0)
+								arg1._dont_rotate_scope_while_sliding = true
+								return
+							end
+							if skinName == "Pixel Crossbow" then
+								arg1.CircleImage.Image = "rbxassetid://97622703342015"
+								arg1.CircleImage.ResampleMode = Enum.ResamplerMode.Pixelated
+								arg1.ReticleDotUICorner:Destroy()
+							end
+						end
+				    end
+				
+					set()
 
 					local name = vm.name
 
