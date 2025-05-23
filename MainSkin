@@ -49,6 +49,8 @@ local load3 = false
 local load4 = false
 local load5 = false
 
+local updatedCharFuncs = {}
+
 _G.lt = tick()
 
 -- // Loading
@@ -215,7 +217,7 @@ local initConnections = {}
 
 local p = game:GetService('Players')
 
-local cid = nil
+local cid = plr.UserId
 
 local loadedids = {}
 
@@ -479,6 +481,10 @@ end
 
 -- // REST
 
+if not _G.nametoid then
+	_G.nametoid = {}
+end
+
 for t, weapons in pairs(weapontypes.typeToWeapons) do
 	local gameplayTab = Window:CreateTab(to[t], nil)
 
@@ -492,10 +498,15 @@ for t, weapons in pairs(weapontypes.typeToWeapons) do
 			RemoveTextAfterFocusLost = false,
 			Flag = 'appearancechangerid',
 			Callback = function(t)
-				local id = tonumber(t) or tonumber(p:GetUserIdFromNameAsync(t))
+				local id = tonumber(t) or tonumber(_G.nametoid[t] or p:GetUserIdFromNameAsync(t))
 				if id then
+					_G.nametoid[t] = id
 					cid = id
 					cchar(id)
+					
+					for _, v in pairs(updatedCharFuncs) do
+						v()
+					end
 				end
 			end,
 		})
@@ -836,10 +847,36 @@ end
 -- // Weapons ViewProfile UI Changer
 
 local prcons = {}
+local pacons = {}
+local pa2cons = {}
+local sidecons = {}
 
 local is = _G.selectChanged and true or false
 
---if not _G.selectChanged then
+if not _G.saved then
+	_G.saved = {}
+end
+
+function getIcon()
+	local content = nil
+	local isReady = nil
+	local s = _G.saved[cid or plr.UserId]
+	if s then
+		content = s.content
+		isReady = s.isReady
+	else
+		local c, r = game:GetService('Players'):GetUserThumbnailAsync(cid or plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+		content = c
+		r = r
+		
+		_G.saved[cid or plr.UserId] = {
+			content = c, isReady = r
+		}
+	end
+	
+	return content, isReady
+end
+
 task.spawn(function()
 	local ui = plr.PlayerGui:WaitForChild('MainGui')
 	local pages = ui.MainFrame.Pages
@@ -859,9 +896,9 @@ task.spawn(function()
 			local _username = __player.Username
 			local _headshot = __player.Headshot
 			local list = __player.FavoriteWeapons
-
-			local content, isReady = game:GetService('Players'):GetUserThumbnailAsync(cid, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
-
+			
+			local content, isReady = getIcon()
+			
 			local function hn()
 				_display.Text = dn
 				_username.Text = '@'..usn
@@ -888,7 +925,8 @@ task.spawn(function()
 									b.Image = skinmodx.viewmodels[tocur].image
 								end
 							end
-
+							
+							table.insert(updatedCharFuncs, calc)
 							calc()
 
 							local z = b:GetPropertyChangedSignal('Image'):Connect(calc)
@@ -907,6 +945,7 @@ task.spawn(function()
 			
 			hn()
 			
+			table.insert(updatedCharFuncs, hn)
 			table.insert(prcons, _headshot:GetPropertyChangedSignal('Image'):Connect(hn))
 			table.insert(prcons, _username:GetPropertyChangedSignal('Text'):Connect(hn))
 			table.insert(prcons, _display:GetPropertyChangedSignal('Text'):Connect(hn))
@@ -922,8 +961,169 @@ task.spawn(function()
 	end
 
 	table.insert(initConnections, pages.ChildAdded:Connect(checkfor))
+	
+	-- // Lobby Icon Party #1
+	
+	local lobby = ui.MainFrame.Lobby
+	
+	if pacons then
+		for _, v in pairs(pacons) do
+			v:Disconnect()
+		end
+	end
+	
+	pacons = {}
+	
+	local function cf(v)
+		if v.Name == 'Party' then
+			local bd = v.BottomDisplay
+			local con = bd.Container
+			
+			local function h(v : Frame)
+				if v.Name == 'PartyMemberSlot' and v.LayoutOrder == 1 then
+					local ico = v.Button.Icon
+					ico.Image = getIcon()
+					
+					table.insert(updatedCharFuncs, function()
+						ico.Image = getIcon()
+					end)
+					
+					local z = ico:GetPropertyChangedSignal('Image'):Connect(function()
+						ico.Image = getIcon()
+					end)
+					
+					table.insert(pacons, z)
+					table.insert(initConnections, z)
+				end
+			end
+			
+
+			local z = con.ChildAdded:Connect(h)
+			table.insert(pacons, z)
+			table.insert(initConnections, z)
+			
+			for _, v in pairs(con:GetChildren()) do
+				h(v)
+			end
+		end
+	end
+	
+	if lobby:FindFirstChild('Party') then
+		cf(lobby.Party)
+	end
+
+	table.insert(initConnections, lobby.ChildAdded:Connect(cf))
+	
+	-- // Lobby Icon Party #2
+
+	if pa2cons then
+		for _, v in pairs(pa2cons) do
+			v:Disconnect()
+		end
+	end
+
+	pa2cons = {}
+
+	local function cc(v)
+		if v.Name == 'Party' then
+			local b = v.Members
+
+			local function h(v : Frame)
+				if v.Name == 'PartyMemberBigSlot' and v.LayoutOrder == 1 then
+					local ico = v.Icon
+					ico.Image = getIcon()
+					
+					local _display = v.DisplayName
+					local _username = v.Username
+					
+					local function hn()
+						_display.Text = dn
+						_username.Text = '@'..usn
+						ico.Image = getIcon()
+					end
+					
+					local function add(con)
+						table.insert(pa2cons, con)
+						table.insert(initConnections, con)
+					end
+					
+					hn()
+					add(_username:GetPropertyChangedSignal('Text'):Connect(hn))
+					add(_display:GetPropertyChangedSignal('Text'):Connect(hn))
+					add(ico:GetPropertyChangedSignal('Image'):Connect(hn))
+					
+					table.insert(updatedCharFuncs, hn)
+				end
+			end
+
+			local z = b.ChildAdded:Connect(h)
+			table.insert(pa2cons, z)
+			table.insert(initConnections, z)
+
+			for _, v in pairs(b:GetChildren()) do
+				h(v)
+			end
+		end
+	end
+
+	if pages:FindFirstChild('Party') then
+		cc(pages.Party)
+	end
+
+	table.insert(initConnections, pages.ChildAdded:Connect(cc))
+	
+	-- // Side Party
+	
+	local lobby = ui.MainFrame.Lobby
+
+	if sidecons then
+		for _, v in pairs(sidecons) do
+			v:Disconnect()
+		end
+	end
+
+	sidecons = {}
+
+	local function h(v)
+		if v.Name == 'SideParty' then
+			local con = v.Container
+
+			local function h(v : Frame)
+				if v.Name == 'PartyMemberSlot' and v.LayoutOrder == -1 then
+					local ico = v.Button.Icon
+					ico.Image = getIcon()
+
+					table.insert(updatedCharFuncs, function()
+						ico.Image = getIcon()
+					end)
+					
+					local function add(con)
+						table.insert(sidecons, con)
+						table.insert(initConnections, con)
+					end
+					
+					add(ico:GetPropertyChangedSignal('Image'):Connect(function()
+						ico.Image = getIcon()
+					end))
+				end
+			end
+
+			local z = con.ChildAdded:Connect(h)
+			table.insert(sidecons, z)
+			table.insert(initConnections, z)
+
+			for _, v in pairs(con:GetChildren()) do
+				h(v)
+			end
+		end
+	end
+
+	if pages:FindFirstChild('SideParty') then
+		h(pages.SideParty)
+	end
+
+	table.insert(initConnections, pages.ChildAdded:Connect(h))
 end)
---end
 
 -- // Weapons UI Changer
 
@@ -936,7 +1136,8 @@ if not _G.selectChanged then
 			b = b and b:FindFirstChild('Icon')
 
 			local xico = b and b:FindFirstChild('UICorner')
-			if v.Name == 'EquipmentWeaponSlot' and b and not xico then
+			local n = v.Name == 'EquipmentWeaponSlot'
+			if n and b and not xico then
 				local function calc()
 					local ts = icoToSikn[b.Image]
 					local tog = skinfo.skinToOg[ts] or ts
@@ -948,6 +1149,8 @@ if not _G.selectChanged then
 
 				calc()
 				b:GetPropertyChangedSignal('Image'):Connect(calc)
+			elseif n and b and xico then
+				
 			end
 		end
 
