@@ -226,6 +226,13 @@ end
 local ltagcon = nil
 local lll = nil
 
+-- // dn = DisplayName [] usn = Username
+
+local dn = (plr.DisplayName or plr.Name)..(plr.HasVerifiedBadge and ' '..utf8.char(0xE000) or '')
+local usn = plr.Name
+
+-- // cchar
+
 local function cchar(id)
 	task.spawn(function()
 		local id = typeof(id) == 'number' and id or cid
@@ -243,7 +250,7 @@ local function cchar(id)
 
 		local cha = lid and lid.apr or p:GetCharacterAppearanceAsync(id)
 		local char = plr.Character
-		
+
 		local inff = nil
 		task.spawn(function()
 			-- // VISUALS
@@ -255,7 +262,7 @@ local function cchar(id)
 				apr = cha,
 				ap = ap
 			}
-			
+
 			if ltagcon then
 				for _, v in pairs(ltagcon) do
 					v:Disconnect()
@@ -285,7 +292,9 @@ local function cchar(id)
 					local un = ff.Username
 
 					local function hn()
-						ff.Text = (tostring(inf.DisplayName) or inf.Username)..(inf.HasVerifiedBadge and ' '..utf8.char(0xE000) or '')
+						dn = (tostring(inf.DisplayName) or inf.Username)..(inf.HasVerifiedBadge and ' '..utf8.char(0xE000) or '')
+						usn = inf.Username
+						ff.Text = dn
 						un.Text = inf.DisplayName and '@'..inf.Username or ''
 					end
 
@@ -475,7 +484,7 @@ for t, weapons in pairs(weapontypes.typeToWeapons) do
 
 	if t == 1 then
 		local sec = gameplayTab:CreateSection('Character Changer')
-		
+
 		local charchanger = gameplayTab:CreateInput({
 			Name = 'Player ID / Name',
 			CurrentValue = '',
@@ -794,7 +803,7 @@ end
 --		if v.Name == 'SDSDSD' then return end
 --		local vw = findSkin(v.Name)
 --		if not vw then return end
-		
+
 --		local vpos = v:IsA('Model') and v:GetPivot().Position
 --		local indist = v:IsA('Model') and (vpos-vw:GetPivot().Position).Magnitude < 1
 --		--local ec = workspace:FindFirstChild('EquipmentScene')
@@ -812,7 +821,7 @@ end
 --			end
 --		end
 --	end
-	
+
 --	_G.h = handle
 
 --	for _, v in pairs(workspace:GetChildren()) do
@@ -822,6 +831,98 @@ end
 --	workspace.ChildAdded:Connect(function(v)
 --		_G.h(v)
 --	end)
+--end
+
+-- // Weapons ViewProfile UI Changer
+
+local prcons = {}
+
+local is = _G.selectChanged and true or false
+
+--if not _G.selectChanged then
+task.spawn(function()
+	local ui = plr.PlayerGui:WaitForChild('MainGui')
+	local pages = ui.MainFrame.Pages
+
+	local function checkfor(v)
+		if v.Name == 'ViewProfile' then
+			if prcons then
+				for _, v in pairs(prcons) do
+					v:Disconnect()
+				end
+			end
+
+			local _active = v:WaitForChild('Active')
+			local __player = _active.Player
+
+			local _display = __player.DisplayName
+			local _username = __player.Username
+			local _headshot = __player.Headshot
+			local list = __player.FavoriteWeapons
+
+			local content, isReady = game:GetService('Players'):GetUserThumbnailAsync(cid, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+
+			local function hn()
+				_display.Text = dn
+				_username.Text = '@'..usn
+				if isReady then
+					_headshot.Image = content
+				end
+			end
+			
+			prcons = {}
+			
+			if not is then
+				local function handle(v)
+					task.spawn(function()
+						local b = v.Name == 'PickWeaponSlot' and v:WaitForChild('Button')
+						if b and b:FindFirstChild('Icon') and b.Icon:FindFirstChild('Picture') then
+							b = b.Icon.Picture
+							b.Name = 'OPic'
+
+							local function calc()
+								local ts = icoToSikn[b.Image]
+								local tog = skinfo.skinToOg[ts] or ts
+								local tocur = _G.toskin[tog]
+								if tocur and tocur ~= 'Dont Change' then
+									b.Image = skinmodx.viewmodels[tocur].image
+								end
+							end
+
+							calc()
+
+							local z = b:GetPropertyChangedSignal('Image'):Connect(calc)
+							table.insert(prcons, z)
+							table.insert(initConnections, z)
+						end
+					end)
+				end
+
+				for _, v in pairs(list:GetChildren()) do
+					handle(v)
+				end
+
+				table.insert(prcons, list.ChildAdded:Connect(handle))
+			end
+			
+			hn()
+			
+			table.insert(prcons, _headshot:GetPropertyChangedSignal('Image'):Connect(hn))
+			table.insert(prcons, _username:GetPropertyChangedSignal('Text'):Connect(hn))
+			table.insert(prcons, _display:GetPropertyChangedSignal('Text'):Connect(hn))
+
+			for _, v in pairs(prcons) do
+				table.insert(initConnections, v)
+			end 
+		end
+	end
+
+	if pages:FindFirstChild('ViewProfile') then
+		checkfor(pages.ViewProfile)
+	end
+
+	table.insert(initConnections, pages.ChildAdded:Connect(checkfor))
+end)
 --end
 
 -- // Weapons UI Changer
@@ -839,7 +940,7 @@ if not _G.selectChanged then
 				local function calc()
 					local ts = icoToSikn[b.Image]
 					local tog = skinfo.skinToOg[ts] or ts
-					local tocur = toskin[tog]
+					local tocur = _G.toskin[tog]
 					if tocur and tocur ~= 'Dont Change' then
 						b.Image = skinmodx.viewmodels[tocur].image
 					end
@@ -887,7 +988,7 @@ if not _G.selectChanged then
 									local function calc()
 										local ts = icoToSikn[b.Image]
 										local tog = skinfo.skinToOg[ts] or ts
-										local tocur = toskin[tog]
+										local tocur = _G.toskin[tog]
 										if tocur and tocur ~= 'Dont Change' then
 											b.Image = skinmodx.viewmodels[tocur].image
 										end
@@ -915,7 +1016,7 @@ if not _G.selectChanged then
 									local function calc()
 										local ts = icoToSikn[b.Image]
 										local tog = skinfo.skinToOg[ts] or ts
-										local tocur = toskin[tog]
+										local tocur = _G.toskin[tog]
 										if tocur and tocur ~= 'Dont Change' then
 											b.Image = skinmodx.viewmodels[tocur].image
 										end
@@ -1107,7 +1208,7 @@ function applySkin(skinName, cs)
 					vm.Name = spl[1]..' - '..spl[2].. ' - '..skinName
 
 					local itemint = plr.PlayerGui.MainGui.MainFrame.ItemInterfaces[plr.Name.. ' - '..spl[2]]
-					
+
 					local function set(arg1)
 						local scope = itemint.Mouse.Scope
 						local tbl = {
@@ -1116,9 +1217,9 @@ function applySkin(skinName, cs)
 							ReticleDotUICorner = scope.Reticle.Container.Dot.UICorner,
 							_dont_rotate_scope_while_sliding = false
 						}
-						
+
 						arg1 = tbl
-						
+
 						if skinName == "Pixel Sniper" then
 							arg1.BlurImage.Image = "rbxassetid://18171031143"
 							arg1.BlurImage.ResampleMode = Enum.ResamplerMode.Pixelated
@@ -1140,8 +1241,8 @@ function applySkin(skinName, cs)
 								arg1.ReticleDotUICorner:Destroy()
 							end
 						end
-				    end
-				
+					end
+
 					set()
 
 					local name = vm.name
