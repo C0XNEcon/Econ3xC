@@ -731,9 +731,8 @@ for t, weapons in pairs(weapontypes.typeToWeapons) do
 
 					_G.toskin[skin] = Options[1]
 					
-					_G.ac(selectedSkin)
-					
 					if not nosound then
+						_G.ac(selectedSkin)
 						writesfile()
 					end
 				end,
