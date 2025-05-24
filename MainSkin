@@ -276,29 +276,54 @@ local function cchar(id)
 		if not id then return end
 
 		local lid = loadedids[id]
-		local ap = lid and lid.ap or p:GetHumanoidDescriptionFromUserId(id)
-
-		if not ap then return end
-
-		local face = ap.Face
-		local faceid = "rbxthumb://type=Asset&w=768&h=432&id="..face
-
-		-- // REST
-
-		local cha = lid and lid.apr or p:GetCharacterAppearanceAsync(id)
+		
+		local suc, z = false, 'Lid Exists'
+		if not (lid and lid.apr) then
+			suc, z = pcall(function()
+				return p:GetCharacterAppearanceAsync(id)
+			end)
+		end
+		
+		local cha = lid and lid.apr or suc and z
+		 
+		if not cha then ui:Notify({Title = 'CharacterAppearance Error', Content = tostring(z), Duration = 10, Image = 'search-x'}) return end
+		
 		local char = plr.Character
+		
+		-- // REST
 
 		local inff = nil
 		task.spawn(function()
 			-- // VISUALS
+			
+			for _, v in pairs(updatedCharFuncs) do
+				v()
+			end
+			
+			local suc, z = false, 'Lid Exists'
+			if not (lid and (not lid.inff)) then
+				suc, z = pcall(function()
+					return game:GetService('UserService'):GetUserInfosByUserIdsAsync({id})
+				end)
+			end
 
-			local inf = lid and lid.inff or game:GetService('UserService'):GetUserInfosByUserIdsAsync({id})
+			local inf = lid and lid.inff or suc and z
+			
+			if not inf or typeof(inf) == 'boolean' then ui:Notify({Title = 'Name,Displayname Error', Content = tostring(z), Duration = 10, Image = 'search-x'}) return end
+			
+			if not inf or typeof(inf) == 'boolean' then
+				inf = {
+					{
+						HasVerifiedBadge = false,
+						Username = 'HTTP_429',
+						DisplayName = 'error429'
+					},
+					isfake = true
+				}
+			end
+			
 			inff = inf
-			loadedids[id] = {
-				inff = inf,
-				apr = cha,
-				ap = ap
-			}
+			loadedids[id].inff = inf
 
 			if ltagcon then
 				for _, v in pairs(ltagcon) do
@@ -359,11 +384,31 @@ local function cchar(id)
 
 		loadedids[id] = {
 			apr = cha,
-			ap = ap,
-			inff = inff
 		}
 
 		task.spawn(function()
+			local suc, z = false, 'Lid Exists'
+			if not (lid and lid.ap) then
+				suc, z = pcall(function()
+					return p:GetHumanoidDescriptionFromUserId(id)
+				end)
+			end
+
+			local ap = lid and lid.ap or suc and z
+
+			if not ap then ui:Notify({Title = 'FaceDecal Error', Content = tostring(z), Duration = 10, Image = 'search-x'}) return end
+
+			if not ap then
+				ap = {
+					Face = 0
+				}
+			end
+			
+			loadedids[id].ap = ap
+
+			local face = ap.Face
+			local faceid = "rbxthumb://type=Asset&w=768&h=432&id="..face
+			
 			local head = char:WaitForChild('Head')
 			for _, v in pairs(head:GetChildren()) do
 				if v.Name == 'face' then
@@ -520,6 +565,8 @@ if not _G.nametoid then
 	_G.nametoid = {}
 end
 
+local redfile = false
+
 for t, weapons in pairs(weapontypes.typeToWeapons) do
 	local gameplayTab = Window:CreateTab(to[t], nil)
 
@@ -533,16 +580,24 @@ for t, weapons in pairs(weapontypes.typeToWeapons) do
 			RemoveTextAfterFocusLost = false,
 			Flag = 'appearancechangerid',
 			Callback = function(t)
-				local id = tonumber(t) or tonumber(_G.nametoid[t] or p:GetUserIdFromNameAsync(t))
+				local suc, z = false, 'Lid Exists'
+				if not (tonumber(t) or tonumber(_G.nametoid[t])) then
+					suc, z = pcall(function()
+						return p:GetUserIdFromNameAsync(t)
+					end)
+				end
+				
+				local id = tonumber(t) or tonumber(_G.nametoid[t] or suc and z)
+				
+				if not id then ui:Notify({Title = 'Name>ID Error', Content = tostring(z), Duration = 10, Image = 'search-x'}) return end
+				
 				if id then
-					writesfile()
-					
 					_G.nametoid[t] = id
 					cid = id
 					cchar(id)
 					
-					for _, v in pairs(updatedCharFuncs) do
-						v()
+					if redfile then
+						writesfile()
 					end
 				end
 			end,
@@ -741,7 +796,9 @@ for t, weapons in pairs(weapontypes.typeToWeapons) do
 					
 					if not nosound then
 						_G.ac(selectedSkin)
-						writesfile()
+						if redfile then
+							writesfile()
+						end
 					end
 				end,
 			})
@@ -901,16 +958,23 @@ end
 function getIcon()
 	local content = nil
 	local isReady = nil
-	local s = _G.saved[cid or plr.UserId]
+	local id = cid or plr.UserId
+	local s = _G.saved[id]
+	
 	if s then
 		content = s.content
 		isReady = s.isReady
 	else
-		local c, r = game:GetService('Players'):GetUserThumbnailAsync(cid or plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+		local suc, c, r = pcall(function()
+			return game:GetService('Players'):GetUserThumbnailAsync(id, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+		end)
+
+		if not suc or not r then ui:Notify({Title = 'PlrIcon Error', Content = tostring(c), Duration = 10, Image = 'search-x'}) return end
+
 		content = c
 		r = r
 		
-		_G.saved[cid or plr.UserId] = {
+		_G.saved[id] = {
 			content = c, isReady = r
 		}
 	end
@@ -1998,6 +2062,7 @@ end
 -- // Skinchanger Save
 
 readsfile()
+redfile = true
 
 -- // Rest
 
