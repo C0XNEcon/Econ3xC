@@ -162,7 +162,7 @@ function readSkinFile()
 	if rf then
 		local splits = string.split(readfile('cSkin'), '.')
 		for _, v in pairs(splits) do
-			local inf = string.split(v, '-')
+			local inf = string.split(v, '`')
 			wrapSkinInfo[inf[1]] = {
 				wrap = inf[2],
 				inverted = inf[3] == 'true'
@@ -176,12 +176,42 @@ end
 function writeSkinFile()
 	local str = ''
 	for skin, inf in pairs(wrapSkinInfo) do
-		str..=skin..'-'..(inf.wrap or 'None')..'-'..tostring(inf.inverted)..'.'
+		str..=skin..'`'..(inf.wrap or 'None')..'`'..tostring(inf.inverted)..'.'
 	end
 	writefile('cSkin', str)
 end
 
 readSkinFile()
+
+-- // Skinchanger Filing
+
+local weaponToButton = {}
+
+function readsfile()
+	local rf = isfile('cSkinchanged') 
+	if rf then
+		local splits = string.split(readfile('cSkinchanged'), '.')
+		for _, v in pairs(splits) do
+			local inf = string.split(v, '`')
+			if weaponToButton[inf[1]] then
+				_G.toskin[inf[1]] = inf[2]
+				weaponToButton[inf[1]]:Set({inf[2]}, true)
+			end
+		end
+	else
+		writefile('cSkinchanged', '')
+	end
+end
+
+function writesfile()
+	local str = ''
+	for weapon, skin in pairs(_G.toskin) do
+		str..=weapon..'`'..skin..'.'
+	end
+	writefile('cSkinchanged', str)
+end
+
+-- // Rest
 
 local ps = plr.PlayerScripts:WaitForChild('Assets')
 
@@ -210,6 +240,7 @@ local to = {
 }
 
 local toskin = {}
+_G.toskin = toskin
 
 local initConnections = {}
 
@@ -623,7 +654,7 @@ for t, weapons in pairs(weapontypes.typeToWeapons) do
 			check(v)
 
 			if not v:HasTag('Changed') then
-				for _, v in pairs(toskin) do
+				for _, v in pairs(_G.toskin) do
 					_G.ac(v)
 				end
 			end
@@ -695,16 +726,20 @@ for t, weapons in pairs(weapontypes.typeToWeapons) do
 				MultipleOptions = false,
 				--Ext = true,
 				Flag = skin,
-				Callback = function(Options, nosound)
+				Callback = function(Options, nosound, nowrite)
 					selectedSkin = Options[1]
 
-					toskin[skin] = Options[1]
-
+					_G.toskin[skin] = Options[1]
+					
+					_G.ac(selectedSkin)
+					
 					if not nosound then
-						_G.ac(selectedSkin)
+						writesfile()
 					end
 				end,
 			})
+			
+			weaponToButton[skin] = drop
 		end
 	end
 end
@@ -790,14 +825,13 @@ end
 
 task.spawn(function()
 	local prelo = {}
-	for _, v in pairs(toskin) do
+	for _, v in pairs(_G.toskin) do
 		table.insert(prelo, skinmodx.viewmodels[v].image)
 	end
 	game:GetService('ContentProvider'):PreloadAsync(prelo)
 end)
 
-_G.toskin = toskin
-ui.LoadConfiguration()
+--ui.LoadConfiguration()
 
 -- // EquipmentScene Weapons Changer
 
@@ -877,6 +911,40 @@ function getIcon()
 	return content, isReady
 end
 
+if not _G.at then
+	_G.at = {}
+end
+
+if not _G.is then
+	_G.is = {}
+end
+
+if not _G.ogim then
+	_G.ogim = {}
+end
+
+-- // FUNCTIONS
+
+if not _G.inf then
+	_G.inf = {
+		idtoname = {}
+	}
+end
+
+function idtplr(id)
+	local d = _G.inf.idtoname[id]
+	if d then return d end
+	
+	for _, v in pairs(game:GetService('Players'):GetPlayers()) do
+		if v.UserId == id then
+			_G.inf.idtoname[id] = v
+			return v
+		end
+	end
+end
+
+-- // REST
+
 task.spawn(function()
 	local ui = plr.PlayerGui:WaitForChild('MainGui')
 	local pages = ui.MainFrame.Pages
@@ -899,11 +967,24 @@ task.spawn(function()
 			
 			local content, isReady = getIcon()
 			
-			local function hn()
-				_display.Text = dn
-				_username.Text = '@'..usn
-				if isReady then
-					_headshot.Image = content
+			if not _G.ogim[_headshot] then
+				_G.ogim[_headshot] = _headshot.Image
+			end
+			
+			local function hn(changedim)
+				if string.find(_G.ogim[_headshot], tostring(plr.UserId)) then
+					_display.Text = dn
+					_username.Text = '@'..usn
+					if isReady and _headshot.Image ~= content then
+						_G.ignorenext = true
+						_headshot.Image = content
+					end
+				else
+					local str = string.sub(_G.ogim[_headshot], 56, -1)
+					local id = tonumber(string.sub(str, 1, string.find(str, '&')-1))
+					if id and idtplr(id) then
+						_username.Text = '@'..idtplr(id).Name
+					end
 				end
 			end
 			
@@ -918,11 +999,13 @@ task.spawn(function()
 							b.Name = 'OPic'
 
 							local function calc()
-								local ts = icoToSikn[b.Image]
-								local tog = skinfo.skinToOg[ts] or ts
-								local tocur = _G.toskin[tog]
-								if tocur and tocur ~= 'Dont Change' then
-									b.Image = skinmodx.viewmodels[tocur].image
+								if string.find(_G.ogim[_headshot], tostring(plr.UserId)) then
+									local ts = icoToSikn[b.Image]
+									local tog = skinfo.skinToOg[ts] or ts
+									local tocur = _G.toskin[tog]
+									if tocur and tocur ~= 'Dont Change' then
+										b.Image = skinmodx.viewmodels[tocur].image
+									end
 								end
 							end
 							
@@ -946,9 +1029,23 @@ task.spawn(function()
 			hn()
 			
 			table.insert(updatedCharFuncs, hn)
-			table.insert(prcons, _headshot:GetPropertyChangedSignal('Image'):Connect(hn))
-			table.insert(prcons, _username:GetPropertyChangedSignal('Text'):Connect(hn))
-			table.insert(prcons, _display:GetPropertyChangedSignal('Text'):Connect(hn))
+			table.insert(prcons, _headshot:GetPropertyChangedSignal('Image'):Connect(function()
+				if not _G.ignorenext then
+					_G.ogim[_headshot] = _headshot.Image
+				else
+					_G.ignorenext = false
+				end
+				
+				hn(true)
+			end))
+			
+			table.insert(prcons, _username:GetPropertyChangedSignal('Text'):Connect(function()
+				hn(true)
+			end))
+			
+			table.insert(prcons, _display:GetPropertyChangedSignal('Text'):Connect(function()
+				hn(true)
+			end))
 
 			for _, v in pairs(prcons) do
 				table.insert(initConnections, v)
@@ -1890,6 +1987,12 @@ function applySkin(skinName, cs)
 		end
 	end)
 end
+
+-- // Skinchanger Save
+
+readsfile()
+
+-- // Rest
 
 cchar()
 table.insert(initConnections, plr.CharacterAdded:Connect(cchar))
