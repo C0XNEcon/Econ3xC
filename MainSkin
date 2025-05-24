@@ -186,6 +186,9 @@ readSkinFile()
 -- // Skinchanger Filing
 
 local weaponToButton = {}
+local charapb = {}
+
+local cid = plr.UserId
 
 function readsfile()
 	local rf = isfile('cSkinchanged') 
@@ -196,6 +199,9 @@ function readsfile()
 			if weaponToButton[inf[1]] then
 				_G.toskin[inf[1]] = inf[2]
 				weaponToButton[inf[1]]:Set({inf[2]}, true)
+			elseif tonumber(inf[1]) and not inf[2] then
+				cid = tonumber(inf[1])
+				charapb:Set(cid)
 			end
 		end
 	else
@@ -204,7 +210,7 @@ function readsfile()
 end
 
 function writesfile()
-	local str = ''
+	local str = tostring(cid)..'.'
 	for weapon, skin in pairs(_G.toskin) do
 		str..=weapon..'`'..skin..'.'
 	end
@@ -247,8 +253,6 @@ local initConnections = {}
 -- // CHARACTER CHANGER
 
 local p = game:GetService('Players')
-
-local cid = plr.UserId
 
 local loadedids = {}
 
@@ -524,13 +528,15 @@ for t, weapons in pairs(weapontypes.typeToWeapons) do
 
 		local charchanger = gameplayTab:CreateInput({
 			Name = 'Player ID / Name',
-			CurrentValue = '',
+			CurrentValue = tostring(cid),
 			PlaceholderText = 'ConePartyy',
 			RemoveTextAfterFocusLost = false,
 			Flag = 'appearancechangerid',
 			Callback = function(t)
 				local id = tonumber(t) or tonumber(_G.nametoid[t] or p:GetUserIdFromNameAsync(t))
 				if id then
+					writesfile()
+					
 					_G.nametoid[t] = id
 					cid = id
 					cchar(id)
@@ -541,6 +547,8 @@ for t, weapons in pairs(weapontypes.typeToWeapons) do
 				end
 			end,
 		})
+		
+		charapb = charchanger
 
 		local visualSection = gameplayTab:CreateSection('Wrap Changer - Hold a weapon')
 
