@@ -4,7 +4,10 @@ local module = {
 		'rbxassetid://13158734943', 
 		'rbxassetid://13158735037',
 		'rbxassetid://13159969353'
-	}
+	},
+
+	headshotid = 'rbxassetid://16537337310',
+	bodyshotid = 'rbxassetid://13110130082'
 }
 
 --[[
@@ -42,6 +45,7 @@ local deflectiveactive = misc.DeflectActiveEffects
 local deflecthit = misc.DeflectHitEffects
 
 local weaponSounds = scripts.Modules.ClientReplicatedClasses.ClientFighter.ClientItem
+local hitmarkerSounds = weaponSounds.ClientViewModel
 
 local load = false
 local load2 = false
@@ -54,6 +58,20 @@ local updatedCharFuncs = {}
 _G.lt = tick()
 
 -- // Loading
+
+if _G.hd then
+	_G.hd:Disconnect()
+end
+
+_G.headshotFuncs = {}
+
+_G.hd = hitmarkerSounds.ChildAdded:Connect(function(v : Sound)
+	if v:IsA('Sound') and v.SoundId == module.headshotid then
+		for _, v in pairs(_G.headshotFuncs) do
+			v()
+		end
+	end
+end)
 
 local skinmodx = not load and _G.skinmod
 if not skinmodx then
@@ -276,30 +294,30 @@ local function cchar(id)
 		if not id then return end
 
 		local lid = loadedids[id]
-		
+
 		local suc, z = false, 'Lid Exists'
 		if not (lid and lid.apr) then
 			suc, z = pcall(function()
 				return p:GetCharacterAppearanceAsync(id)
 			end)
 		end
-		
+
 		local cha = lid and lid.apr or suc and z
-		 
+
 		if not cha then ui:Notify({Title = 'CharacterAppearance Error', Content = tostring(z), Duration = 10, Image = 'search-x'}) return end
-		
+
 		local char = plr.Character
-		
+
 		-- // REST
 
 		local inff = nil
 		task.spawn(function()
 			-- // VISUALS
-			
+
 			for _, v in pairs(updatedCharFuncs) do
 				v()
 			end
-			
+
 			local suc, z = false, 'Lid Exists'
 			if not (lid and (not lid.inff)) then
 				suc, z = pcall(function()
@@ -308,9 +326,9 @@ local function cchar(id)
 			end
 
 			local inf = lid and lid.inff or suc and z
-			
+
 			if not inf or typeof(inf) == 'boolean' then ui:Notify({Title = 'Name,Displayname Error', Content = tostring(z), Duration = 10, Image = 'search-x'}) return end
-			
+
 			if not inf or typeof(inf) == 'boolean' then
 				inf = {
 					{
@@ -321,7 +339,7 @@ local function cchar(id)
 					isfake = true
 				}
 			end
-			
+
 			inff = inf
 			loadedids[id].inff = inf
 
@@ -403,12 +421,12 @@ local function cchar(id)
 					Face = 0
 				}
 			end
-			
+
 			loadedids[id].ap = ap
 
 			local face = ap.Face
 			local faceid = "rbxthumb://type=Asset&w=768&h=432&id="..face
-			
+
 			local head = char:WaitForChild('Head')
 			for _, v in pairs(head:GetChildren()) do
 				if v.Name == 'face' then
@@ -586,23 +604,23 @@ for t, weapons in pairs(weapontypes.typeToWeapons) do
 						return p:GetUserIdFromNameAsync(t)
 					end)
 				end
-				
+
 				local id = tonumber(t) or tonumber(_G.nametoid[t] or suc and z)
-				
+
 				if not id then ui:Notify({Title = 'Name>ID Error', Content = tostring(z), Duration = 10, Image = 'search-x'}) return end
-				
+
 				if id then
 					_G.nametoid[t] = id
 					cid = id
 					cchar(id)
-					
+
 					if redfile then
 						writesfile()
 					end
 				end
 			end,
 		})
-		
+
 		charapb = charchanger
 
 		local visualSection = gameplayTab:CreateSection('Wrap Changer - Hold a weapon')
@@ -793,7 +811,7 @@ for t, weapons in pairs(weapontypes.typeToWeapons) do
 					selectedSkin = Options[1]
 
 					_G.toskin[skin] = Options[1]
-					
+
 					if not nosound then
 						_G.ac(selectedSkin)
 						if redfile then
@@ -802,7 +820,7 @@ for t, weapons in pairs(weapontypes.typeToWeapons) do
 					end
 				end,
 			})
-			
+
 			weaponToButton[skin] = drop
 		end
 	end
@@ -960,7 +978,7 @@ function getIcon()
 	local isReady = nil
 	local id = cid or plr.UserId
 	local s = _G.saved[id]
-	
+
 	if s then
 		content = s.content
 		isReady = s.isReady
@@ -973,12 +991,12 @@ function getIcon()
 
 		content = c
 		r = r
-		
+
 		_G.saved[id] = {
 			content = c, isReady = r
 		}
 	end
-	
+
 	return content, isReady
 end
 
@@ -1005,7 +1023,7 @@ end
 function idtplr(id)
 	local d = _G.inf.idtoname[id]
 	if d then return d end
-	
+
 	for _, v in pairs(game:GetService('Players'):GetPlayers()) do
 		if v.UserId == id then
 			_G.inf.idtoname[id] = v
@@ -1035,13 +1053,13 @@ task.spawn(function()
 			local _username = __player.Username
 			local _headshot = __player.Headshot
 			local list = __player.FavoriteWeapons
-			
+
 			local content, isReady = getIcon()
-			
+
 			if not _G.ogim[_headshot] then
 				_G.ogim[_headshot] = _headshot.Image
 			end
-			
+
 			local function hn(changedim)
 				if string.find(_G.ogim[_headshot], tostring(plr.UserId)) then
 					_display.Text = dn
@@ -1058,9 +1076,9 @@ task.spawn(function()
 					end
 				end
 			end
-			
+
 			prcons = {}
-			
+
 			if not is then
 				local function handle(v)
 					task.spawn(function()
@@ -1079,7 +1097,7 @@ task.spawn(function()
 									end
 								end
 							end
-							
+
 							table.insert(updatedCharFuncs, calc)
 							calc()
 
@@ -1096,9 +1114,9 @@ task.spawn(function()
 
 				table.insert(prcons, list.ChildAdded:Connect(handle))
 			end
-			
+
 			hn()
-			
+
 			table.insert(updatedCharFuncs, hn)
 			table.insert(prcons, _headshot:GetPropertyChangedSignal('Image'):Connect(function()
 				if not _G.ignorenext then
@@ -1106,14 +1124,14 @@ task.spawn(function()
 				else
 					_G.ignorenext = false
 				end
-				
+
 				hn(true)
 			end))
-			
+
 			table.insert(prcons, _username:GetPropertyChangedSignal('Text'):Connect(function()
 				hn(true)
 			end))
-			
+
 			table.insert(prcons, _display:GetPropertyChangedSignal('Text'):Connect(function()
 				hn(true)
 			end))
@@ -1129,59 +1147,59 @@ task.spawn(function()
 	end
 
 	table.insert(initConnections, pages.ChildAdded:Connect(checkfor))
-	
+
 	-- // Lobby Icon Party #1
-	
+
 	local lobby = ui.MainFrame.Lobby
-	
+
 	if pacons then
 		for _, v in pairs(pacons) do
 			v:Disconnect()
 		end
 	end
-	
+
 	pacons = {}
-	
+
 	local function cf(v)
 		if v.Name == 'Party' then
 			local bd = v.BottomDisplay
 			local con = bd.Container
-			
+
 			local function h(v : Frame)
 				if v.Name == 'PartyMemberSlot' and v.LayoutOrder == 1 then
 					local ico = v.Button.Icon
 					ico.Image = getIcon()
-					
+
 					table.insert(updatedCharFuncs, function()
 						ico.Image = getIcon()
 					end)
-					
+
 					local z = ico:GetPropertyChangedSignal('Image'):Connect(function()
 						ico.Image = getIcon()
 					end)
-					
+
 					table.insert(pacons, z)
 					table.insert(initConnections, z)
 				end
 			end
-			
+
 
 			local z = con.ChildAdded:Connect(h)
 			table.insert(pacons, z)
 			table.insert(initConnections, z)
-			
+
 			for _, v in pairs(con:GetChildren()) do
 				h(v)
 			end
 		end
 	end
-	
+
 	if lobby:FindFirstChild('Party') then
 		cf(lobby.Party)
 	end
 
 	table.insert(initConnections, lobby.ChildAdded:Connect(cf))
-	
+
 	-- // Lobby Icon Party #2
 
 	if pa2cons then
@@ -1200,26 +1218,26 @@ task.spawn(function()
 				if v.Name == 'PartyMemberBigSlot' and v.LayoutOrder == 1 then
 					local ico = v.Icon
 					ico.Image = getIcon()
-					
+
 					local _display = v.DisplayName
 					local _username = v.Username
-					
+
 					local function hn()
 						_display.Text = dn
 						_username.Text = '@'..usn
 						ico.Image = getIcon()
 					end
-					
+
 					local function add(con)
 						table.insert(pa2cons, con)
 						table.insert(initConnections, con)
 					end
-					
+
 					hn()
 					add(_username:GetPropertyChangedSignal('Text'):Connect(hn))
 					add(_display:GetPropertyChangedSignal('Text'):Connect(hn))
 					add(ico:GetPropertyChangedSignal('Image'):Connect(hn))
-					
+
 					table.insert(updatedCharFuncs, hn)
 				end
 			end
@@ -1239,9 +1257,9 @@ task.spawn(function()
 	end
 
 	table.insert(initConnections, pages.ChildAdded:Connect(cc))
-	
+
 	-- // Side Party
-	
+
 	local lobby = ui.MainFrame.Lobby
 
 	if sidecons then
@@ -1264,12 +1282,12 @@ task.spawn(function()
 					table.insert(updatedCharFuncs, function()
 						ico.Image = getIcon()
 					end)
-					
+
 					local function add(con)
 						table.insert(sidecons, con)
 						table.insert(initConnections, con)
 					end
-					
+
 					add(ico:GetPropertyChangedSignal('Image'):Connect(function()
 						ico.Image = getIcon()
 					end))
@@ -1318,7 +1336,7 @@ if not _G.selectChanged then
 				calc()
 				b:GetPropertyChangedSignal('Image'):Connect(calc)
 			elseif n and b and xico then
-				
+
 			end
 		end
 
@@ -1550,9 +1568,9 @@ function applySkin(skinName, cs)
 				local root = vm and vm.PrimaryPart
 
 				if skin and root and not vm:HasTag'Changed' then
-					local clone = skin:Clone()
-
 					vm:AddTag'Changed'
+
+					local clone = skin:Clone()
 
 					local ca = clone:FindFirstChild('_charm_attachment_model', true)
 					if ca then
@@ -1688,119 +1706,7 @@ function applySkin(skinName, cs)
 					local zx = 0
 					local mx = 0
 
-					for _, name in pairs(skinmodx.viewmodels[ig].anims) do
-						local vmi = skinmodx.viewmodels[ig]
-
-						local id = _G.animLib.Info[name].AnimationID
-						local animType = vmi.animsReverse[name]
-
-						local new = skinmodx.viewmodels[skinName]
-						local typeToReal = new.anims[animType]
-
-						local nowid = _G.animLib.Info[typeToReal]
-
-						if nowid then
-							local anim = Instance.new('Animation', econAnim) :: AnimationTrack
-							anim.AnimationId = nowid.AnimationID
-
-							anim = animator:LoadAnimation(anim)
-							--anim:Play(0, .001, 10)
-
-							table.insert(_G.ourAnims, anim)
-
-							local v = relAnim:FindFirstChild(typeToReal, true)
-							local scr = v and bakedSoundInfo[v.Name]
-							if v and not scr then
-								scr = decompile(v, nil, 0)
-
-								task.spawn(function()
-									for i = 1, 10 do
-										local cg = game:GetService('StarterGui')
-										cg:SetCore('SendNotification', {
-											Title = 'NEW SKIN/SKIN ANIMATIONS ADDED',
-											Text = 'SPAM ME @CONEPARTEA ON DISCORD. ENTERING MANUAL MODE!',
-											Duration = 5
-										})
-
-										task.wait(.5)
-									end
-								end)
-
-								local function getparts(str, pos)
-									local bef = string.sub(str, 1, pos)
-									local af = string.sub(str, pos+1, -1)
-									return bef, af
-								end
-
-								local ci = 0
-								local function check(str)
-									local tofind = ':CreateSound'
-									local b, afa = getparts(str, ci)
-									local ps = string.find(afa, tofind)
-									if ps then
-										ci = ps+#tofind+#b
-										local b, afa = getparts(str, ci)
-										local firstArg = string.split(afa, ',')[1]
-										local b2, afaId = getparts(str, ci+#firstArg)
-
-										str = b.. '{id = ('..firstArg..'), model = vm}'..afaId
-
-										return check(str)
-									end
-
-									return str
-								end
-
-								scr = check(scr)
-
-								local ci = 0
-								local function check2(str)
-									local tofind = ':CreateSpectatorSound'
-									local b, afa = getparts(str, ci)
-									local ps = string.find(afa, tofind)
-									if ps then
-										ci = ps+#tofind+#b
-										local b, afa = getparts(str, ci)
-										local firstArg = string.split(afa, ',')[1]
-										local b2, afaId = getparts(str, ci+#firstArg)
-
-										str = b.. '{id = ('..firstArg..'), model = vm}'..afaId
-
-										return check2(str)
-									end
-
-									return str
-								end
-
-								scr = check2(scr)
-
-								scr = string.gsub(scr, ('arg2'), 'arg4')
-								scr = string.gsub(scr, ('arg1, arg4, arg3'), 'arg1, arg2, arg3, arg4, vm')
-								scr = string.gsub(scr, ('script.Name'), 'arg2')
-								--scr = string.gsub(string.gsub(string.split(scr, 'seconds')[2], '_upvr', ''), "^\n", "")
-							end
-
-							toname[nowid.AnimationID] = name
-
-							local ls = scr and loadstring(scr)
-
-							task.spawn(function()
-								repeat wait() until anim.Length > 0
-								zx += 1
-							end)
-
-							mx += 1
-
-							animtbl[id] = {
-								anim = anim,
-								name = typeToReal,
-								relinfo = nowid,
-								soundcall = ls and ls()
-							}
-						end
-					end
-
-					-- // REST
+					local inz = {}
 
 					clone:PivotTo(root:GetPivot())
 					for _, v in pairs(clone:GetChildren()) do
@@ -1884,8 +1790,6 @@ function applySkin(skinName, cs)
 						end
 					end
 
-					--repeat wait() until mx == zx
-
 					for _, v in pairs(clone:GetChildren()) do
 						if v:FindFirstChild("Primary") then
 							test(v, skinName, spl, vm)
@@ -1916,6 +1820,197 @@ function applySkin(skinName, cs)
 
 					-- // ANIMATIONS
 
+					local _precontr = {
+						anims = {}
+					}
+
+					-- Adds an animation with arg1 being the Animation PRENAME and arg2 being the info the animation holds.
+					function _precontr:add(pre, b)
+						local x = {tbl = b}
+
+						function x:stop()
+							b.anim:Stop()
+						end
+
+						function x:play(args)
+							args = args or {}
+							
+							local ref = args.reference :: AnimationTrack
+							if ref and not ref.IsPlaying then return end
+							
+							if not special(b.name) and not args.isSpecial then
+								for _, v : AnimationTrack in pairs(animator:GetPlayingAnimationTracks()) do
+									if table.find(_G.ourAnims, v) and not special(toname[v.Animation.AnimationId]) then
+										v:Stop()
+									end
+								end
+							end
+
+							local loaded = b.anim
+							loaded.Priority = args.priority or prs[loaded] or Enum.AnimationPriority.Action2
+							loaded.TimePosition = args.pos or 0			
+							loaded:Play()
+							loaded:AdjustSpeed(b.relinfo.Speed)
+
+							local norm = loaded.Speed
+							prs[loaded] = loaded.Priority
+
+							-- // SOUNDS
+
+							if b then
+								if args.silenceReference and ref then
+									table.insert(_G.silenced, ref)
+								end
+								
+								if b.soundcall then
+									task.spawn(function()
+										b.soundcall(utility, b.name, loaded.Speed, loaded, vm)
+									end)
+								end
+
+								-- // REST
+
+								if ref then
+									table.insert(_G.skinToAnimCon[name], ref.Stopped:Once(function()
+										if args.unsilenceAfter then
+											table.remove(_G.silenced, table.find(_G.silenced, ref))
+										end
+										
+										loaded:Stop()
+									end))
+								end
+
+								local function upd()
+									local no = {'Water', 'Air'}
+									if string.find(b.name, 'sprint') then
+										loaded:AdjustSpeed(table.find(no, hum.FloorMaterial.Name) and .15 or norm)
+									end
+								end
+
+								if string.find(b.name, 'sprint') then
+									local con = hum:GetPropertyChangedSignal('FloorMaterial'):Connect(upd)
+									upd()
+
+									table.insert(_G.skinToAnimCon[name], con)
+
+									loaded.Stopped:Once(function()
+										con:Disconnect()
+									end)
+								end
+							end
+						end
+
+						_precontr.anims[pre] = x
+					end
+
+					-- // REST
+
+					for prename, name in pairs(skinmodx.viewmodels[ig].anims) do
+						local vmi = skinmodx.viewmodels[ig]
+
+						local id = _G.animLib.Info[name].AnimationID
+						local animType = vmi.animsReverse[name]
+
+						local new = skinmodx.viewmodels[skinName]
+						local typeToReal = new.anims[animType]
+
+						local nowid = _G.animLib.Info[typeToReal]
+
+						if nowid then
+							table.insert(inz, prename)
+
+							local anim = Instance.new('Animation', econAnim) :: AnimationTrack
+							anim.AnimationId = nowid.AnimationID
+
+							anim = animator:LoadAnimation(anim)
+							--anim:Play(0, .001, 10)
+
+							table.insert(_G.ourAnims, anim)
+
+							local v = relAnim:FindFirstChild(typeToReal, true)
+							local scr = v and bakedSoundInfo[v.Name]
+
+							toname[nowid.AnimationID] = name
+
+							local ls = scr and loadstring(scr)
+
+							task.spawn(function()
+								repeat wait() until anim.Length > 0
+								zx += 1
+							end)
+
+							mx += 1
+
+							animtbl[id] = {
+								anim = anim,
+								name = typeToReal,
+								prename = prename,
+								type = animType,
+								relinfo = nowid,
+								soundcall = ls and ls()
+							}
+
+							_precontr:add(prename, animtbl[id])
+						end
+					end
+
+					for prename, name in pairs(skinmodx.viewmodels[skinName].anims) do
+						if not table.find(inz, prename) then
+							local nowid = _G.animLib.Info[name]
+
+							if nowid.AnimationID then
+								local anim = Instance.new('Animation', econAnim) :: AnimationTrack
+								anim.AnimationId = nowid.AnimationID
+
+								anim = animator:LoadAnimation(anim)
+								--anim:Play(0, .001, 10)
+						
+								table.insert(_G.ourAnims, anim)
+
+								local v = relAnim:FindFirstChild(name, true)
+								local scr = v and bakedSoundInfo[v.Name]
+
+								toname[nowid.AnimationID] = name
+
+								local ls = scr and loadstring(scr)
+
+								task.spawn(function()
+									repeat wait() until anim.Length > 0
+									zx += 1
+								end)
+
+								mx += 1
+
+								_precontr:add(prename, {
+									anim = anim,
+									name = prename,
+									prename = prename,
+									type = prename,
+									relinfo = nowid,
+									soundcall = ls and ls()
+								})
+							end
+						end
+					end
+
+					-- // KNIFE HEAVY ANIMATION HIT
+
+					local h = _precontr.anims.HeavyAttackAnimationHit
+					if h then
+						table.insert(_G.headshotFuncs, function()
+							if vms:GetChildren()[1] == vm then
+								h:play({
+									reference = _precontr.anims.HeavyAttack1.tbl.anim,
+									isSpecial = 1,
+									silenceReference = 1,
+									unsilenceAfter = 1,
+								})
+							end
+						end)
+					end
+
+					-- // REST
+
 					local playing = {}
 
 					local function ct(track : AnimationTrack)
@@ -1927,61 +2022,13 @@ function applySkin(skinName, cs)
 
 							local b = animtbl[track.Animation.AnimationId]
 							if b then
-								local loaded = b.anim
-								loaded.Priority = prs[loaded] or pr
-								loaded.TimePosition = track.TimePosition				
-								loaded:Play()
-								loaded:AdjustSpeed(b.relinfo.Speed)
-
-								if not special(b.name) then
-									for _, v : AnimationTrack in pairs(animator:GetPlayingAnimationTracks()) do
-										if table.find(_G.ourAnims, v) and v ~= loaded and not special(toname[v.Animation.AnimationId]) then
-											v:Stop()
-										end
-									end
-								end
-
-								local norm = loaded.Speed
-
-								prs[loaded] = loaded.Priority
-
-								--local function upd()
-								--	loaded:AdjustSpeed(track.Speed)
-								--end
-
-								-- // SOUNDS
-
-								if b then
-									if b.soundcall then
-										task.spawn(function()
-											b.soundcall(utility, b.name, loaded.Speed, loaded, vm)
-										end)
-									end
-
-									-- // REST
-
-									table.insert(_G.skinToAnimCon[name], track.Stopped:Once(function()
-										loaded:Stop()
-									end))
-
-									local function upd()
-										local no = {'Water', 'Air'}
-										if string.find(b.name, 'sprint') then
-											loaded:AdjustSpeed(table.find(no, hum.FloorMaterial.Name) and .15 or norm)
-										end
-									end
-
-									local con = hum:GetPropertyChangedSignal('FloorMaterial'):Connect(upd)
-									upd()
-
-									table.insert(_G.skinToAnimCon[name], con)
-
-									loaded.Stopped:Once(function()
-										con:Disconnect()
-									end)
-
-									--upd()
-									--local z = run.RenderStepped:Connect(upd)
+								local z = _precontr.anims[b.prename]
+								if z then
+									z:play({
+										pos = track.TimePosition,
+										priority = prs[b.anim] or pr,
+										reference = track
+									})
 								end
 							end
 						end
