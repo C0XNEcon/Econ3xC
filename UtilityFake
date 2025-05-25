@@ -17,17 +17,21 @@ local weaponSounds = scripts.Modules.ClientReplicatedClasses.ClientFighter.Clien
 
 _G.durr = .92
 
+if not _G.silenced then
+	_G.silenced = {}
+end
+
 _G.ffunc = function(name, anim, dur)
-	if anim then
+	if anim and not table.find(_G.silenced, anim) then
 		local stopped = false
-		
+
 		local z = anim.Stopped:Once(function()
 			stopped = true
 		end)
-		
+
 		task.wait(dur*_G.durr)
 		if z then z:Disconnect() end
-		return anim and anim.IsPlaying and not stopped
+		return anim and anim.IsPlaying and not stopped and not table.find(_G.silenced, anim)
 	end
 end
 
@@ -77,14 +81,14 @@ function ut:CreateSound(id, vol, speed, pos, play, dur, mind, maxd, soundserv, e
 			s[i] = v
 		end
 	end
-	
+
 	_G.soundToWeapon[s] = id.model
-	
+
 	s:AddTag('IsOurs')
 	s.Parent = weaponSounds
 
-    s:Play()
-	
+	s:Play()
+
 	s.Ended:Once(function()
 		wait(1)
 		s:Destroy()
