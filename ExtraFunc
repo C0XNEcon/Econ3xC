@@ -1,0 +1,124 @@
+local module = {
+	Laptop = [=[
+local tbl = {}
+
+function tbl.new(shar)
+	local _play_cat_gif_hash = 0
+	local _cat_surface_gui = shar.ItemModel:WaitForChild("MedkitTop"):WaitForChild("Screen"):WaitForChild("CatGui")
+	local _cat_image_label = _cat_surface_gui:WaitForChild("Frame"):WaitForChild("ImageLabel"):WaitForChild("Picture"):WaitForChild("ImageLabel")
+	local _use_surface_gui = shar.ItemModel:WaitForChild("MedkitTop"):WaitForChild("Screen"):WaitForChild("UseGui")
+	local _use_bar = _use_surface_gui:WaitForChild("Frame"):WaitForChild("Frame"):WaitForChild("Bar")
+	local _use_text = _use_surface_gui:WaitForChild("Frame"):WaitForChild("Progress")
+	local _use_background = _use_surface_gui:WaitForChild("Frame"):WaitForChild("ImageLabel")
+	local _use_effect_hash = 0
+	
+	local tbl = {}
+
+	function tbl._UpdateUseBar(arg1) -- Line 48
+		local var5
+		if _use_bar.AbsoluteSize.X <= 1 then
+			var5 = "• • •"
+		else
+			var5 = math.floor(_use_bar.AbsoluteSize.X / _use_bar.Parent.AbsoluteSize.X * 100)..'%'
+		end
+		_use_text.Text = var5
+	end
+
+	local AnimationLibrary_upvr = require(game:GetService("ReplicatedStorage").Modules.AnimationLibrary)
+	function tbl._UpdateUseGui(arg1) -- Line 52
+	--[[ Upvalues[1]:
+		[1]: AnimationLibrary_upvr (readonly)
+	]]
+		_use_effect_hash += 1
+		local _use_effect_hash_upvr = _use_effect_hash
+		local any_IsAnimationPlaying_result1 = arg1:IsAnimationPlaying("Use")
+		local var9 = not any_IsAnimationPlaying_result1
+		if not var9 then
+			var9 = arg1:IsAnimationPlaying("UseQuick")
+		end
+		_use_surface_gui.Enabled = any_IsAnimationPlaying_result1 or var9
+		if not _use_surface_gui.Enabled then
+		else
+			task.spawn(function() -- Line 64
+			--[[ Upvalues[2]:
+				[1]: arg1 (readonly)
+				[2]: _use_effect_hash_upvr (readonly)
+			]]
+				while not shar._destroyed and _use_effect_hash == _use_effect_hash_upvr do
+					_use_background.Image = "rbxassetid://134936596399147"
+					wait(0.1)
+					if shar._destroyed or _use_effect_hash ~= _use_effect_hash_upvr then return end
+					_use_background.Image = "rbxassetid://115756225131937"
+					wait(0.1)
+				end
+			end)
+			_use_bar.Size = UDim2.new(0, 0, 1, 0)
+			if any_IsAnimationPlaying_result1 then
+				wait(2)
+				if shar._destroyed or _use_effect_hash ~= _use_effect_hash_upvr then
+				else
+					_use_bar:TweenSize(UDim2.new(1, 0, 1, 0), "Out", "Linear", 4.375 - 2, true)
+				end
+			end
+			if var9 then
+				wait(.45)
+				if shar._destroyed or _use_effect_hash ~= _use_effect_hash_upvr then return end
+				_use_bar.Size = UDim2.new(1, 0, 1, 0)
+			end
+		end
+	end
+	function tbl._UpdateCatGui(arg1) -- Line 101
+		_play_cat_gif_hash += 1
+		_cat_surface_gui.Enabled = arg1:IsAnimationPlaying("RareInspect")
+		if not _cat_surface_gui.Enabled then
+		else
+			local var11 = 1
+			while not shar._destroyed and arg1:IsAnimationPlaying("RareInspect") and _play_cat_gif_hash == _play_cat_gif_hash do
+				_cat_image_label.Position = UDim2.new((var11 - 1) % Vector3.new(4, 4, -2).X * -1, 0, math.floor((var11 - 1) / Vector3.new(4, 4, -2).Y) * -1, 0)
+				wait(0.1)
+			end
+		end
+	end
+	function tbl._Setup(arg1) -- Line 129
+		_cat_image_label.Image = "rbxassetid://120426879154579"
+		_cat_image_label.Size = UDim2.new(_cat_image_label.Size.X.Scale * Vector3.new(4, 4, -2).X, _cat_image_label.Size.X.Offset * Vector3.new(4, 4, -2).X, _cat_image_label.Size.Y.Scale * Vector3.new(4, 4, -2).Y, _cat_image_label.Size.Y.Offset * Vector3.new(4, 4, -2).Y)
+	end
+	function tbl._Init(arg1) -- Line 141
+		shar.AnimationPlayed:Connect(function(arg1_2) -- Line 142
+		--[[ Upvalues[1]:
+			[1]: arg1 (readonly)
+		]]
+			if arg1_2 == "RareInspect" then
+				arg1:_UpdateCatGui()
+			elseif arg1_2 == "Use" or arg1_2 == "UseQuick" then
+				arg1:_UpdateUseGui()
+			end
+		end)
+		shar.AnimationStopped:Connect(function(arg1_3) -- Line 150
+		--[[ Upvalues[1]:
+			[1]: arg1 (readonly)
+		]]
+			if arg1_3 == "RareInspect" then
+				arg1:_UpdateCatGui()
+			elseif arg1_3 == "Use" or arg1_3 == "UseQuick" then
+				arg1:_UpdateUseGui()
+			end
+		end)
+		_use_bar:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- Line 158
+		--[[ Upvalues[1]:
+			[1]: arg1 (readonly)
+		]]
+			arg1:_UpdateUseBar()
+		end)
+		arg1:_Setup()
+	end
+	
+	tbl._Init()
+	return tbl
+end
+
+return tbl	
+	]=]
+}
+
+return module
