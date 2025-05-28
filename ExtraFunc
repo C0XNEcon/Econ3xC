@@ -30,10 +30,10 @@ function tbl.new(shar)
 	]]
 		_use_effect_hash += 1
 		local _use_effect_hash_upvr = _use_effect_hash
-		local any_IsAnimationPlaying_result1 = arg1:IsAnimationPlaying("Use")
+		local any_IsAnimationPlaying_result1 = shar:IsAnimationPlaying("Use")
 		local var9 = not any_IsAnimationPlaying_result1
 		if not var9 then
-			var9 = arg1:IsAnimationPlaying("UseQuick")
+			var9 = shar:IsAnimationPlaying("UseQuick")
 		end
 		_use_surface_gui.Enabled = any_IsAnimationPlaying_result1 or var9
 		if not _use_surface_gui.Enabled then
@@ -68,11 +68,11 @@ function tbl.new(shar)
 	end
 	function tbl._UpdateCatGui(arg1) -- Line 101
 		_play_cat_gif_hash += 1
-		_cat_surface_gui.Enabled = arg1:IsAnimationPlaying("RareInspect")
+		_cat_surface_gui.Enabled = shar:IsAnimationPlaying("RareInspect")
 		if not _cat_surface_gui.Enabled then
 		else
 			local var11 = 1
-			while not shar._destroyed and arg1:IsAnimationPlaying("RareInspect") and _play_cat_gif_hash == _play_cat_gif_hash do
+			while not shar._destroyed and shar:IsAnimationPlaying("RareInspect") and _play_cat_gif_hash == _play_cat_gif_hash do
 				_cat_image_label.Position = UDim2.new((var11 - 1) % Vector3.new(4, 4, -2).X * -1, 0, math.floor((var11 - 1) / Vector3.new(4, 4, -2).Y) * -1, 0)
 				wait(0.1)
 			end
@@ -88,9 +88,9 @@ function tbl.new(shar)
 			[1]: arg1 (readonly)
 		]]
 			if arg1_2 == "RareInspect" then
-				arg1:_UpdateCatGui()
+				tbl:_UpdateCatGui()
 			elseif arg1_2 == "Use" or arg1_2 == "UseQuick" then
-				arg1:_UpdateUseGui()
+				tbl:_UpdateUseGui()
 			end
 		end)
 		shar.AnimationStopped:Connect(function(arg1_3) -- Line 150
@@ -98,25 +98,25 @@ function tbl.new(shar)
 			[1]: arg1 (readonly)
 		]]
 			if arg1_3 == "RareInspect" then
-				arg1:_UpdateCatGui()
+				tbl:_UpdateCatGui()
 			elseif arg1_3 == "Use" or arg1_3 == "UseQuick" then
-				arg1:_UpdateUseGui()
+				tbl:_UpdateUseGui()
 			end
 		end)
 		_use_bar:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() -- Line 158
 		--[[ Upvalues[1]:
 			[1]: arg1 (readonly)
 		]]
-			arg1:_UpdateUseBar()
+			tbl:_UpdateUseBar()
 		end)
-		arg1:_Setup()
+		tbl:_Setup()
 	end
 	
 	tbl._Init()
 	return tbl
 end
 
-return tbl	
+return tbl
 	]=]
 }
 
