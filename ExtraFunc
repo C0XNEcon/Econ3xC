@@ -24,7 +24,6 @@ function tbl.new(shar)
 		_use_text.Text = var5
 	end
 
-	local AnimationLibrary_upvr = require(game:GetService("ReplicatedStorage").Modules.AnimationLibrary)
 	function tbl._UpdateUseGui(arg1) -- Line 52
 	--[[ Upvalues[1]:
 		[1]: AnimationLibrary_upvr (readonly)
