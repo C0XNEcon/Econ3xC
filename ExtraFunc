@@ -11,7 +11,7 @@ function tbl.new(shar)
 	local _use_text = _use_surface_gui:WaitForChild("Frame"):WaitForChild("Progress")
 	local _use_background = _use_surface_gui:WaitForChild("Frame"):WaitForChild("ImageLabel")
 	local _use_effect_hash = 0
-	
+
 	local tbl = {}
 
 	function tbl._UpdateUseBar(arg1) -- Line 48
@@ -35,6 +35,7 @@ function tbl.new(shar)
 		if not var9 then
 			var9 = shar:IsAnimationPlaying("UseQuick")
 		end
+		_cat_surface_gui.Enabled = false
 		_use_surface_gui.Enabled = any_IsAnimationPlaying_result1 or var9
 		if not _use_surface_gui.Enabled then
 		else
@@ -112,7 +113,7 @@ function tbl.new(shar)
 		end)
 		tbl:_Setup()
 	end
-	
+
 	tbl._Init()
 	return tbl
 end
