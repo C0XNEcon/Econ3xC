@@ -69,11 +69,12 @@ function tbl.new(shar)
 	function tbl._UpdateCatGui(arg1) -- Line 101
 		_play_cat_gif_hash += 1
 		_cat_surface_gui.Enabled = shar:IsAnimationPlaying("RareInspect")
-		if not _cat_surface_gui.Enabled then
-		else
-			local var11 = 1
-			while not shar._destroyed and shar:IsAnimationPlaying("RareInspect") and _play_cat_gif_hash == _play_cat_gif_hash do
-				_cat_image_label.Position = UDim2.new((var11 - 1) % Vector3.new(4, 4, -2).X * -1, 0, math.floor((var11 - 1) / Vector3.new(4, 4, -2).Y) * -1, 0)
+		local z = _play_cat_gif_hash
+		if _cat_surface_gui.Enabled then
+			local v = 1
+			while not shar._destroyed and shar:IsAnimationPlaying("RareInspect") and _play_cat_gif_hash == z do
+				v = v < 14 and v+1 or 1
+				_cat_image_label.Position = UDim2.new((v - 1) % Vector3.new(4, 4, -2).X * -1, 0, math.floor((v - 1) / Vector3.new(4, 4, -2).Y) * -1, 0)
 				wait(0.1)
 			end
 		end
