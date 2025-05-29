@@ -3,7 +3,7 @@ local module = {
 		'rbxassetid://13158735106', 
 		'rbxassetid://13158734943', 
 		'rbxassetid://13158735037',
-		'rbxassetid://13159969353'
+		--'rbxassetid://13159969353'
 	},
 
 	headshotid = 'rbxassetid://16537337310',
@@ -52,6 +52,7 @@ local load2 = false
 local load3 = false
 local load4 = false
 local load5 = false
+local load6 = false
 
 local updatedCharFuncs = {}
 
@@ -108,7 +109,14 @@ if not weapontypes then
 	end)
 end
 
-repeat run.Stepped:Wait() until skinmodx and utility and skinfo and bakedSoundInfo and weapontypes
+local extrafunc = not load6 and _G.exf
+if not extrafunc then
+	task.spawn(function()
+		extrafunc = loadstring(game:HttpGet('https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/ExtraFunc'))()
+	end)
+end
+
+repeat run.Stepped:Wait() until skinmodx and utility and skinfo and bakedSoundInfo and weapontypes and extrafunc
 
 local sound = Instance.new('Sound')
 sound.Volume = 1
@@ -134,6 +142,7 @@ local icoToSikn = skinmodx.its
 
 local z = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/'
 local ui = loadstring(game:HttpGet(z..'Econ%20UI.txt'))()
+local uiii = ui
 
 local Window = ui:CreateWindow({
 	Name = 'Econ Skinchanger',
@@ -885,6 +894,7 @@ _G.wpt = weapontypes
 _G.skinfo = skinfo
 _G.skinmod = skinmodx
 _G.utility = utility
+_G.exf = extrafunc
 
 local toMuzzle = {
 	Minigun = 'Minigun',
@@ -1712,7 +1722,7 @@ function applySkin(skinName, cs)
 					for _, v in pairs(clone:GetChildren()) do
 						v.PrimaryPart = v:FindFirstChild('Primary')
 						for _, p : BasePart in pairs(v:GetDescendants()) do
-							if p:IsA('MeshPart') then
+							if p:IsA('BasePart') then
 								p.CanCollide = false
 								p.Massless = true
 
@@ -1789,6 +1799,44 @@ function applySkin(skinName, cs)
 							v:Destroy()
 						end
 					end
+					
+					-- // EXCF
+
+					local ef = extrafunc[skinName] and loadstring(extrafunc[skinName])()
+
+					-- // AnimationPlayed
+
+					local apev = {}
+					local playcons = {}
+					function apev:Connect(func)
+						table.insert(playcons, func)
+					end
+
+					-- // AnimationStopped
+
+					local asev = {}
+					local stopcons = {}
+					function asev:Connect(func)
+						table.insert(stopcons, func)
+					end
+
+					-- // Table
+
+					local tb = {
+						ItemModel = clone,
+						_destroyed = false,
+						AnimationPlayed = apev,
+						AnimationStopped = asev
+					}
+					
+					local playii = {}
+					function tb:IsAnimationPlaying(n)
+						return table.find(playii, n)
+					end
+
+					if ef then
+						ef = ef.new(tb)
+					end
 
 					for _, v in pairs(clone:GetChildren()) do
 						if v:FindFirstChild("Primary") then
@@ -1817,13 +1865,13 @@ function applySkin(skinName, cs)
 					end
 
 					clone:Destroy()
-
+					
 					-- // ANIMATIONS
 
 					local _precontr = {
 						anims = {}
 					}
-
+					
 					-- Adds an animation with arg1 being the Animation PRENAME and arg2 being the info the animation holds.
 					function _precontr:add(pre, b)
 						local x = {tbl = b}
@@ -1834,10 +1882,10 @@ function applySkin(skinName, cs)
 
 						function x:play(args)
 							args = args or {}
-							
+
 							local ref = args.reference :: AnimationTrack
 							if ref and not ref.IsPlaying then return end
-							
+
 							if not special(b.name) and not args.isSpecial then
 								for _, v : AnimationTrack in pairs(animator:GetPlayingAnimationTracks()) do
 									if table.find(_G.ourAnims, v) and not special(toname[v.Animation.AnimationId]) then
@@ -1850,6 +1898,7 @@ function applySkin(skinName, cs)
 							loaded.Priority = args.priority or prs[loaded] or Enum.AnimationPriority.Action2
 							loaded.TimePosition = args.pos or 0			
 							loaded:Play()
+							loaded:AdjustWeight(1)
 							loaded:AdjustSpeed(b.relinfo.Speed)
 
 							local norm = loaded.Speed
@@ -1861,7 +1910,7 @@ function applySkin(skinName, cs)
 								if args.silenceReference and ref then
 									table.insert(_G.silenced, ref)
 								end
-								
+
 								if b.soundcall then
 									task.spawn(function()
 										b.soundcall(utility, b.name, loaded.Speed, loaded, vm)
@@ -1886,7 +1935,13 @@ function applySkin(skinName, cs)
 										loaded:AdjustSpeed(table.find(no, hum.FloorMaterial.Name) and .15 or norm)
 									end
 								end
-
+								
+								if args.stopref and ref then
+									ref.Priority = Enum.AnimationPriority.Core
+									ref:AdjustSpeed(0)
+									ref:AdjustWeight(.001, 0)
+								end
+								
 								if string.find(b.name, 'sprint') then
 									local con = hum:GetPropertyChangedSignal('FloorMaterial'):Connect(upd)
 									upd()
@@ -1904,12 +1959,22 @@ function applySkin(skinName, cs)
 					end
 
 					-- // REST
+					
+					local _ogidtoinf = {}
+					local _ogprentoid = {}
 
 					for prename, name in pairs(skinmodx.viewmodels[ig].anims) do
 						local vmi = skinmodx.viewmodels[ig]
 
 						local id = _G.animLib.Info[name].AnimationID
 						local animType = vmi.animsReverse[name]
+						
+						_ogprentoid[prename] = id
+						
+						_ogidtoinf[id] = {
+							name = name,
+							prename = prename,
+						}
 
 						local new = skinmodx.viewmodels[skinName]
 						local typeToReal = new.anims[animType]
@@ -1927,8 +1992,7 @@ function applySkin(skinName, cs)
 
 							table.insert(_G.ourAnims, anim)
 
-							local v = relAnim:FindFirstChild(typeToReal, true)
-							local scr = v and bakedSoundInfo[v.Name]
+							local scr = bakedSoundInfo[typeToReal]
 
 							toname[nowid.AnimationID] = name
 
@@ -1964,11 +2028,10 @@ function applySkin(skinName, cs)
 
 								anim = animator:LoadAnimation(anim)
 								--anim:Play(0, .001, 10)
-						
-								table.insert(_G.ourAnims, anim)
 
-								local v = relAnim:FindFirstChild(name, true)
-								local scr = v and bakedSoundInfo[v.Name]
+								table.insert(_G.ourAnims, anim)
+								
+								local scr = bakedSoundInfo[name]
 
 								toname[nowid.AnimationID] = name
 
@@ -2019,16 +2082,78 @@ function applySkin(skinName, cs)
 							track:AdjustWeight(0.0001, 0)
 							track:AdjustSpeed(0)
 							track.Priority = Enum.AnimationPriority.Core
-
+							
+							local bg = _ogidtoinf[track.Animation.AnimationId] -- name, prename
 							local b = animtbl[track.Animation.AnimationId]
-							if b then
-								local z = _precontr.anims[b.prename]
+							
+							local z
+							
+							if bg and bg.prename == 'rareinspect' then
+								z = _precontr.anims.inspect
+							end
+							
+							local ri = _precontr.anims.rareinspect
+							local inspects = {'inspect', 'rareinspect'}
+							local rare = false
+							if ri and math.random(1, (_G.rarechance or 6)) == 1 and table.find(inspects, bg.prename) then
+								z = _precontr.anims.inspect
+								rare = true
+								
+								local s = 1 + 0.25 * math.random()
+								utility:CreateSound('rbxassetid://13159969353', .25, s, nil, true)
+							end
+							
+							if b or z then
+								local z = z or _precontr.anims[b.prename]
 								if z then
-									z:play({
+									local basicPlayed = z.tbl.prename
+									local basic = z.tbl.anim
+									
+									local tbl = {
 										pos = track.TimePosition,
-										priority = prs[b.anim] or pr,
+										priority = prs[z.tbl.anim] or pr,
 										reference = track
-									})
+									}
+
+									z:play(tbl)
+									
+									if ri and rare then
+										basicPlayed = 'rareinspect'
+										basic = ri.tbl.anim
+										
+										ri:play({
+											reference = _precontr.anims.inspect.tbl.anim,
+											isSpecial = 1,
+											silenceReference = 1,
+											unsilenceAfter = 1,
+											stopref = 1,
+										})
+									end
+									
+									local ttb = {
+										inspect = 'Inspect',
+										equip = 'Equip',
+										idle = 'Idle',
+										sprint = 'Sprint',
+										rareinspect = 'RareInspect'
+									}
+											
+									if ttb[basicPlayed] then
+										basicPlayed = ttb[basicPlayed]
+									end
+									
+									table.insert(playii, basicPlayed)
+
+									for _, v in pairs(playcons) do
+										v(basicPlayed)
+									end
+									
+									table.insert(initConnections, basic.Stopped:Once(function()
+										table.remove(playii, table.find(playii, basicPlayed))
+										for _, v in pairs(stopcons) do
+											v(basicPlayed)
+										end
+									end))
 								end
 							end
 						end
@@ -2067,6 +2192,10 @@ function applySkin(skinName, cs)
 					end
 
 					_G.skinToAnimCon[name][3] = vm:GetPropertyChangedSignal('Parent'):Connect(function()
+						if not vm.Parent then
+							tb._destroyed = true
+						end
+						
 						pt(vm.Parent)
 					end)
 
