@@ -1,9 +1,11 @@
 local str = [=[
+-- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
+
 -- Decompiler will be improved VERY SOON!
 -- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/wyButjTMhM)
--- Decompiled on 2025-05-15 23:32:45
+-- Decompiled on 2025-06-06 05:30:46
 -- Luau version 6, Types version 3
--- Time taken: 0.129195 seconds
+-- Time taken: 0.142021 seconds
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CurrencyLibrary_upvr = require(ReplicatedStorage.Modules.CurrencyLibrary)
@@ -68,9 +70,9 @@ local function _(arg1, arg2) -- Line 42, Named "add_cosmetic_type"
 	--[[ Upvalues[1]:
 		[1]: module_3_upvr (readonly)
 	]]
-	local tbl_10 = {}
-	tbl_10.NotCosmetic = arg2
-	module_3_upvr.Types[arg1] = tbl_10
+	local tbl_11 = {}
+	tbl_11.NotCosmetic = arg2
+	module_3_upvr.Types[arg1] = tbl_11
 end
 module_3_upvr.Types.Skin = {
 	NotCosmetic = nil;
@@ -88,12 +90,12 @@ module_3_upvr.Types.Reward = {
 	NotCosmetic = true;
 }
 local CONSTANTS_upvr = require(ReplicatedStorage.Modules.CONSTANTS)
-local tbl_3_upvr = {}
+local tbl_10_upvr = {}
 local function add_cosmetic_upvr(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) -- Line 56, Named "add_cosmetic"
 	--[[ Upvalues[3]:
 		[1]: module_3_upvr (readonly)
 		[2]: CONSTANTS_upvr (readonly)
-		[3]: tbl_3_upvr (readonly)
+		[3]: tbl_10_upvr (readonly)
 	]]
 	local var28
 	if module_3_upvr.Rarities[arg2] == nil then
@@ -127,14 +129,14 @@ local function add_cosmetic_upvr(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8,
 	var28_result1[arg3] = var34
 	var28_result1 = CONSTANTS_upvr.IS_SERVER
 	if var28_result1 then
-		var28_result1 = tbl_3_upvr[arg3]
+		var28_result1 = tbl_10_upvr[arg3]
 		if var28_result1 then
 			var28_result1 = warn
 			i = arg3
 			var28_result1("[ITEM] Duplicate item name: "..i)
 			return
 		end
-		var28_result1 = tbl_3_upvr
+		var28_result1 = tbl_10_upvr
 		var28_result1[arg3] = true
 	end
 end
@@ -144,11 +146,16 @@ local function _(arg1, arg2, arg3, arg4, arg5, arg6) -- Line 84, Named "add_skin
 		[2]: add_cosmetic_upvr (readonly)
 	]]
 	local var35 = ItemLibrary_upvr.ViewModels[arg3]
-	local tbl_5 = {}
-	tbl_5.ItemName = arg2
-	tbl_5.ImageHighResolution = var35.ImageHighResolution
-	add_cosmetic_upvr("Skin", arg1, arg3, var35.Image, 3, arg4, arg5, arg6, tbl_5)
+	local tbl_2 = {}
+	tbl_2.ItemName = arg2
+	tbl_2.ImageHighResolution = var35.ImageHighResolution
+	add_cosmetic_upvr("Skin", arg1, arg3, var35.Image, 3, arg4, arg5, arg6, tbl_2)
 end
+local _0B_Visits = ItemLibrary_upvr.ViewModels["10B Visits"]
+add_cosmetic_upvr("Skin", "Unique", "10B Visits", _0B_Visits.Image, 3, nil, "Earned by redeeming a code when the game (RIVALS) reached 10,000,000,000 visits", nil, {
+	ItemName = "Assault Rifle";
+	ImageHighResolution = _0B_Visits.ImageHighResolution;
+})
 local Compound_Bow = ItemLibrary_upvr.ViewModels["Compound Bow"]
 add_cosmetic_upvr("Skin", "Common", "Compound Bow", Compound_Bow.Image, 3, nil, nil, nil, {
 	ItemName = "Bow";
@@ -408,6 +415,16 @@ local Pencil_Launcher = ItemLibrary_upvr.ViewModels["Pencil Launcher"]
 add_cosmetic_upvr("Skin", "Common", "Pencil Launcher", Pencil_Launcher.Image, 3, nil, "Included in the RPG Bundle", nil, {
 	ItemName = "RPG";
 	ImageHighResolution = Pencil_Launcher.ImageHighResolution;
+})
+local Bag_o__Money = ItemLibrary_upvr.ViewModels["Bag o' Money"]
+add_cosmetic_upvr("Skin", "Common", "Bag o' Money", Bag_o__Money.Image, 3, nil, nil, nil, {
+	ItemName = "Satchel";
+	ImageHighResolution = Bag_o__Money.ImageHighResolution;
+})
+local Shurikens = ItemLibrary_upvr.ViewModels.Shurikens
+add_cosmetic_upvr("Skin", "Common", "Shurikens", Shurikens.Image, 3, nil, nil, nil, {
+	ItemName = "Daggers";
+	ImageHighResolution = Shurikens.ImageHighResolution;
 })
 local Slime_Gun = ItemLibrary_upvr.ViewModels["Slime Gun"]
 add_cosmetic_upvr("Skin", "Rare", "Slime Gun", Slime_Gun.Image, 3, nil, nil, nil, {
@@ -779,6 +796,36 @@ add_cosmetic_upvr("Skin", "Rare", "Stellar Katana", Stellar_Katana.Image, 3, nil
 	ItemName = "Katana";
 	ImageHighResolution = Stellar_Katana.ImageHighResolution;
 })
+local Air_Horn = ItemLibrary_upvr.ViewModels["Air Horn"]
+add_cosmetic_upvr("Skin", "Rare", "Air Horn", Air_Horn.Image, 3, nil, nil, nil, {
+	ItemName = "War Horn";
+	ImageHighResolution = Air_Horn.ImageHighResolution;
+})
+local Masterpiece = ItemLibrary_upvr.ViewModels.Masterpiece
+add_cosmetic_upvr("Skin", "Rare", "Masterpiece", Masterpiece.Image, 3, nil, nil, nil, {
+	ItemName = "Riot Shield";
+	ImageHighResolution = Masterpiece.ImageHighResolution;
+})
+local Cerulean_Axe = ItemLibrary_upvr.ViewModels["Cerulean Axe"]
+add_cosmetic_upvr("Skin", "Rare", "Cerulean Axe", Cerulean_Axe.Image, 3, nil, nil, nil, {
+	ItemName = "Battle Axe";
+	ImageHighResolution = Cerulean_Axe.ImageHighResolution;
+})
+local Hydro_Pistols = ItemLibrary_upvr.ViewModels["Hydro Pistols"]
+add_cosmetic_upvr("Skin", "Rare", "Hydro Pistols", Hydro_Pistols.Image, 3, nil, nil, nil, {
+	ItemName = "Energy Pistols";
+	ImageHighResolution = Hydro_Pistols.ImageHighResolution;
+})
+local Shady_Chicken_Sandwich = ItemLibrary_upvr.ViewModels["Shady Chicken Sandwich"]
+add_cosmetic_upvr("Skin", "Rare", "Shady Chicken Sandwich", Shady_Chicken_Sandwich.Image, 3, nil, nil, nil, {
+	ItemName = "Jump Pad";
+	ImageHighResolution = Shady_Chicken_Sandwich.ImageHighResolution;
+})
+local Violin_Crossbow = ItemLibrary_upvr.ViewModels["Violin Crossbow"]
+add_cosmetic_upvr("Skin", "Rare", "Violin Crossbow", Violin_Crossbow.Image, 3, nil, nil, nil, {
+	ItemName = "Crossbow";
+	ImageHighResolution = Violin_Crossbow.ImageHighResolution;
+})
 local Saber = ItemLibrary_upvr.ViewModels.Saber
 add_cosmetic_upvr("Skin", "Legendary", "Saber", Saber.Image, 3, nil, nil, nil, {
 	ItemName = "Katana";
@@ -1114,6 +1161,21 @@ add_cosmetic_upvr("Skin", "Legendary", "Mega Drill", Mega_Drill.Image, 3, nil, n
 	ItemName = "Chainsaw";
 	ImageHighResolution = Mega_Drill.ImageHighResolution;
 })
+local Spray_Bottle = ItemLibrary_upvr.ViewModels["Spray Bottle"]
+add_cosmetic_upvr("Skin", "Legendary", "Spray Bottle", Spray_Bottle.Image, 3, nil, nil, nil, {
+	ItemName = "Spray";
+	ImageHighResolution = Spray_Bottle.ImageHighResolution;
+})
+local Void_Rifle = ItemLibrary_upvr.ViewModels["Void Rifle"]
+add_cosmetic_upvr("Skin", "Legendary", "Void Rifle", Void_Rifle.Image, 3, nil, nil, nil, {
+	ItemName = "Energy Rifle";
+	ImageHighResolution = Void_Rifle.ImageHighResolution;
+})
+local Gunsaw = ItemLibrary_upvr.ViewModels.Gunsaw
+add_cosmetic_upvr("Skin", "Legendary", "Gunsaw", Gunsaw.Image, 3, nil, nil, nil, {
+	ItemName = "Gunblade";
+	ImageHighResolution = Gunsaw.ImageHighResolution;
+})
 local RPKEY = ItemLibrary_upvr.ViewModels.RPKEY
 add_cosmetic_upvr("Skin", "Mythical", "RPKEY", RPKEY.Image, 3, nil, "Used to be included in the Legendary Key Bundle", nil, {
 	ItemName = "RPG";
@@ -1140,14 +1202,24 @@ add_cosmetic_upvr("Skin", "Mythical", "Crystal Daggers", Crystal_Daggers.Image, 
 	ImageHighResolution = Crystal_Daggers.ImageHighResolution;
 })
 local Keytana = ItemLibrary_upvr.ViewModels.Keytana
-add_cosmetic_upvr("Skin", "Mythical", "Keytana", Keytana.Image, 3, nil, "Included in the Legendary Key Bundle", nil, {
+add_cosmetic_upvr("Skin", "Mythical", "Keytana", Keytana.Image, 3, nil, "Used to be included in the Legendary Key Bundle", nil, {
 	ItemName = "Katana";
 	ImageHighResolution = Keytana.ImageHighResolution;
 })
 local Keyvolver = ItemLibrary_upvr.ViewModels.Keyvolver
-add_cosmetic_upvr("Skin", "Mythical", "Keyvolver", Keyvolver.Image, 3, nil, "Included in the Ultra Key Bundle", nil, {
+add_cosmetic_upvr("Skin", "Mythical", "Keyvolver", Keyvolver.Image, 3, nil, "Used to be included in the Ultra Key Bundle", nil, {
 	ItemName = "Revolver";
 	ImageHighResolution = Keyvolver.ImageHighResolution;
+})
+local Shotkey = ItemLibrary_upvr.ViewModels.Shotkey
+add_cosmetic_upvr("Skin", "Mythical", "Shotkey", Shotkey.Image, 3, nil, "Included in the Legendary Key Bundle", nil, {
+	ItemName = "Shotgun";
+	ImageHighResolution = Shotkey.ImageHighResolution;
+})
+local Keyzi = ItemLibrary_upvr.ViewModels.Keyzi
+add_cosmetic_upvr("Skin", "Mythical", "Keyzi", Keyzi.Image, 3, nil, "Included in the Ultra Key Bundle", nil, {
+	ItemName = "Uzi";
+	ImageHighResolution = Keyzi.ImageHighResolution;
 })
 local Bug_Net = ItemLibrary_upvr.ViewModels["Bug Net"]
 add_cosmetic_upvr("Skin", "Unobtainable", "Bug Net", Bug_Net.Image, 3, true, "Given to the best bug hunters, thank you for helping us improve the game (RIVALS)", nil, {
@@ -1155,46 +1227,46 @@ add_cosmetic_upvr("Skin", "Unobtainable", "Bug Net", Bug_Net.Image, 3, true, "Gi
 	ImageHighResolution = Bug_Net.ImageHighResolution;
 })
 local MaterialService_upvr = game:GetService("MaterialService")
-local function add_wrap(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) -- Line 302
+local function add_wrap(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) -- Line 316
 	--[[ Upvalues[2]:
 		[1]: MaterialService_upvr (readonly)
 		[2]: add_cosmetic_upvr (readonly)
 	]]
 	-- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
-	local tbl_9 = {
+	local tbl_5 = {
 		WrapGroups = {};
 	}
-	local tbl_4 = {}
-	tbl_4[1] = arg3
-	tbl_4[2] = arg4
-	tbl_4[3] = arg5
-	for _, v_2 in pairs(tbl_4) do
+	local tbl_3 = {}
+	tbl_3[1] = arg3
+	tbl_3[2] = arg4
+	tbl_3[3] = arg5
+	for _, v_2 in pairs(tbl_3) do
 		local unpacked_value_1, unpacked_value_2, unpacked_value_3, unpacked_value_4, unpacked_value_5, unpacked_value_6, unpacked_value_7 = table.unpack(v_2)
-		local var460
+		local var488
 		if typeof(unpacked_value_1) ~= "string" then
-			var460 = false
+			var488 = false
 		else
-			var460 = true
+			var488 = true
 		end
-		if var460 then
+		if var488 then
 			local SOME = MaterialService_upvr.Wraps:WaitForChild(unpacked_value_1)
 		end
-		local tbl_11 = {}
-		if not SOME or not SOME.BaseMaterial or var460 or not unpacked_value_1 then
+		local tbl_4 = {}
+		if not SOME or not SOME.BaseMaterial or var488 or not unpacked_value_1 then
 		end
-		tbl_11.Material = nil
-		if not var460 or not unpacked_value_1 then
+		tbl_4.Material = nil
+		if not var488 or not unpacked_value_1 then
 		end
-		tbl_11.MaterialVariant = ""
-		tbl_11.Color = unpacked_value_2 or nil
-		tbl_11.Transparency = unpacked_value_3 or nil
-		tbl_11.Reflectance = unpacked_value_4 or nil
-		tbl_11.Textures = unpacked_value_5 or nil
-		tbl_11.CallbackName = unpacked_value_6
-		tbl_11.ObjectName = unpacked_value_7
-		table.insert(tbl_9.WrapGroups, tbl_11)
+		tbl_4.MaterialVariant = ""
+		tbl_4.Color = unpacked_value_2 or nil
+		tbl_4.Transparency = unpacked_value_3 or nil
+		tbl_4.Reflectance = unpacked_value_4 or nil
+		tbl_4.Textures = unpacked_value_5 or nil
+		tbl_4.CallbackName = unpacked_value_6
+		tbl_4.ObjectName = unpacked_value_7
+		table.insert(tbl_5.WrapGroups, tbl_4)
 	end
-	add_cosmetic_upvr("Wrap", arg1, arg2, nil, nil, arg6, arg7, arg8, tbl_9)
+	add_cosmetic_upvr("Wrap", arg1, arg2, nil, nil, arg6, arg7, arg8, tbl_5)
 end
 add_wrap("Unique", "Community", {Enum.Material.Glass, Color3.fromRGB(124, 17, 255), 0, 0.1, nil}, {Enum.Material.Glass, Color3.fromRGB(255, 213, 0), 0, 0.1, nil}, {nil, Color3.fromRGB(112, 181, 255), nil, nil, nil}, nil, "Earned by redeeming codes")
 add_wrap("Unique", "1B Visits", {Enum.Material.Glass, Color3.fromRGB(48, 38, 0), 0, 0.4, "1BVisits"}, {Enum.Material.Glass, Color3.fromRGB(127, 100, 0), 0, 0.4, "1BVisits"}, {Enum.Material.Neon, Color3.fromRGB(173, 155, 123), 0, 0, nil}, nil, "Earned by redeeming a code when the game (RIVALS) reached 1,000,000,000 visits")
@@ -1457,7 +1529,7 @@ add_wrap("Unobtainable", "Scribble", {"Scribble", Color3.fromRGB(255, 255, 255),
 add_wrap("Unobtainable", "Net", {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 255, 255), 0.75, 0, "Net1"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(165, 114, 55), 0, 0, "Net2"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 255, 255), 1, 0, "Net3"}, true, "Given to bug hunters, thank you for helping us improve the game (RIVALS)")
 add_wrap("Unobtainable", "Accretion", {Enum.Material.SmoothPlastic, Color3.fromRGB(149, 167, 248), 0, 0.4, nil}, {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 0, 0, "Accretion2"}, {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 0, 0, "Accretion3"}, true, "im like hey whats up hello")
 add_wrap("Unobtainable", "Eruption", {Enum.Material.Neon, Color3.fromRGB(255, 112, 69), 0, 0, "Eruption1"}, {Enum.Material.Neon, Color3.fromRGB(218, 96, 9), 0, 0, "Eruption2"}, {Enum.Material.Neon, Color3.fromRGB(168, 92, 69), 0, 0, nil}, true, "RAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-local function _(arg1, arg2, arg3, arg4, arg5) -- Line 596, Named "add_charm"
+local function _(arg1, arg2, arg3, arg4, arg5) -- Line 610, Named "add_charm"
 	--[[ Upvalues[1]:
 		[1]: add_cosmetic_upvr (readonly)
 	]]
@@ -1500,6 +1572,7 @@ add_cosmetic_upvr("Charm", "Unique", "Mega Token", nil, nil, nil, "Earned by fin
 add_cosmetic_upvr("Charm", "Unique", "I Survived Season 0", nil, nil, nil, "Given to players affected by the 3,400+ ELO reset during Ranked Season 0", nil, {})
 add_cosmetic_upvr("Charm", "Unique", "8sty", nil, nil, nil, nil, nil, {})
 add_cosmetic_upvr("Charm", "Unique", "Applino", nil, nil, nil, nil, nil, {})
+add_cosmetic_upvr("Charm", "Unique", "1st Birthday Cake", nil, nil, nil, "Earned by making it to the 1st birthday party for the game (RIVALS)", nil, {})
 add_cosmetic_upvr("Charm", "Common", "Hook", nil, nil, nil, nil, nil, {})
 add_cosmetic_upvr("Charm", "Common", "Cookie", nil, nil, nil, nil, nil, {})
 add_cosmetic_upvr("Charm", "Common", "Cupcake", nil, nil, nil, nil, nil, {})
@@ -1578,7 +1651,7 @@ add_cosmetic_upvr("Charm", "Legendary", "Jingle Bell", nil, nil, nil, "Purchased
 add_cosmetic_upvr("Charm", "Legendary", "Mini Snowglobe", nil, nil, nil, "Used to be included in Crystal Bundles", nil, {})
 add_cosmetic_upvr("Charm", "Unobtainable", "Coinbama", nil, nil, true, "Friends & Family", nil, {})
 add_cosmetic_upvr("Charm", "Unobtainable", "Alpha Coin", nil, nil, true, "Thanks for helping us test :3", nil, {})
-local function _(arg1, arg2, arg3, arg4, arg5, arg6) -- Line 725, Named "add_finisher"
+local function _(arg1, arg2, arg3, arg4, arg5, arg6) -- Line 740, Named "add_finisher"
 	--[[ Upvalues[1]:
 		[1]: add_cosmetic_upvr (readonly)
 	]]
@@ -1656,37 +1729,37 @@ add_cosmetic_upvr("Finisher", "Legendary", "Rainbow Barf", "rbxassetid://1320450
 add_cosmetic_upvr("Finisher", "Unobtainable", "Ragdoll", "rbxassetid://131997354939473", nil, true, "Used internally when no finisher is equipped", nil, {})
 add_cosmetic_upvr("Finisher", "Unobtainable", "Every Finisher Ever", "rbxassetid://131997354939473", nil, true, "play super golf", nil, {})
 add_cosmetic_upvr("Finisher", "Unobtainable", "Bubblegum", "rbxassetid://95870163076585", nil, true, "data mining detected, you will be banned shortly", nil, {})
-local function add_reward_upvr(arg1, arg2, arg3, arg4, arg5, arg6, arg7) -- Line 810, Named "add_reward"
+local function add_reward_upvr(arg1, arg2, arg3, arg4, arg5, arg6, arg7) -- Line 825, Named "add_reward"
 	--[[ Upvalues[1]:
 		[1]: module_3_upvr (readonly)
 	]]
-	local tbl_8 = {}
-	tbl_8.Name = arg2
-	tbl_8.Type = arg1
-	tbl_8.Image = arg5 or ""
-	tbl_8.ImageScale = arg6 or 1
-	tbl_8.DisplayName = arg3
-	tbl_8.DisplayNamePlural = arg4
-	local var1188 = arg7
-	if not var1188 then
-		var1188 = {}
+	local tbl_9 = {}
+	tbl_9.Name = arg2
+	tbl_9.Type = arg1
+	tbl_9.Image = arg5 or ""
+	tbl_9.ImageScale = arg6 or 1
+	tbl_9.DisplayName = arg3
+	tbl_9.DisplayNamePlural = arg4
+	local var1216 = arg7
+	if not var1216 then
+		var1216 = {}
 	end
-	for i_3, v_3 in pairs(var1188) do
-		tbl_8[i_3] = v_3
+	for i_3, v_3 in pairs(var1216) do
+		tbl_9[i_3] = v_3
 	end
-	module_3_upvr.Rewards[arg2] = tbl_8
+	module_3_upvr.Rewards[arg2] = tbl_9
 end
-local function _(arg1, arg2, arg3) -- Line 827, Named "add_currency_reward"
+local function _(arg1, arg2, arg3) -- Line 842, Named "add_currency_reward"
 	--[[ Upvalues[2]:
 		[1]: CurrencyLibrary_upvr (readonly)
 		[2]: add_reward_upvr (readonly)
 	]]
-	local var1192 = CurrencyLibrary_upvr.Info[arg2]
-	local tbl_2 = {
-		DataName = var1192.DataName;
+	local var1220 = CurrencyLibrary_upvr.Info[arg2]
+	local tbl_8 = {
+		DataName = var1220.DataName;
 	}
-	tbl_2.BubbleDescription = arg3
-	add_reward_upvr("Currency", arg1, var1192.DisplayName, var1192.DisplayNamePlural, var1192.Image, 1, tbl_2)
+	tbl_8.BubbleDescription = arg3
+	add_reward_upvr("Currency", arg1, var1220.DisplayName, var1220.DisplayNamePlural, var1220.Image, 1, tbl_8)
 end
 local WeaponKeys = CurrencyLibrary_upvr.Info.WeaponKeys
 add_reward_upvr("Currency", "Key", WeaponKeys.DisplayName, WeaponKeys.DisplayNamePlural, WeaponKeys.Image, 1, {
@@ -1703,7 +1776,7 @@ add_reward_upvr("Currency", "EventCurrency", EventCurrency.DisplayName, EventCur
 	DataName = EventCurrency.DataName;
 	BubbleDescription = "Only here for a limited time!";
 })
-local function add_lootbox_upvr(arg1, arg2, arg3, arg4, arg5) -- Line 837, Named "add_lootbox"
+local function add_lootbox_upvr(arg1, arg2, arg3, arg4, arg5) -- Line 852, Named "add_lootbox"
 	--[[ Upvalues[3]:
 		[1]: add_reward_upvr (readonly)
 		[2]: module_3_upvr (readonly)
@@ -1711,28 +1784,28 @@ local function add_lootbox_upvr(arg1, arg2, arg3, arg4, arg5) -- Line 837, Named
 	]]
 	local tbl_7 = {}
 	tbl_7.SoundProfile = arg3
-	local var1206
+	local var1234
 	local function INLINED() -- Internal function, doesn't exist in bytecode
-		var1206 = arg5
-		return var1206
+		var1234 = arg5
+		return var1234
 	end
 	if typeof(arg5) ~= "function" or not INLINED() then
-		function var1206() -- Line 840
+		function var1234() -- Line 855
 			--[[ Upvalues[1]:
 				[1]: arg5 (readonly)
 			]]
 			return arg5
 		end
 	end
-	tbl_7.GetContents = var1206
-	var1206 = add_reward_upvr
-	var1206("Lootbox", arg1, arg1, arg2, arg4, nil, tbl_7)
-	var1206 = table.insert
-	var1206(module_3_upvr.LootboxOrder, arg1)
-	var1206 = {}
+	tbl_7.GetContents = var1234
+	var1234 = add_reward_upvr
+	var1234("Lootbox", arg1, arg1, arg2, arg4, nil, tbl_7)
+	var1234 = table.insert
+	var1234(module_3_upvr.LootboxOrder, arg1)
+	var1234 = {}
 	for _, v_4 in pairs(tbl_7.GetContents()) do
-		assert(not var1206[v_4], v_4)
-		var1206[v_4] = true
+		assert(not var1234[v_4], v_4)
+		var1234[v_4] = true
 		if module_3_upvr.Cosmetics[v_4] then
 			module_3_upvr.Cosmetics[v_4].Description = "Unboxed from the "..arg1
 			module_3_upvr.CosmeticNameToLootbox[v_4] = arg1
@@ -1744,7 +1817,7 @@ local function add_lootbox_upvr(arg1, arg2, arg3, arg4, arg5) -- Line 837, Named
 end
 add_lootbox_upvr("Skin Case", "Skin Cases", "Case", "rbxassetid://18185475009", {"Sandwich", "Saber", "Nuke Launcher", "Whoopee Cushion", "Disco Ball", "Singularity", "Pixel Sniper", "Don't Press", "Lasergun 3000", "Firework Gun", "Pixel Flamethrower", "Swashbuckler", "Electro Rifle", "Balloon Shotgun", "Emoji Cloud", "Pixel Crossbow", "Hyper Gunblade", "The Shred", "Temporal Ray", "Slime Gun", "Blobsaw", "Plastic Shovel", "Boxing Gloves", "AK-47", "Scythe of Death", "Blaster", "Water Uzi", "Desert Eagle", "Hacker Rifle", "Hacker Pistols", "Aces", "Trumpet", "Advanced Satchel", "Compound Bow", "Not So Shorty", "Stick", "Chancla", "Coffee", "Door", "Lovely Spray", "Trampoline"})
 add_lootbox_upvr("Skin Case 2", "Skin Case 2s", "Case", "rbxassetid://18763894913", {"Hyper Sniper", "Hyper Shotgun", "AUG", "Hand Gun", "Sheriff", "Laptop", "Electro Uzi", "Karambit", "Spaceship Launcher", "Handsaws", "Camera", "Boba Gun", "Pixel Minigun", "Void Pistols", "Bounce House", "Aqua Burst", "Dynamite Gun", "Raven Bow", "Anchor", "Lightning Bolt", "Water Balloon", "Garden Shovel", "Uranium Launcher", "Ray Gun", "Bubble Ray", "Spring", "Energy Shield", "Harpoon Crossbow", "Hydro Rifle", "Lovely Shorty", "Lamethrower", "Brass Knuckles", "Balance", "Goalpost", "Torch", "Ban Axe", "Crude Gunblade", "Megaphone", "Nail Gun", "Notebook Satchel", "Paper Planes"})
-add_lootbox_upvr("Skin Case 3", "Skin Case 3s", "Case", "rbxassetid://109359591947074", {"Money Gun", "Medkitty", "Balisong", "Event Horizon", "Banana Flare", "Fighter Jet", "Harp", "Repulsor", "Tommy Gun", "FAMAS", "Peppergun", "Mega Drill", "Balloon Shorty", "Dream Bow", "Fists of Hurt", "Gearnade Launcher", "Glitterthrower", "Gum Ray", "Hourglass", "Lava Lamp", "Paintbrush", "Sakura Scythe", "Squid Launcher", "Stellar Katana", "Cactus Shotgun", "DIY Tripmine", "Dynamite", "Gumball Handgun", "Ketchup Gun", "Lightbulb"})
+add_lootbox_upvr("Skin Case 3", "Skin Case 3s", "Case", "rbxassetid://109359591947074", {"Money Gun", "Medkitty", "Balisong", "Event Horizon", "Banana Flare", "Fighter Jet", "Harp", "Repulsor", "Tommy Gun", "FAMAS", "Peppergun", "Mega Drill", "Balloon Shorty", "Spray Bottle", "Void Rifle", "Gunsaw", "Dream Bow", "Fists of Hurt", "Gearnade Launcher", "Glitterthrower", "Gum Ray", "Hourglass", "Lava Lamp", "Paintbrush", "Sakura Scythe", "Squid Launcher", "Stellar Katana", "Cerulean Axe", "Air Horn", "Masterpiece", "Hydro Pistols", "Shady Chicken Sandwich", "Violin Crossbow", "Cactus Shotgun", "DIY Tripmine", "Dynamite", "Gumball Handgun", "Ketchup Gun", "Lightbulb", "Bag o' Money", "Shurikens"})
 add_lootbox_upvr("Wrap Box", "Wrap Boxes", "Box", "rbxassetid://18185503558", {"Solar", "Malachite", "Lightning", "Arabesque", "Webbed", "Plastic", "Chrome", "A5", "Amber", "Insidious", "Iridescent", "Moonstone", "Bright", "Dark", "Mischief", "Rage", "Obsidian", "Toy", "Scales", "Well Done", "Dunes", "Glisten", "Glossy", "Bunsen", "Storm", "Mustard", "Violet", "Jean"})
 add_lootbox_upvr("Wrap Box 2", "Wrap Box 2s", "Box", "rbxassetid://18763894596", {"Speed", "Hologram", "Thunderburst", "Encrypt", "Starblaze", "Carbon Fiber", "Hyperdrive", "Insignia", "Cardinal", "Starfall", "Resolute", "Liquid Gold", "Tiger", "Black Granite", "Cerulean", "Clamshell", "Cool Crochet", "Cork", "Hammered Copper", "Hypnotic", "Leafy Grass", "Liquid Chrome", "Mahogany", "Neo", "Pink Crochet", "Pink Glitter", "Studded", "Tempest", "Yang", "Yin", "Ancient", "Grass", "Rustic", "Copper", "Machine", "Titanium", "Tungsten"})
 add_lootbox_upvr("Wrap Box 3", "Wrap Box 3s", "Box", "rbxassetid://77468549139941", {"Neon Lights", "Mesh", "Bombastic", "Candy Apple", "Dark Arena", "Green Sparkle", "Indigo Sparkle", "Rift", "Spectral", "Lovely Leopard", "Arbiter", "Antimatter", "Crimson Art", "Model", "Plasma", "Waste", "Purpleize", "Regal", "Sentinel", "Strobe", "TIX", "Tealur", "Lavish Crystal", "Noir", "Normal", "Rust", "Tawny"})
@@ -1757,7 +1830,7 @@ add_lootbox_upvr("Festive Skin Case", "Festive Skin Cases", "CaseFestive", "rbxa
 add_lootbox_upvr("Jolly Chest", "Jolly Chests", "ChestFestive", "rbxassetid://125958746511820", {"Snowballed", "David", "Aurora", "Peppermint", "Gingerbread", "Gingerbread Cat", "Chillman", "Wreath", "Frozen", "Gingerbreadify", "Jolly Wrapping", "Snowfall", "Ugly Sweater", "Stocking", "Festive Light", "Hot Chocolate", "Festive Confetti", "Wrapped", "Midnight", "Slush", "Frigid", "Crystal", "Mini Candy Cane", "Snowflake", "Mini Shining Star", "Ornament"})
 add_lootbox_upvr("Festive Wrap Box", "Festive Wrap Boxes", "Box", "rbxassetid://85450469885400", {"2025 Wrapping", "Forest Wrapping", "Peppermint Wrapping", "Winter Wrapping", "Mocha Wrapping", "Minty Wrapping", "Frosty Wrapping", "Creme Wrapping", "Blush Wrapping", "Cashmere Wrapping", "Carbon Wrapping", "Caned Wrapping"})
 local ShopLibrary_upvr = require(ReplicatedStorage.Modules.ShopLibrary)
-;(function() -- Line 968, Named "add_weapons"
+;(function() -- Line 983, Named "add_weapons"
 	--[[ Upvalues[5]:
 		[1]: ShopLibrary_upvr (readonly)
 		[2]: add_reward_upvr (readonly)
@@ -1769,7 +1842,7 @@ local ShopLibrary_upvr = require(ReplicatedStorage.Modules.ShopLibrary)
 	for _, v_5 in pairs(ShopLibrary_upvr.OwnableWeapons) do
 		add_reward_upvr("Weapon", v_5, v_5, v_5, ItemLibrary_upvr.Items[v_5].Image, 3)
 	end
-	local function get_contents_upvr() -- Line 973, Named "get_contents"
+	local function get_contents_upvr() -- Line 988, Named "get_contents"
 		--[[ Upvalues[3]:
 			[1]: ShopLibrary_upvr (copied, readonly)
 			[2]: ItemLibrary_upvr (copied, readonly)
@@ -1781,37 +1854,37 @@ local ShopLibrary_upvr = require(ReplicatedStorage.Modules.ShopLibrary)
 				table.insert(module_2, v_6)
 			end
 		end
-		table.sort(module_2, function(arg1, arg2) -- Line 984
+		table.sort(module_2, function(arg1, arg2) -- Line 999
 			--[[ Upvalues[2]:
 				[1]: ItemLibrary_upvr (copied, readonly)
 				[2]: Utility_upvr (copied, readonly)
 			]]
 			local Value_2 = ItemLibrary_upvr.Statuses[ItemLibrary_upvr.Items[arg1].Status].Value
-			local var1254 = ItemLibrary_upvr.Statuses[ItemLibrary_upvr.Items[arg2].Status]
-			local Value = var1254.Value
+			local var1282 = ItemLibrary_upvr.Statuses[ItemLibrary_upvr.Items[arg2].Status]
+			local Value = var1282.Value
 			if Value_2 ~= Value then
 				if Value >= Value_2 then
-					var1254 = false
+					var1282 = false
 				else
-					var1254 = true
+					var1282 = true
 				end
-				return var1254
+				return var1282
 			end
 			return Utility_upvr:StringLessThan(arg1, arg2)
 		end)
 		local module = {}
 		for _, v_7 in pairs(module_2) do
-			local var1260 = ItemLibrary_upvr.Items[v_7]
-			local var1261 = module[var1260.Status]
-			if not var1261 then
-				var1261 = {}
+			local var1288 = ItemLibrary_upvr.Items[v_7]
+			local var1289 = module[var1288.Status]
+			if not var1289 then
+				var1289 = {}
 			end
-			module[var1260.Status] = var1261
-			table.insert(module[var1260.Status], v_7)
+			module[var1288.Status] = var1289
+			table.insert(module[var1288.Status], v_7)
 		end
 		return module_2, module
 	end
-	add_lootbox_upvr("Weapon Crate", "Weapon Crates", "Crate", "rbxassetid://134795947609872", function() -- Line 1007
+	add_lootbox_upvr("Weapon Crate", "Weapon Crates", "Crate", "rbxassetid://134795947609872", function() -- Line 1022
 		--[[ Upvalues[1]:
 			[1]: get_contents_upvr (readonly)
 		]]
@@ -1819,18 +1892,22 @@ local ShopLibrary_upvr = require(ReplicatedStorage.Modules.ShopLibrary)
 		return get_contents_result1
 	end)
 	for i_8_upvr in pairs(ItemLibrary_upvr.Statuses) do
-		add_lootbox_upvr(i_8_upvr.." Weapon Crate", i_8_upvr.." Weapon Crates", "Crate", "rbxassetid://134795947609872", function() -- Line 1014
+		add_lootbox_upvr(i_8_upvr.." Weapon Crate", i_8_upvr.." Weapon Crates", "Crate", "rbxassetid://134795947609872", function() -- Line 1029
 			--[[ Upvalues[2]:
 				[1]: get_contents_upvr (readonly)
 				[2]: i_8_upvr (readonly)
 			]]
 			local _, get_contents_result2 = get_contents_upvr()
-			return get_contents_result2[i_8_upvr]
+			local var1299 = get_contents_result2[i_8_upvr]
+			if not var1299 then
+				var1299 = {}
+			end
+			return var1299
 		end)
 		local _
 	end
 end)()
-;(function() -- Line 1024, Named "alphabetize"
+;(function() -- Line 1039, Named "alphabetize"
 	--[[ Upvalues[2]:
 		[1]: module_3_upvr (readonly)
 		[2]: Utility_upvr (readonly)
@@ -1838,13 +1915,13 @@ end)()
 	for i_9 in pairs(module_3_upvr.Cosmetics) do
 		table.insert(module_3_upvr.CosmeticsAlphabetized, i_9)
 	end
-	table.sort(module_3_upvr.CosmeticsAlphabetized, function(arg1, arg2) -- Line 1029
+	table.sort(module_3_upvr.CosmeticsAlphabetized, function(arg1, arg2) -- Line 1044
 		--[[ Upvalues[1]:
 			[1]: Utility_upvr (copied, readonly)
 		]]
 		return Utility_upvr:StringLessThan(string.lower(arg1), string.lower(arg2))
 	end)
-	task.delay(5, function() -- Line 1033
+	task.delay(5, function() -- Line 1048
 		--[[ Upvalues[1]:
 			[1]: module_3_upvr (copied, readonly)
 		]]
@@ -1878,24 +1955,24 @@ local function check(str)
 		ci = ps+#tofind+#b
 		local b, afa = getparts(str, ci)
 		local b2, afa2 = getparts(str, ci+string.find(afa, 'ItemName = ')+10)
-		
+
 		local skin = string.split(string.split(afa, ', ')[2], '"')[2]
 		local ogItem = string.split(afa2, '"')[2]
-		
+
 		local ps = string.find(afa2, '})')
 		b, afa2 = getparts(afa2, ps+2)
 		ci = 0
 		str = afa2
-		
+
 		if skin and ogItem then
 			if not inf.skinInfo[ogItem] then
 				inf.skinInfo[ogItem] = {}
 			end
-			
+
 			table.insert(inf.skinInfo[ogItem], skin)
 			inf.skinToOg[skin] = ogItem
 		end
-		
+
 		return check(str)
 	end
 
