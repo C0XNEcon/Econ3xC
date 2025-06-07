@@ -1,4 +1,4 @@
-return {[[BaseBow]] = [=[local tbl = {}
+return {['BaseBow'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _charge_attachment = shar.Model:FindFirstChild("_bow_charge", true)
@@ -124,7 +124,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Bow]] = [=[local tbl = {}
+return tbl]=],['Bow'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _charge_attachment = shar.Model:FindFirstChild("_bow_charge", true)
@@ -151,7 +151,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Raven Bow]] = [=[local tbl = {}
+return tbl]=],['Raven Bow'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _charge_attachment = shar.Model:FindFirstChild("_bow_charge", true)
@@ -179,7 +179,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Compound Bow]] = [=[local tbl = {}
+return tbl]=],['Compound Bow'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _charge_attachment = shar.Model:FindFirstChild("_bow_charge", true)
@@ -205,7 +205,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Bat Bow]] = [=[local tbl = {}
+return tbl]=],['Bat Bow'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _charge_attachment = shar.Model:FindFirstChild("_bow_charge", true)
@@ -240,7 +240,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Frostbite Bow]] = [=[local tbl = {}
+return tbl]=],['Frostbite Bow'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _charge_attachment = shar.Model:FindFirstChild("_bow_charge", true)
@@ -266,7 +266,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Dream Bow]] = [=[local tbl = {}
+return tbl]=],['Dream Bow'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _charge_attachment = shar.Model:FindFirstChild("_bow_charge", true)
@@ -293,7 +293,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[BaseChainsaw]] = [=[local tbl = {}
+return tbl]=],['BaseChainsaw'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _spike_toggle = false
@@ -410,7 +410,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Blobsaw]] = [=[local tbl = {}
+return tbl]=],['Blobsaw'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _spike_toggle = false
@@ -441,7 +441,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Handsaws]] = [=[local tbl = {}
+return tbl]=],['Handsaws'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _spike_toggle = false
@@ -475,7 +475,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Chainsaw]] = [=[local tbl = {}
+return tbl]=],['Chainsaw'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _spike_toggle = false
@@ -506,7 +506,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Buzzsaw]] = [=[local tbl = {}
+return tbl]=],['Buzzsaw'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _spike_toggle = false
@@ -537,7 +537,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Festive Buzzsaw]] = [=[local tbl = {}
+return tbl]=],['Festive Buzzsaw'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _spike_toggle = false
@@ -562,7 +562,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Mega Drill]] = [=[local tbl = {}
+return tbl]=],['Mega Drill'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _spike_toggle = false
@@ -610,7 +610,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[BaseRPG]] = [=[local tbl = {}
+return tbl]=],['BaseRPG'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -625,7 +625,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[RPG]] = [=[local tbl = {}
+return tbl]=],['RPG'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -645,7 +645,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Pumpkin Launcher]] = [=[local tbl = {}
+return tbl]=],['Pumpkin Launcher'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -660,7 +660,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Nuke Launcher]] = [=[local tbl = {}
+return tbl]=],['Nuke Launcher'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -687,7 +687,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Spaceship Launcher]] = [=[local tbl = {}
+return tbl]=],['Spaceship Launcher'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -702,7 +702,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[RPKEY]] = [=[local tbl = {}
+return tbl]=],['RPKEY'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -717,7 +717,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Firework Launcher]] = [=[local tbl = {}
+return tbl]=],['Firework Launcher'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -732,7 +732,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Pencil Launcher]] = [=[local tbl = {}
+return tbl]=],['Pencil Launcher'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -754,7 +754,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Squid Launcher]] = [=[local tbl = {}
+return tbl]=],['Squid Launcher'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -769,7 +769,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[BaseRevolver]] = [=[local tbl = {}
+return tbl]=],['BaseRevolver'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _registered_ammo_visuals = {
@@ -866,7 +866,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Sheriff]] = [=[local tbl = {}
+return tbl]=],['Sheriff'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _registered_ammo_visuals = {
@@ -887,7 +887,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Boneclaw Revolver]] = [=[local tbl = {}
+return tbl]=],['Boneclaw Revolver'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _registered_ammo_visuals = {
@@ -908,7 +908,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Peppermint Sheriff]] = [=[local tbl = {}
+return tbl]=],['Peppermint Sheriff'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _registered_ammo_visuals = {
@@ -925,7 +925,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Revolver]] = [=[local tbl = {}
+return tbl]=],['Revolver'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _registered_ammo_visuals = {
@@ -946,7 +946,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Keyvolver]] = [=[local tbl = {}
+return tbl]=],['Keyvolver'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _registered_ammo_visuals = {
@@ -1039,7 +1039,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Peppergun]] = [=[local tbl = {}
+return tbl]=],['Peppergun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _registered_ammo_visuals = {
@@ -1100,7 +1100,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Slingshot]] = [=[local tbl = {}
+return tbl]=],['Slingshot'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local Sphere = shar.ItemModel:WaitForChild("Ball"):WaitForChild("Sphere")
@@ -1170,7 +1170,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Goalpost]] = [=[local tbl = {}
+return tbl]=],['Goalpost'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local Sphere = shar.ItemModel:WaitForChild("Ball"):WaitForChild("Sphere")
@@ -1192,7 +1192,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Stick]] = [=[local tbl = {}
+return tbl]=],['Stick'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local Sphere = shar.ItemModel:WaitForChild("Ball"):WaitForChild("Sphere")
@@ -1214,7 +1214,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Boneshot]] = [=[local tbl = {}
+return tbl]=],['Boneshot'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local Sphere = shar.ItemModel:WaitForChild("Ball"):WaitForChild("Sphere")
@@ -1236,7 +1236,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Reindeer Slingshot]] = [=[local tbl = {}
+return tbl]=],['Reindeer Slingshot'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local Sphere = shar.ItemModel:WaitForChild("Ball"):WaitForChild("Sphere")
@@ -1258,7 +1258,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Fists]] = [=[local tbl = {}
+return tbl]=],['Fists'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -1276,7 +1276,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Fists of Hurt]] = [=[local tbl = {}
+return tbl]=],['Fists of Hurt'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -1305,7 +1305,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Brass Knuckles]] = [=[local tbl = {}
+return tbl]=],['Brass Knuckles'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -1323,7 +1323,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Pumpkin Claws]] = [=[local tbl = {}
+return tbl]=],['Pumpkin Claws'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -1341,7 +1341,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Festive Fists]] = [=[local tbl = {}
+return tbl]=],['Festive Fists'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _festive_lights_circuits = {}
@@ -1394,7 +1394,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Boxing Gloves]] = [=[local tbl = {}
+return tbl]=],['Boxing Gloves'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -1423,7 +1423,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Flamethrower]] = [=[local tbl = {}
+return tbl]=],['Flamethrower'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _flame_particles = {}
@@ -1562,7 +1562,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Pixel Flamethrower]] = [=[local tbl = {}
+return tbl]=],['Pixel Flamethrower'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _flame_particles = {}
@@ -1594,7 +1594,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Jack O'Thrower]] = [=[local tbl = {}
+return tbl]=],['Jack O'Thrower'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _flame_particles = {}
@@ -1618,7 +1618,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Lamethrower]] = [=[local tbl = {}
+return tbl]=],['Lamethrower'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _flame_particles = {}
@@ -1642,7 +1642,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Snowblower]] = [=[local tbl = {}
+return tbl]=],['Snowblower'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _flame_particles = {}
@@ -1670,7 +1670,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Glitterthrower]] = [=[local tbl = {}
+return tbl]=],['Glitterthrower'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _flame_particles = {}
@@ -1698,7 +1698,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Minigun]] = [=[local tbl = {}
+return tbl]=],['Minigun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -1713,7 +1713,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Pumpkin Minigun]] = [=[local tbl = {}
+return tbl]=],['Pumpkin Minigun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -1731,7 +1731,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Pixel Minigun]] = [=[local tbl = {}
+return tbl]=],['Pixel Minigun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -1763,7 +1763,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Lasergun 3000]] = [=[local tbl = {}
+return tbl]=],['Lasergun 3000'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -1807,7 +1807,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Wrapped Minigun]] = [=[local tbl = {}
+return tbl]=],['Wrapped Minigun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -1825,7 +1825,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Fighter Jet]] = [=[local tbl = {}
+return tbl]=],['Fighter Jet'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -1843,7 +1843,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Grenade Launcher]] = [=[local tbl = {}
+return tbl]=],['Grenade Launcher'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local ReloadBulletsModel = shar.ItemModel:WaitForChild("ReloadBullets")
@@ -1917,7 +1917,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Skull Launcher]] = [=[local tbl = {}
+return tbl]=],['Skull Launcher'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local ReloadBulletsModel = shar.ItemModel:WaitForChild("ReloadBullets")
@@ -1941,7 +1941,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Uranium Launcher]] = [=[local tbl = {}
+return tbl]=],['Uranium Launcher'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local ReloadBulletsModel = shar.ItemModel:WaitForChild("ReloadBullets")
@@ -1962,7 +1962,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Swashbuckler]] = [=[local tbl = {}
+return tbl]=],['Swashbuckler'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local ReloadBulletsModel = shar.ItemModel:WaitForChild("ReloadBullets")
@@ -1983,7 +1983,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Snowball Launcher]] = [=[local tbl = {}
+return tbl]=],['Snowball Launcher'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local ReloadBulletsModel = shar.ItemModel:WaitForChild("ReloadBullets")
@@ -2004,7 +2004,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Gearnade Launcher]] = [=[local tbl = {}
+return tbl]=],['Gearnade Launcher'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local ReloadBulletsModel = shar.ItemModel:WaitForChild("ReloadBullets")
@@ -2025,7 +2025,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Katana]] = [=[local tbl = {}
+return tbl]=],['Katana'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2040,7 +2040,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Saber]] = [=[local tbl = {}
+return tbl]=],['Saber'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2062,7 +2062,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Lightning Bolt]] = [=[local tbl = {}
+return tbl]=],['Lightning Bolt'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2085,7 +2085,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Pixel Katana]] = [=[local tbl = {}
+return tbl]=],['Pixel Katana'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2108,7 +2108,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Devil's Trident]] = [=[local tbl = {}
+return tbl]=],['Devil's Trident'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2126,7 +2126,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[2025 Katana]] = [=[local tbl = {}
+return tbl]=],['2025 Katana'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2150,7 +2150,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Keytana]] = [=[local tbl = {}
+return tbl]=],['Keytana'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2174,7 +2174,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Stellar Katana]] = [=[local tbl = {}
+return tbl]=],['Stellar Katana'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2192,7 +2192,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Paintball Gun]] = [=[local tbl = {}
+return tbl]=],['Paintball Gun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2221,7 +2221,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Slime Gun]] = [=[local tbl = {}
+return tbl]=],['Slime Gun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2246,7 +2246,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Boba Gun]] = [=[local tbl = {}
+return tbl]=],['Boba Gun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2271,7 +2271,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Brain Gun]] = [=[local tbl = {}
+return tbl]=],['Brain Gun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2296,7 +2296,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Snowball Gun]] = [=[local tbl = {}
+return tbl]=],['Snowball Gun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2311,7 +2311,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Ketchup Gun]] = [=[local tbl = {}
+return tbl]=],['Ketchup Gun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2336,7 +2336,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Flashbang]] = [=[local tbl = {}
+return tbl]=],['Flashbang'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2368,7 +2368,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Disco Ball]] = [=[local tbl = {}
+return tbl]=],['Disco Ball'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2402,7 +2402,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Pixel Flashbang]] = [=[local tbl = {}
+return tbl]=],['Pixel Flashbang'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2427,7 +2427,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Camera]] = [=[local tbl = {}
+return tbl]=],['Camera'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2454,7 +2454,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Skullbang]] = [=[local tbl = {}
+return tbl]=],['Skullbang'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2472,7 +2472,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Shining Star]] = [=[local tbl = {}
+return tbl]=],['Shining Star'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2490,7 +2490,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Lightbulb]] = [=[local tbl = {}
+return tbl]=],['Lightbulb'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2536,7 +2536,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Exogun]] = [=[local tbl = {}
+return tbl]=],['Exogun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2551,7 +2551,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Wondergun]] = [=[local tbl = {}
+return tbl]=],['Wondergun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2584,7 +2584,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Singularity]] = [=[local tbl = {}
+return tbl]=],['Singularity'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2617,7 +2617,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Ray Gun]] = [=[local tbl = {}
+return tbl]=],['Ray Gun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2650,7 +2650,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Exogourd]] = [=[local tbl = {}
+return tbl]=],['Exogourd'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2683,7 +2683,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Midnight Festive Exogun]] = [=[local tbl = {}
+return tbl]=],['Midnight Festive Exogun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2698,7 +2698,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Repulsor]] = [=[local tbl = {}
+return tbl]=],['Repulsor'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2713,70 +2713,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Grenade]] = [=[local tbl = {}
-
-function tbl.new(shar)
-
-	local arg1 = {
-	}
-	
-for name, v in pairs(shar) do
-	arg1[name]=v
-end
-	
-	function arg1._Init() -- Line 26
-	end
-
-	arg1._Init()
-	return arg1
-end
-
-return tbl]=],[[Whoopee Cushion]] = [=[local tbl = {}
-
-function tbl.new(shar)
-
-	local arg1 = {
-	}
-	
-for name, v in pairs(shar) do
-	arg1[name]=v
-end
-	
-	arg1._Init()
-	return arg1
-end
-
-return tbl]=],[[Water Balloon]] = [=[local tbl = {}
-
-function tbl.new(shar)
-
-	local arg1 = {
-	}
-	
-for name, v in pairs(shar) do
-	arg1[name]=v
-end
-	
-	arg1._Init()
-	return arg1
-end
-
-return tbl]=],[[Soul Grenade]] = [=[local tbl = {}
-
-function tbl.new(shar)
-
-	local arg1 = {
-	}
-	
-for name, v in pairs(shar) do
-	arg1[name]=v
-end
-	
-	arg1._Init()
-	return arg1
-end
-
-return tbl]=],[[Dynamite]] = [=[local tbl = {}
+return tbl]=],['Grenade'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2794,7 +2731,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Jingle Grenade]] = [=[local tbl = {}
+return tbl]=],['Whoopee Cushion'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2809,7 +2746,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Subspace Tripmine]] = [=[local tbl = {}
+return tbl]=],['Water Balloon'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2824,7 +2761,70 @@ end
 	return arg1
 end
 
-return tbl]=],[[Don't Press]] = [=[local tbl = {}
+return tbl]=],['Soul Grenade'] = [=[local tbl = {}
+
+function tbl.new(shar)
+
+	local arg1 = {
+	}
+	
+for name, v in pairs(shar) do
+	arg1[name]=v
+end
+	
+	arg1._Init()
+	return arg1
+end
+
+return tbl]=],['Dynamite'] = [=[local tbl = {}
+
+function tbl.new(shar)
+
+	local arg1 = {
+	}
+	
+for name, v in pairs(shar) do
+	arg1[name]=v
+end
+	
+	function arg1._Init() -- Line 26
+	end
+
+	arg1._Init()
+	return arg1
+end
+
+return tbl]=],['Jingle Grenade'] = [=[local tbl = {}
+
+function tbl.new(shar)
+
+	local arg1 = {
+	}
+	
+for name, v in pairs(shar) do
+	arg1[name]=v
+end
+	
+	arg1._Init()
+	return arg1
+end
+
+return tbl]=],['Subspace Tripmine'] = [=[local tbl = {}
+
+function tbl.new(shar)
+
+	local arg1 = {
+	}
+	
+for name, v in pairs(shar) do
+	arg1[name]=v
+end
+	
+	arg1._Init()
+	return arg1
+end
+
+return tbl]=],['Don't Press'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2856,7 +2856,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Spring]] = [=[local tbl = {}
+return tbl]=],['Spring'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2871,7 +2871,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Trick or Treat]] = [=[local tbl = {}
+return tbl]=],['Trick or Treat'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2899,7 +2899,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Dev-in-the-Box]] = [=[local tbl = {}
+return tbl]=],['Dev-in-the-Box'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2914,7 +2914,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[DIY Tripmine]] = [=[local tbl = {}
+return tbl]=],['DIY Tripmine'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -2932,7 +2932,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Flare Gun]] = [=[local tbl = {}
+return tbl]=],['Flare Gun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local ShellSubModel = shar.ItemModel:WaitForChild("Shell")
@@ -3026,7 +3026,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Firework Gun]] = [=[local tbl = {}
+return tbl]=],['Firework Gun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local ShellSubModel = shar.ItemModel:WaitForChild("Shell")
@@ -3071,7 +3071,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Dynamite Gun]] = [=[local tbl = {}
+return tbl]=],['Dynamite Gun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local ShellSubModel = shar.ItemModel:WaitForChild("Shell")
@@ -3091,7 +3091,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Vexed Flare Gun]] = [=[local tbl = {}
+return tbl]=],['Vexed Flare Gun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local ShellSubModel = shar.ItemModel:WaitForChild("Shell")
@@ -3111,7 +3111,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Wrapped Flare Gun]] = [=[local tbl = {}
+return tbl]=],['Wrapped Flare Gun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local ShellSubModel = shar.ItemModel:WaitForChild("Shell")
@@ -3131,7 +3131,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Banana Flare]] = [=[local tbl = {}
+return tbl]=],['Banana Flare'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local ShellSubModel = shar.ItemModel:WaitForChild("Shell")
@@ -3168,7 +3168,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Uzi]] = [=[local tbl = {}
+return tbl]=],['Uzi'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -3186,7 +3186,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Water Uzi]] = [=[local tbl = {}
+return tbl]=],['Water Uzi'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -3211,7 +3211,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Electro Uzi]] = [=[local tbl = {}
+return tbl]=],['Electro Uzi'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -3236,7 +3236,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Demon Uzi]] = [=[local tbl = {}
+return tbl]=],['Demon Uzi'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -3261,7 +3261,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Pine Uzi]] = [=[local tbl = {}
+return tbl]=],['Pine Uzi'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -3279,7 +3279,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Money Gun]] = [=[local tbl = {}
+return tbl]=],['Money Gun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _body_money = shar.ItemModel:WaitForChild("Body"):WaitForChild("Money")
@@ -3367,7 +3367,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Handgun]] = [=[local tbl = {}
+return tbl]=],['Handgun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -3385,7 +3385,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Blaster]] = [=[local tbl = {}
+return tbl]=],['Blaster'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -3410,7 +3410,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Hand Gun]] = [=[local tbl = {}
+return tbl]=],['Hand Gun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -3425,7 +3425,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Gumball Handgun]] = [=[local tbl = {}
+return tbl]=],['Gumball Handgun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -3450,7 +3450,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Burst Rifle]] = [=[local tbl = {}
+return tbl]=],['Burst Rifle'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -3468,7 +3468,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Electro Rifle]] = [=[local tbl = {}
+return tbl]=],['Electro Rifle'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -3493,7 +3493,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Spectral Burst]] = [=[local tbl = {}
+return tbl]=],['Spectral Burst'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -3518,7 +3518,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Aqua Burst]] = [=[local tbl = {}
+return tbl]=],['Aqua Burst'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -3543,7 +3543,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Pine Burst]] = [=[local tbl = {}
+return tbl]=],['Pine Burst'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -3561,7 +3561,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[FAMAS]] = [=[local tbl = {}
+return tbl]=],['FAMAS'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -3579,7 +3579,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Freeze Ray]] = [=[local tbl = {}
+return tbl]=],['Freeze Ray'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -3594,7 +3594,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Temporal Ray]] = [=[local tbl = {}
+return tbl]=],['Temporal Ray'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -3609,7 +3609,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Gum Ray]] = [=[local tbl = {}
+return tbl]=],['Gum Ray'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -3624,7 +3624,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Spider Ray]] = [=[local tbl = {}
+return tbl]=],['Spider Ray'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -3639,7 +3639,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Wrapped Freeze Ray]] = [=[local tbl = {}
+return tbl]=],['Wrapped Freeze Ray'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -3654,7 +3654,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Bubble Ray]] = [=[local tbl = {}
+return tbl]=],['Bubble Ray'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -3669,7 +3669,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Medkit]] = [=[local tbl = {}
+return tbl]=],['Medkit'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local PlayEquipAnimationOnHeal = true
@@ -3689,7 +3689,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Laptop]] = [=[local tbl = {}
+return tbl]=],['Laptop'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local PlayEquipAnimationOnHeal = true
@@ -3823,7 +3823,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Sandwich]] = [=[local tbl = {}
+return tbl]=],['Sandwich'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local PlayEquipAnimationOnHeal = true
@@ -3843,7 +3843,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Bucket of Candy]] = [=[local tbl = {}
+return tbl]=],['Bucket of Candy'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local PlayEquipAnimationOnHeal = true
@@ -3863,7 +3863,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Milk & Cookies]] = [=[local tbl = {}
+return tbl]=],['Milk & Cookies'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local PlayEquipAnimationOnHeal = true
@@ -3883,7 +3883,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Medkitty]] = [=[local tbl = {}
+return tbl]=],['Medkitty'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local PlayEquipAnimationOnHeal = true
@@ -3923,7 +3923,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Sniper]] = [=[local tbl = {}
+return tbl]=],['Sniper'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -3941,7 +3941,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Keyper]] = [=[local tbl = {}
+return tbl]=],['Keyper'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -3956,7 +3956,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Event Horizon]] = [=[local tbl = {}
+return tbl]=],['Event Horizon'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _reload_start_attachment = shar.ItemModel:WaitForChild("Body"):WaitForChild("Black"):WaitForChild("Start")
@@ -3999,7 +3999,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Shorty]] = [=[local tbl = {}
+return tbl]=],['Shorty'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -4017,7 +4017,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Demon Shorty]] = [=[local tbl = {}
+return tbl]=],['Demon Shorty'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -4042,7 +4042,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[War Horn]] = [=[local tbl = {}
+return tbl]=],['War Horn'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _horn_particles = {}
@@ -4103,7 +4103,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Trumpet]] = [=[local tbl = {}
+return tbl]=],['Trumpet'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _horn_particles = {}
@@ -4127,7 +4127,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Mammoth Horn]] = [=[local tbl = {}
+return tbl]=],['Mammoth Horn'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _horn_particles = {}
@@ -4151,7 +4151,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Megaphone]] = [=[local tbl = {}
+return tbl]=],['Megaphone'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _horn_particles = {}
@@ -4175,7 +4175,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Air Horn]] = [=[local tbl = {}
+return tbl]=],['Air Horn'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _horn_particles = {}
@@ -4199,7 +4199,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Elixir]] = [=[local tbl = {}
+return tbl]=],['Elixir'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -4214,7 +4214,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Scepter]] = [=[local tbl = {}
+return tbl]=],['Scepter'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -4229,7 +4229,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Battle Axe]] = [=[local tbl = {}
+return tbl]=],['Battle Axe'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -4244,25 +4244,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[The Shred]] = [=[local tbl = {}
-
-function tbl.new(shar)
-
-	local arg1 = {
-	}
-	
-for name, v in pairs(shar) do
-	arg1[name]=v
-end
-	
-	function arg1._Init() -- Line 26
-	end
-
-	arg1._Init()
-	return arg1
-end
-
-return tbl]=],[[Nordic Axe]] = [=[local tbl = {}
+return tbl]=],['The Shred'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -4280,7 +4262,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Ban Axe]] = [=[local tbl = {}
+return tbl]=],['Nordic Axe'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -4298,7 +4280,25 @@ end
 	return arg1
 end
 
-return tbl]=],[[Cerulean Axe]] = [=[local tbl = {}
+return tbl]=],['Ban Axe'] = [=[local tbl = {}
+
+function tbl.new(shar)
+
+	local arg1 = {
+	}
+	
+for name, v in pairs(shar) do
+	arg1[name]=v
+end
+	
+	function arg1._Init() -- Line 26
+	end
+
+	arg1._Init()
+	return arg1
+end
+
+return tbl]=],['Cerulean Axe'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _equip_effect_hash = 0
@@ -4373,7 +4373,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[BaseSatchel]] = [=[local tbl = {}
+return tbl]=],['BaseSatchel'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -4388,7 +4388,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Satchel]] = [=[local tbl = {}
+return tbl]=],['Satchel'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -4418,7 +4418,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Advanced Satchel]] = [=[local tbl = {}
+return tbl]=],['Advanced Satchel'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -4433,7 +4433,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Suspicious Gift]] = [=[local tbl = {}
+return tbl]=],['Suspicious Gift'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -4451,7 +4451,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Notebook Satchel]] = [=[local tbl = {}
+return tbl]=],['Notebook Satchel'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -4466,7 +4466,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Bag o' Money]] = [=[local tbl = {}
+return tbl]=],['Bag o' Money'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -4481,7 +4481,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[BaseDaggers]] = [=[local tbl = {}
+return tbl]=],['BaseDaggers'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _registered_ammo_visuals = {}
@@ -4556,7 +4556,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Daggers]] = [=[local tbl = {}
+return tbl]=],['Daggers'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _registered_ammo_visuals = {}
@@ -4580,7 +4580,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Aces]] = [=[local tbl = {}
+return tbl]=],['Aces'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _registered_ammo_visuals = {}
@@ -4606,7 +4606,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Cookies]] = [=[local tbl = {}
+return tbl]=],['Cookies'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _registered_ammo_visuals = {}
@@ -4631,7 +4631,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Crystal Daggers]] = [=[local tbl = {}
+return tbl]=],['Crystal Daggers'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _registered_ammo_visuals = {}
@@ -4653,7 +4653,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Paper Planes]] = [=[local tbl = {}
+return tbl]=],['Paper Planes'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _registered_ammo_visuals = {}
@@ -4675,7 +4675,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Shurikens]] = [=[local tbl = {}
+return tbl]=],['Shurikens'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _registered_ammo_visuals = {}
@@ -4699,7 +4699,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[BaseCrossbow]] = [=[local tbl = {}
+return tbl]=],['BaseCrossbow'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -4714,7 +4714,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Crossbow]] = [=[local tbl = {}
+return tbl]=],['Crossbow'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -4734,7 +4734,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Pixel Crossbow]] = [=[local tbl = {}
+return tbl]=],['Pixel Crossbow'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -4755,7 +4755,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Frostbite Crossbow]] = [=[local tbl = {}
+return tbl]=],['Frostbite Crossbow'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -4775,7 +4775,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Harpoon Crossbow]] = [=[local tbl = {}
+return tbl]=],['Harpoon Crossbow'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -4796,7 +4796,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Violin Crossbow]] = [=[local tbl = {}
+return tbl]=],['Violin Crossbow'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -4815,7 +4815,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Energy Pistols]] = [=[local tbl = {}
+return tbl]=],['Energy Pistols'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local EnergyPistolsShootSoundCooldown = 0
@@ -4835,7 +4835,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Hacker Pistols]] = [=[local tbl = {}
+return tbl]=],['Hacker Pistols'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local EnergyPistolsShootSoundCooldown = 0
@@ -4855,7 +4855,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Apex Pistols]] = [=[local tbl = {}
+return tbl]=],['Apex Pistols'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local EnergyPistolsShootSoundCooldown = 0
@@ -4875,7 +4875,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[2025 Energy Pistols]] = [=[local tbl = {}
+return tbl]=],['2025 Energy Pistols'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local EnergyPistolsShootSoundCooldown = 0
@@ -4895,7 +4895,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Void Pistols]] = [=[local tbl = {}
+return tbl]=],['Void Pistols'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local EnergyPistolsShootSoundCooldown = 0
@@ -4915,7 +4915,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Hydro Pistols]] = [=[local tbl = {}
+return tbl]=],['Hydro Pistols'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local EnergyPistolsShootSoundCooldown = 0
@@ -4935,7 +4935,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Energy Rifle]] = [=[local tbl = {}
+return tbl]=],['Energy Rifle'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -4960,7 +4960,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Hacker Rifle]] = [=[local tbl = {}
+return tbl]=],['Hacker Rifle'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -4985,7 +4985,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Apex Rifle]] = [=[local tbl = {}
+return tbl]=],['Apex Rifle'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -5010,7 +5010,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[2025 Energy Rifle]] = [=[local tbl = {}
+return tbl]=],['2025 Energy Rifle'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -5035,7 +5035,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Hydro Rifle]] = [=[local tbl = {}
+return tbl]=],['Hydro Rifle'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -5053,7 +5053,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Void Rifle]] = [=[local tbl = {}
+return tbl]=],['Void Rifle'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -5078,7 +5078,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Assault Rifle]] = [=[local tbl = {}
+return tbl]=],['Assault Rifle'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -5096,7 +5096,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[AKEY-47]] = [=[local tbl = {}
+return tbl]=],['AKEY-47'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -5132,7 +5132,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Tommy Gun]] = [=[local tbl = {}
+return tbl]=],['Tommy Gun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -5188,7 +5188,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Molotov]] = [=[local tbl = {}
+return tbl]=],['Molotov'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -5203,7 +5203,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Hot Coals]] = [=[local tbl = {}
+return tbl]=],['Hot Coals'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -5239,7 +5239,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Coffee]] = [=[local tbl = {}
+return tbl]=],['Coffee'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -5257,7 +5257,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Torch]] = [=[local tbl = {}
+return tbl]=],['Torch'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -5275,7 +5275,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Lava Lamp]] = [=[local tbl = {}
+return tbl]=],['Lava Lamp'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -5301,7 +5301,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Vexed Candle]] = [=[local tbl = {}
+return tbl]=],['Vexed Candle'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -5319,7 +5319,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Riot Shield]] = [=[local tbl = {}
+return tbl]=],['Riot Shield'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -5341,7 +5341,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Energy Shield]] = [=[local tbl = {}
+return tbl]=],['Energy Shield'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -5363,7 +5363,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Door]] = [=[local tbl = {}
+return tbl]=],['Door'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -5381,7 +5381,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Sled]] = [=[local tbl = {}
+return tbl]=],['Sled'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -5399,7 +5399,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Masterpiece]] = [=[local tbl = {}
+return tbl]=],['Masterpiece'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _painting_data = tbl_upvr[math.random(#tbl_upvr)]
@@ -5432,7 +5432,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Knife]] = [=[local tbl = {}
+return tbl]=],['Knife'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -5450,7 +5450,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Balisong]] = [=[local tbl = {}
+return tbl]=],['Balisong'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -5469,7 +5469,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Spray]] = [=[local tbl = {}
+return tbl]=],['Spray'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -5487,7 +5487,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Spray Bottle]] = [=[local tbl = {}
+return tbl]=],['Spray Bottle'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -5512,7 +5512,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Gunblade]] = [=[local tbl = {}
+return tbl]=],['Gunblade'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -5530,7 +5530,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Gunsaw]] = [=[local tbl = {}
+return tbl]=],['Gunsaw'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _spike_toggle = false
@@ -5603,7 +5603,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Glass Cannon]] = [=[local tbl = {}
+return tbl]=],['Glass Cannon'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _hide_this_mesh = shar.ItemModel:WaitForChild("Body"):WaitForChild("MeshPart")
@@ -5650,7 +5650,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Daggers]] = [=[local tbl = {}
+return tbl]=],['Daggers'] = [=[local tbl = {}
 
 function tbl.new(shar)
 	local _hide_this_mesh = shar.ItemModel:WaitForChild("Body"):WaitForChild("MeshPart")
@@ -5674,7 +5674,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Shotgun]] = [=[local tbl = {}
+return tbl]=],['Shotgun'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
@@ -5692,7 +5692,7 @@ end
 	return arg1
 end
 
-return tbl]=],[[Shotkey]] = [=[local tbl = {}
+return tbl]=],['Shotkey'] = [=[local tbl = {}
 
 function tbl.new(shar)
 
