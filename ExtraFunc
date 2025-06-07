@@ -15,11 +15,11 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.PlayChargeSound(, arg2) -- Line 28
+	function arg1.PlayChargeSound(non, arg2) -- Line 28
 		arg1:CreateSound("rbxassetid://13744359504", 1, 0.75 + 0.25 * arg2, true, 10)
 	end
 
-	function arg1.PlayChargeEffect(, arg2) -- Line 32
+	function arg1.PlayChargeEffect(non, arg2) -- Line 32
 		arg1:PlayChargeSound(arg2)
 		for _, v in pairs(arg1._charge_particles) do
 			v.Color = ColorSequence.new(arg1.ClientItem:GetChargeColor(arg2))
@@ -27,7 +27,7 @@ end
 		end
 	end
 
-	function arg1._UpdateArrow() -- Line 45
+	function arg1._UpdateArrow(non) -- Line 45
 		-- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
 		local var29
 		if var29 then
@@ -78,11 +78,11 @@ end
 		end
 	end
 
-	function arg1._RegisterAmmoVisual(, arg2) -- Line 75
+	function arg1._RegisterAmmoVisual(non, arg2) -- Line 75
 		table.insert(arg1._registered_ammo_visuals, arg2)
 	end
 
-	function arg1._Setup() -- Line 79
+	function arg1._Setup(non) -- Line 79
 		--[[ Upvalues[1]:
 			[1]: BowChargeEffects_upvr (readonly)
 		]]
@@ -97,7 +97,7 @@ end
 		end
 	end
 
-	function arg1._Init() -- Line 87
+	function arg1._Init(non) -- Line 87
 		arg1.ClientItem:GetDataChangedSignal("Ammo"):Connect(function() -- Line 88
 			--[[ Upvalues[1]:
 				[1]: arg1 (readonly)
@@ -141,7 +141,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Feather"))
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Stick"))
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Tip"))
@@ -168,7 +168,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Feather1"))
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Feather2"))
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Stick"))
@@ -196,7 +196,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Stick"))
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Tip"))
 	end
@@ -222,7 +222,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.PlayChargeSound(, arg2) -- Line 20
+	function arg1.PlayChargeSound(non, arg2) -- Line 20
 		--[[ Upvalues[1]:
 			[1]: BaseBow_upvr (readonly)
 		]]
@@ -230,7 +230,7 @@ end
 		arg1:CreateSound("rbxassetid://117872201487330", 0.5, 0.5 + 0.1 * arg2, true, 10)
 	end
 
-	function arg1._Init() -- Line 29
+	function arg1._Init(non) -- Line 29
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Feather"))
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Stick"))
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Tip"))
@@ -257,7 +257,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Stick"))
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Tip"))
 	end
@@ -283,7 +283,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Cloud"))
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Stick"))
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Tip"))
@@ -314,20 +314,20 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.CreateHoldSounds() -- Line 29
+	function arg1.CreateHoldSounds(non) -- Line 29
 		return {arg1:CreateSound("rbxassetid://16359327230", 0.5, 1, true)}
 	end
 
-	function arg1.PlayStartingHoldSounds() -- Line 33
+	function arg1.PlayStartingHoldSounds(non) -- Line 33
 	end
 
-	function arg1.EnableParticles(, arg2) -- Line 37
+	function arg1.EnableParticles(non, arg2) -- Line 37
 		for _, v in pairs(arg1._hold_particles) do
 			v.Enabled = arg2
 		end
 	end
 
-	function arg1.Update(, arg2, arg3, arg4) -- Line 43
+	function arg1.Update(non, arg2, arg3, arg4) -- Line 43
 		--[[ Upvalues[1]:
 			[1]: module_upvr (readonly)
 		]]
@@ -349,7 +349,7 @@ end
 		end
 	end
 
-	function arg1._PlayIdleSound(, arg2, arg3) -- Line 66
+	function arg1._PlayIdleSound(non, arg2, arg3) -- Line 66
 		local var23 = arg3 or 0.2
 		if 0 < var23 then
 			wait(var23)
@@ -369,11 +369,11 @@ end
 		end
 	end
 
-	function arg1._RegisterSpikesPart(, arg2, arg3) -- Line 96
+	function arg1._RegisterSpikesPart(non, arg2, arg3) -- Line 96
 		arg1._spike_parts[arg2] = arg3
 	end
 
-	function arg1._RegisterBlade(, arg2) -- Line 100
+	function arg1._RegisterBlade(non, arg2) -- Line 100
 		--[[ Upvalues[1]:
 			[1]: ChainsawParticles_upvr (readonly)
 		]]
@@ -388,7 +388,7 @@ end
 		end
 	end
 
-	function arg1._Init() -- Line 108
+	function arg1._Init(non) -- Line 108
 		arg1.Equipped:Connect(function() -- Line 109
 			--[[ Upvalues[1]:
 				[1]: arg1 (readonly)
@@ -431,7 +431,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1:_RegisterBlade(arg1.ItemModel:WaitForChild("Body"):WaitForChild("Blade"))
 		arg1:_RegisterSpikesPart(arg1.ItemModel:WaitForChild("Body"):WaitForChild("Spikes1"), true)
 		arg1:_RegisterSpikesPart(arg1.ItemModel:WaitForChild("Body"):WaitForChild("Spikes2"), false)
@@ -462,7 +462,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1:_RegisterBlade(arg1.ItemModel:WaitForChild("RightBlade"):WaitForChild("Blade"))
 		arg1:_RegisterBlade(arg1.ItemModel:WaitForChild("LeftBlade"):WaitForChild("Blade"))
 		arg1:_RegisterSpikesPart(arg1.ItemModel:WaitForChild("RightBlade"):WaitForChild("Spikes1"), true)
@@ -496,7 +496,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1:_RegisterBlade(arg1.ItemModel:WaitForChild("Body"):WaitForChild("Blade"))
 		arg1:_RegisterSpikesPart(arg1.ItemModel:WaitForChild("Body"):WaitForChild("Spikes1"), true)
 		arg1:_RegisterSpikesPart(arg1.ItemModel:WaitForChild("Body"):WaitForChild("Spikes2"), false)
@@ -527,7 +527,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1:_RegisterBlade(arg1.ItemModel:WaitForChild("Spin"):WaitForChild("Blade"))
 		arg1:_RegisterSpikesPart(arg1.ItemModel:WaitForChild("Spin"):WaitForChild("Spikes1"), true)
 		arg1:_RegisterSpikesPart(arg1.ItemModel:WaitForChild("Spin"):WaitForChild("Spikes2"), false)
@@ -583,7 +583,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.CreateHoldSounds() -- Line 20
+	function arg1.CreateHoldSounds(non) -- Line 20
 		local module = {}
 		local any_CreateSound_result1_2 = arg1:CreateSound("rbxassetid://16359327230", 0.75, 1.25, true)
 		local PitchShiftSoundEffect_2 = Instance.new("PitchShiftSoundEffect")
@@ -598,11 +598,11 @@ end
 		return module
 	end
 
-	function arg1.PlayStartingHoldSounds() -- Line 38
+	function arg1.PlayStartingHoldSounds(non) -- Line 38
 		arg1:CreateSound("rbxassetid://18763594759", 0.5, 1, true, 10)
 	end
 
-	function arg1._Init() -- Line 46
+	function arg1._Init(non) -- Line 46
 		arg1:_RegisterBlade(arg1.ItemModel:WaitForChild("Drill"):WaitForChild("Blade"))
 	end
 
@@ -636,7 +636,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Rocket"):WaitForChild("Head"))
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Rocket"):WaitForChild("Neck"))
 	end
@@ -671,14 +671,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.ExplosionEffect(, arg2, arg3) -- Line 21
+	function arg1.ExplosionEffect(non, arg2, arg3) -- Line 21
 		--[[ Upvalues[1]:
 			[1]: FunctionsController_upvr (readonly)
 		]]
 		FunctionsController_upvr:FireAsync(arg1:ToEnum("NukeEffect"), arg2, arg3, nil, true)
 	end
 
-	function arg1._Init() -- Line 29
+	function arg1._Init(non) -- Line 29
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Rocket"):WaitForChild("Head"))
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Rocket"):WaitForChild("Neck"))
 	end
@@ -743,7 +743,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Rocket"):WaitForChild("Lead"))
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Rocket"):WaitForChild("Wood"))
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Rocket"):WaitForChild("Yellow"))
@@ -782,7 +782,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._UpdateAmmoVisual() -- Line 28
+	function arg1._UpdateAmmoVisual(non) -- Line 28
 		local var13
 		if var13 then
 		else
@@ -817,11 +817,11 @@ end
 		end
 	end
 
-	function arg1._RegisterAmmoVisual(, arg2, arg3) -- Line 47
+	function arg1._RegisterAmmoVisual(non, arg2, arg3) -- Line 47
 		table.insert(arg1._registered_ammo_visuals[arg2], arg3)
 	end
 
-	function arg1._RegisterDefaultAmmoVisuals() -- Line 51
+	function arg1._RegisterDefaultAmmoVisuals(non) -- Line 51
 		for _, v in pairs({"ReloadBullets", "Bullets"}) do
 			local SOME = arg1.ItemModel:WaitForChild(v)
 			for i_2 = 1, 6 do
@@ -830,7 +830,7 @@ end
 		end
 	end
 
-	function arg1._Init() -- Line 61
+	function arg1._Init(non) -- Line 61
 		arg1.ClientItem:GetDataChangedSignal("AmmoReserve"):Connect(function() -- Line 62
 			--[[ Upvalues[1]:
 				[1]: arg1 (readonly)
@@ -879,7 +879,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1:_RegisterDefaultAmmoVisuals()
 	end
 
@@ -900,7 +900,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1:_RegisterDefaultAmmoVisuals()
 	end
 
@@ -938,7 +938,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1:_RegisterDefaultAmmoVisuals()
 	end
 
@@ -963,7 +963,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._UpdateAmmoContext() -- Line 29
+	function arg1._UpdateAmmoContext(non) -- Line 29
 		-- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
 		local any_Get_result1 = arg1.ClientItem:Get("Ammo")
 		local _, pairs_result2_2, pairs_result3_2 = pairs(arg1._keyvolver_bullets.Bullets)
@@ -1009,7 +1009,7 @@ end
 		end
 	end
 
-	function arg1._Setup() -- Line 56
+	function arg1._Setup(non) -- Line 56
 		for _, v_3 in pairs({"Bullets", "ReloadBullets"}) do
 			arg1._keyvolver_bullets[v_3] = {}
 			for i_4 = 1, 6 do
@@ -1018,7 +1018,7 @@ end
 		end
 	end
 
-	function arg1._Init() -- Line 66
+	function arg1._Init(non) -- Line 66
 		arg1.ClientItem:GetDataChangedSignal("AmmoReserve"):Connect(function() -- Line 67
 			--[[ Upvalues[1]:
 				[1]: arg1 (readonly)
@@ -1054,7 +1054,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._UpdateDefaultAnimationsFromAmmo() -- Line 28
+	function arg1._UpdateDefaultAnimationsFromAmmo(non) -- Line 28
 		-- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
 		local var4
 		if arg1.ClientItem:Get("Ammo") > 0 then
@@ -1079,7 +1079,7 @@ end
 		end
 	end
 
-	function arg1._Init() -- Line 46
+	function arg1._Init(non) -- Line 46
 		arg1.ClientItem:GetDataChangedSignal("AmmoReserve"):Connect(function() -- Line 47
 			--[[ Upvalues[1]:
 				[1]: arg1 (readonly)
@@ -1115,7 +1115,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._UpdateBall() -- Line 30
+	function arg1._UpdateBall(non) -- Line 30
 		local var4
 		if var4 then
 		else
@@ -1140,7 +1140,7 @@ end
 		end
 	end
 
-	function arg1._Init() -- Line 51
+	function arg1._Init(non) -- Line 51
 		arg1.ClientItem:GetDataChangedSignal("Ammo"):Connect(function() -- Line 52
 			--[[ Upvalues[1]:
 				[1]: arg1 (readonly)
@@ -1185,7 +1185,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -1207,7 +1207,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -1229,7 +1229,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -1251,7 +1251,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -1269,7 +1269,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -1287,7 +1287,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.PlayHitmarkerSound(, arg2, arg3) -- Line 20
+	function arg1.PlayHitmarkerSound(non, arg2, arg3) -- Line 20
 		--[[ Upvalues[1]:
 			[1]: Fists_upvr (readonly)
 		]]
@@ -1298,7 +1298,7 @@ end
 		end
 	end
 
-	function arg1._Init() -- Line 32
+	function arg1._Init(non) -- Line 32
 	end
 
 	arg1._Init()
@@ -1316,7 +1316,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -1334,7 +1334,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -1354,7 +1354,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.Update(, arg2, arg3, arg4) -- Line 23
+	function arg1.Update(non, arg2, arg3, arg4) -- Line 23
 		--[[ Upvalues[1]:
 			[1]: Fists_upvr (readonly)
 		]]
@@ -1367,7 +1367,7 @@ end
 		end
 	end
 
-	function arg1.Destroy() -- Line 35
+	function arg1.Destroy(non) -- Line 35
 		--[[ Upvalues[1]:
 			[1]: Fists_upvr (readonly)
 		]]
@@ -1377,7 +1377,7 @@ end
 		Fists_upvr.Destroy(arg1)
 	end
 
-	function arg1._Setup() -- Line 47
+	function arg1._Setup(non) -- Line 47
 		--[[ Upvalues[1]:
 			[1]: FestiveLightsCircuit_upvr (readonly)
 		]]
@@ -1386,7 +1386,7 @@ end
 		end
 	end
 
-	function arg1._Init() -- Line 53
+	function arg1._Init(non) -- Line 53
 		arg1:_Setup()
 	end
 
@@ -1405,7 +1405,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.PlayHitmarkerSound(, arg2, arg3) -- Line 20
+	function arg1.PlayHitmarkerSound(non, arg2, arg3) -- Line 20
 		--[[ Upvalues[1]:
 			[1]: Fists_upvr (readonly)
 		]]
@@ -1416,7 +1416,7 @@ end
 		end
 	end
 
-	function arg1._Init() -- Line 32
+	function arg1._Init(non) -- Line 32
 	end
 
 	arg1._Init()
@@ -1440,7 +1440,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.SetFlameParticlesEnabled(, arg2) -- Line 30
+	function arg1.SetFlameParticlesEnabled(non, arg2) -- Line 30
 		--[[ Upvalues[1]:
 			[1]: _G.utility (readonly)
 		]]
@@ -1474,7 +1474,7 @@ end
 		end
 	end
 
-	function arg1.PlayFlameSoundEffect(, arg2) -- Line 59
+	function arg1.PlayFlameSoundEffect(non, arg2) -- Line 59
 		arg1:StopFlameSoundEffect(false)
 		local _flame_sounds = arg1._flame_sounds
 		if not _flame_sounds then
@@ -1486,7 +1486,7 @@ end
 		end
 	end
 
-	function arg1.StopFlameSoundEffect(, arg2) -- Line 69
+	function arg1.StopFlameSoundEffect(non, arg2) -- Line 69
 		--[[ Upvalues[1]:
 			[1]: _G.utility (readonly)
 		]]
@@ -1513,11 +1513,11 @@ end
 		end
 	end
 
-	function arg1.PlayAirblastSoundEffect() -- Line 91
+	function arg1.PlayAirblastSoundEffect(non) -- Line 91
 		arg1:CreateSound("rbxassetid://17209245422", 1, 1, true, 5)
 	end
 
-	function arg1.AirblastEffect() -- Line 95
+	function arg1.AirblastEffect(non) -- Line 95
 		--[[ Upvalues[3]:
 			[1]: FlamethrowerAirblasts_upvr (readonly)
 			[2]: BetterDebris_upvr (readonly)
@@ -1535,11 +1535,11 @@ end
 		arg1:PlayAirblastSoundEffect()
 	end
 
-	function arg1._CreateFlameSoundEffects() -- Line 108
+	function arg1._CreateFlameSoundEffects(non) -- Line 108
 		return {arg1:CreateSound("rbxassetid://17209245734", 1.5, 1, true)}
 	end
 
-	function arg1._Setup() -- Line 112
+	function arg1._Setup(non) -- Line 112
 		--[[ Upvalues[1]:
 			[1]: FlamethrowerFlames_upvr (readonly)
 		]]
@@ -1554,7 +1554,7 @@ end
 		end
 	end
 
-	function arg1._Init() -- Line 120
+	function arg1._Init(non) -- Line 120
 		arg1:_Setup()
 	end
 
@@ -1579,15 +1579,15 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.PlayAirblastSoundEffect() -- Line 20
+	function arg1.PlayAirblastSoundEffect(non) -- Line 20
 		arg1:CreateSound("rbxassetid://17772394926", 1, 1, true)
 	end
 
-	function arg1._CreateFlameSoundEffects() -- Line 28
+	function arg1._CreateFlameSoundEffects(non) -- Line 28
 		return {arg1:CreateSound("rbxassetid://17772394725", 2, 1.25, true)}
 	end
 
-	function arg1._Init() -- Line 32
+	function arg1._Init(non) -- Line 32
 	end
 
 	arg1._Init()
@@ -1611,7 +1611,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -1635,7 +1635,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -1659,11 +1659,11 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._CreateFlameSoundEffects() -- Line 26
+	function arg1._CreateFlameSoundEffects(non) -- Line 26
 		return {arg1:CreateSound("rbxassetid://89834210702442", 0.75, 1, true), arg1:CreateSound("rbxassetid://115412300262585", 1, 1, true)}
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 	end
 
 	arg1._Init()
@@ -1687,11 +1687,11 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._CreateFlameSoundEffects() -- Line 26
+	function arg1._CreateFlameSoundEffects(non) -- Line 26
 		return {arg1:CreateSound("rbxassetid://17209245734", 1.25, 1, true), arg1:CreateSound("rbxassetid://129124742663895", 2, 1.25, true)}
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 	end
 
 	arg1._Init()
@@ -1724,7 +1724,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -1742,21 +1742,21 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._CreateMinigunShootingSounds() -- Line 26
+	function arg1._CreateMinigunShootingSounds(non) -- Line 26
 		local any_CreateSound_result1 = arg1:CreateSound("rbxassetid://112116120783481", 8.75, 1, true)
 		any_CreateSound_result1.TimePosition = 0.25 + 0.25 * math.random()
 		any_CreateSound_result1.Looped = true
 		return {any_CreateSound_result1}
 	end
 
-	function arg1._CreateMinigunWindingSounds() -- Line 34
+	function arg1._CreateMinigunWindingSounds(non) -- Line 34
 		local any_CreateSound_result1_2 = arg1:CreateSound("rbxassetid://111731354794881", 0.5, 1, true)
 		any_CreateSound_result1_2.TimePosition = 2
 		any_CreateSound_result1_2.Looped = true
 		return {any_CreateSound_result1_2}
 	end
 
-	function arg1._Init() -- Line 42
+	function arg1._Init(non) -- Line 42
 	end
 
 	arg1._Init()
@@ -1774,14 +1774,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetFriendlyTracerColor() -- Line 22
+	function arg1.GetFriendlyTracerColor(non) -- Line 22
 		--[[ Upvalues[1]:
 			[1]: ColorSequence_new_result1_upvr (readonly)
 		]]
 		return ColorSequence_new_result1_upvr
 	end
 
-	function arg1._CreateMinigunShootingSounds() -- Line 30
+	function arg1._CreateMinigunShootingSounds(non) -- Line 30
 		local any_CreateSound_result1_4 = arg1:CreateSound("rbxassetid://17722581026", 0.75, 1, true)
 		any_CreateSound_result1_4.TimePosition = 0.5 * math.random()
 		any_CreateSound_result1_4.Looped = true
@@ -1794,13 +1794,13 @@ end
 		return {any_CreateSound_result1_4, any_CreateSound_result1, any_CreateSound_result1_2}
 	end
 
-	function arg1._CreateMinigunWindingSounds() -- Line 50
+	function arg1._CreateMinigunWindingSounds(non) -- Line 50
 		local any_CreateSound_result1_3 = arg1:CreateSound("rbxassetid://17722633119", 0.25, 1, true)
 		any_CreateSound_result1_3.Looped = true
 		return {any_CreateSound_result1_3}
 	end
 
-	function arg1._Init() -- Line 57
+	function arg1._Init(non) -- Line 57
 	end
 
 	arg1._Init()
@@ -1818,7 +1818,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -1836,7 +1836,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 42
+	function arg1._Init(non) -- Line 42
 	end
 
 	arg1._Init()
@@ -1860,7 +1860,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._UpdateAmmoVisual() -- Line 31
+	function arg1._UpdateAmmoVisual(non) -- Line 31
 		if arg1._destroyed then
 		else
 			for i_3, v_2 in pairs(arg1._bullet_parts.BulletsModel) do
@@ -1887,7 +1887,7 @@ end
 		end
 	end
 
-	function arg1._Setup() -- Line 52
+	function arg1._Setup(non) -- Line 52
 		for _, v in pairs({"ReloadBulletsModel", "BulletsModel"}) do
 			arg1._bullet_parts[v] = {}
 			for i_2 = 1, 6 do
@@ -1896,7 +1896,7 @@ end
 		end
 	end
 
-	function arg1._Init() -- Line 62
+	function arg1._Init(non) -- Line 62
 		arg1.ClientItem:GetDataChangedSignal("AmmoReserve"):Connect(function() -- Line 63
 			--[[ Upvalues[1]:
 				[1]: arg1 (readonly)
@@ -1934,7 +1934,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -2051,11 +2051,11 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.PlayDeflectHitSounds() -- Line 20
+	function arg1.PlayDeflectHitSounds(non) -- Line 20
 		arg1:CreateSound("rbxassetid://17640978084", 1.75, 0.9 + 0.2 * math.random(), true, 5)
 	end
 
-	function arg1._Init() -- Line 28
+	function arg1._Init(non) -- Line 28
 	end
 
 	arg1._Init()
@@ -2073,12 +2073,12 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.PlayDeflectHitSounds() -- Line 20
+	function arg1.PlayDeflectHitSounds(non) -- Line 20
 		arg1:CreateSound("rbxassetid://18763556154", 1.25, 1 + 0.25 * math.random(), true, 5)
 		arg1:CreateSound("rbxassetid://14776437962", 1, 0.9 + 0.2 * math.random(), true, 5)
 	end
 
-	function arg1._Init() -- Line 29
+	function arg1._Init(non) -- Line 29
 	end
 
 	arg1._Init()
@@ -2096,12 +2096,12 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.PlayDeflectHitSounds() -- Line 20
+	function arg1.PlayDeflectHitSounds(non) -- Line 20
 		arg1:CreateSound("rbxassetid://103220108305486", 1.25, 1 + 0.25 * math.random(), true, 5)
 		arg1:CreateSound("rbxassetid://127511989334071", 1, 0.9 + 0.2 * math.random(), true, 5)
 	end
 
-	function arg1._Init() -- Line 29
+	function arg1._Init(non) -- Line 29
 	end
 
 	arg1._Init()
@@ -2119,7 +2119,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -2137,13 +2137,13 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.PlayDeflectHitSounds() -- Line 20
+	function arg1.PlayDeflectHitSounds(non) -- Line 20
 		arg1:CreateSound("rbxassetid://14776414133", 0.75, 1.5 + 0.5 * math.random(), true, 5)
 		arg1:CreateSound("rbxassetid://14776437962", 0.75, 0.9 + 0.2 * math.random(), true, 5)
 		arg1:CreateSound("rbxassetid://76137984414279", 1.25, 0.9 + 0.2 * math.random(), true, 5)
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 	end
 
 	arg1._Init()
@@ -2161,13 +2161,13 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.PlayDeflectHitSounds() -- Line 20
+	function arg1.PlayDeflectHitSounds(non) -- Line 20
 		arg1:CreateSound("rbxassetid://14776414133", 1.25, 1.5 + 0.5 * math.random(), true, 5)
 		arg1:CreateSound("rbxassetid://14776437962", 1, 0.9 + 0.2 * math.random(), true, 5)
 		arg1:CreateSound("rbxassetid://110122962237431", 1.5, 1.25 + 0.25 * math.random(), true, 5)
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 	end
 
 	arg1._Init()
@@ -2185,7 +2185,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -2203,18 +2203,18 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetPaintballColor() -- Line 23
+	function arg1.GetPaintballColor(non) -- Line 23
 		return Color3.fromHSV(tick() * 2 % 1, 0.75, 1)
 	end
 
-	function arg1.PlaySplatSound(, arg2) -- Line 27
+	function arg1.PlaySplatSound(non, arg2) -- Line 27
 		--[[ Upvalues[1]:
 			[1]: _G.utility (readonly)
 		]]
 		_G.utility:CreateSound("rbxassetid://16835701807", 0.5, 1 + 0.4 * math.random(), arg2, true, 1)
 	end
 
-	function arg1._Init() -- Line 35
+	function arg1._Init(non) -- Line 35
 	end
 
 	arg1._Init()
@@ -2232,14 +2232,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetPaintballColor() -- Line 22
+	function arg1.GetPaintballColor(non) -- Line 22
 		--[[ Upvalues[1]:
 			[1]: Color3_fromRGB_result1_upvr (readonly)
 		]]
 		return Color3_fromRGB_result1_upvr
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 	end
 
 	arg1._Init()
@@ -2257,14 +2257,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetPaintballColor() -- Line 22
+	function arg1.GetPaintballColor(non) -- Line 22
 		--[[ Upvalues[1]:
 			[1]: Color3_fromRGB_result1_upvr (readonly)
 		]]
 		return Color3_fromRGB_result1_upvr
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 	end
 
 	arg1._Init()
@@ -2282,14 +2282,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetPaintballColor() -- Line 22
+	function arg1.GetPaintballColor(non) -- Line 22
 		--[[ Upvalues[1]:
 			[1]: Color3_fromRGB_result1_upvr (readonly)
 		]]
 		return Color3_fromRGB_result1_upvr
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 	end
 
 	arg1._Init()
@@ -2322,14 +2322,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetPaintballColor() -- Line 22
+	function arg1.GetPaintballColor(non) -- Line 22
 		--[[ Upvalues[1]:
 			[1]: Color3_fromRGB_result1_upvr (readonly)
 		]]
 		return Color3_fromRGB_result1_upvr
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 	end
 
 	arg1._Init()
@@ -2347,21 +2347,21 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.PlayFlashSound(, arg2) -- Line 22
+	function arg1.PlayFlashSound(non, arg2) -- Line 22
 		--[[ Upvalues[1]:
 			[1]: _G.utility (readonly)
 		]]
 		_G.utility:CreateSound("rbxassetid://14778230670", 1, 1, arg2, true, 10)
 	end
 
-	function arg1.PlayRingingSound() -- Line 26
+	function arg1.PlayRingingSound(non) -- Line 26
 		--[[ Upvalues[1]:
 			[1]: _G.utility (readonly)
 		]]
 		return _G.utility:CreateSound("rbxassetid://14778230632", 1, 1, script, true, 10)
 	end
 
-	function arg1._Init() -- Line 34
+	function arg1._Init(non) -- Line 34
 	end
 
 	arg1._Init()
@@ -2379,7 +2379,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.PlayFlashSound(, arg2) -- Line 22
+	function arg1.PlayFlashSound(non, arg2) -- Line 22
 		--[[ Upvalues[2]:
 			[1]: Flashbang_upvr (readonly)
 			[2]: _G.utility (readonly)
@@ -2388,14 +2388,14 @@ end
 		_G.utility:CreateSound("rbxassetid://17643323391", 1, 1, arg2, true, 10)
 	end
 
-	function arg1.PlayRingingSound() -- Line 27
+	function arg1.PlayRingingSound(non) -- Line 27
 		--[[ Upvalues[1]:
 			[1]: _G.utility (readonly)
 		]]
 		return _G.utility:CreateSound("rbxassetid://17643323267", 1, 0.85, script, true, 10)
 	end
 
-	function arg1._Init() -- Line 35
+	function arg1._Init(non) -- Line 35
 	end
 
 	arg1._Init()
@@ -2413,14 +2413,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.PlayFlashSound(, arg2) -- Line 22
+	function arg1.PlayFlashSound(non, arg2) -- Line 22
 		--[[ Upvalues[1]:
 			[1]: _G.utility (readonly)
 		]]
 		_G.utility:CreateSound("rbxassetid://94088948330527", 1, 1, arg2, true, 10)
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 	end
 
 	arg1._Init()
@@ -2438,7 +2438,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.PlayFlashSound(, arg2) -- Line 22
+	function arg1.PlayFlashSound(non, arg2) -- Line 22
 		--[[ Upvalues[2]:
 			[1]: Flashbang_upvr (readonly)
 			[2]: _G.utility (readonly)
@@ -2447,7 +2447,7 @@ end
 		_G.utility:CreateSound("rbxassetid://18763877246", 1.25, 1, arg2, true, 10)
 	end
 
-	function arg1._Init() -- Line 31
+	function arg1._Init(non) -- Line 31
 	end
 
 	arg1._Init()
@@ -2465,7 +2465,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -2483,7 +2483,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -2501,7 +2501,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.PlayFlashSound(, arg2) -- Line 23
+	function arg1.PlayFlashSound(non, arg2) -- Line 23
 		--[[ Upvalues[2]:
 			[1]: Flashbang_upvr (readonly)
 			[2]: _G.utility (readonly)
@@ -2510,7 +2510,7 @@ end
 		_G.utility:CreateSound("rbxassetid://137109782386847", 2, 1, arg2, true, 10)
 	end
 
-	function arg1._Init() -- Line 32
+	function arg1._Init(non) -- Line 32
 		--[[ Upvalues[1]:
 			[1]: _G.r (readonly)
 		]]
@@ -2562,14 +2562,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetFriendlyTracerColor() -- Line 23
+	function arg1.GetFriendlyTracerColor(non) -- Line 23
 		--[[ Upvalues[1]:
 			[1]: ColorSequence_new_result1_upvr (readonly)
 		]]
 		return ColorSequence_new_result1_upvr
 	end
 
-	function arg1.ExplosionEffect(, arg2, arg3) -- Line 27
+	function arg1.ExplosionEffect(non, arg2, arg3) -- Line 27
 		--[[ Upvalues[2]:
 			[1]: Exogun_upvr (readonly)
 			[2]: WondergunExplosionParticles_upvr (readonly)
@@ -2577,7 +2577,7 @@ end
 		Exogun_upvr.ExplosionEffect(arg1, arg2, arg3, WondergunExplosionParticles_upvr)
 	end
 
-	function arg1._Init() -- Line 35
+	function arg1._Init(non) -- Line 35
 	end
 
 	arg1._Init()
@@ -2595,14 +2595,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetFriendlyTracerColor() -- Line 23
+	function arg1.GetFriendlyTracerColor(non) -- Line 23
 		--[[ Upvalues[1]:
 			[1]: ColorSequence_new_result1_upvr (readonly)
 		]]
 		return ColorSequence_new_result1_upvr
 	end
 
-	function arg1.ExplosionEffect(, arg2, arg3) -- Line 27
+	function arg1.ExplosionEffect(non, arg2, arg3) -- Line 27
 		--[[ Upvalues[2]:
 			[1]: Exogun_upvr (readonly)
 			[2]: SingularityExplosionParticles_upvr (readonly)
@@ -2610,7 +2610,7 @@ end
 		Exogun_upvr.ExplosionEffect(arg1, arg2, arg3, SingularityExplosionParticles_upvr)
 	end
 
-	function arg1._Init() -- Line 35
+	function arg1._Init(non) -- Line 35
 	end
 
 	arg1._Init()
@@ -2628,14 +2628,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetFriendlyTracerColor() -- Line 23
+	function arg1.GetFriendlyTracerColor(non) -- Line 23
 		--[[ Upvalues[1]:
 			[1]: ColorSequence_new_result1_upvr (readonly)
 		]]
 		return ColorSequence_new_result1_upvr
 	end
 
-	function arg1.ExplosionEffect(, arg2, arg3) -- Line 27
+	function arg1.ExplosionEffect(non, arg2, arg3) -- Line 27
 		--[[ Upvalues[2]:
 			[1]: Exogun_upvr (readonly)
 			[2]: RayGunExplosionParticles_upvr (readonly)
@@ -2643,7 +2643,7 @@ end
 		Exogun_upvr.ExplosionEffect(arg1, arg2, arg3, RayGunExplosionParticles_upvr)
 	end
 
-	function arg1._Init() -- Line 35
+	function arg1._Init(non) -- Line 35
 	end
 
 	arg1._Init()
@@ -2661,14 +2661,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetFriendlyTracerColor() -- Line 23
+	function arg1.GetFriendlyTracerColor(non) -- Line 23
 		--[[ Upvalues[1]:
 			[1]: ColorSequence_new_result1_upvr (readonly)
 		]]
 		return ColorSequence_new_result1_upvr
 	end
 
-	function arg1.ExplosionEffect(, arg2, arg3) -- Line 27
+	function arg1.ExplosionEffect(non, arg2, arg3) -- Line 27
 		--[[ Upvalues[2]:
 			[1]: Exogun_upvr (readonly)
 			[2]: ExogourdExplosionParticles_upvr (readonly)
@@ -2676,7 +2676,7 @@ end
 		Exogun_upvr.ExplosionEffect(arg1, arg2, arg3, ExogourdExplosionParticles_upvr)
 	end
 
-	function arg1._Init() -- Line 35
+	function arg1._Init(non) -- Line 35
 	end
 
 	arg1._Init()
@@ -2724,7 +2724,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -2787,7 +2787,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -2835,21 +2835,21 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.PlayHideMineSound(, arg2) -- Line 23
+	function arg1.PlayHideMineSound(non, arg2) -- Line 23
 		--[[ Upvalues[1]:
 			[1]: _G.utility (readonly)
 		]]
 		_G.utility:CreateSound("rbxassetid://17675605394", 1, 1.25, arg2.Hitbox, true, 5)
 	end
 
-	function arg1.ExplosionEffect(, arg2) -- Line 27
+	function arg1.ExplosionEffect(non, arg2) -- Line 27
 		--[[ Upvalues[1]:
 			[1]: FunctionsController_upvr (readonly)
 		]]
 		FunctionsController_upvr:FireAsync(arg1:ToEnum("NukeEffect"), arg2, arg1.ClientItem.Info.ExplosionRadius * 3, 0.25)
 	end
 
-	function arg1._Init() -- Line 35
+	function arg1._Init(non) -- Line 35
 	end
 
 	arg1._Init()
@@ -2882,7 +2882,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.ExplosionEffect(, arg2) -- Line 23
+	function arg1.ExplosionEffect(non, arg2) -- Line 23
 		--[[ Upvalues[1]:
 			[1]: FunctionsController_upvr (readonly)
 		]]
@@ -2892,7 +2892,7 @@ end
 		end
 	end
 
-	function arg1._Init() -- Line 38
+	function arg1._Init(non) -- Line 38
 	end
 
 	arg1._Init()
@@ -2925,7 +2925,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -2945,7 +2945,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._UpdateAmmoVisual() -- Line 33
+	function arg1._UpdateAmmoVisual(non) -- Line 33
 		local var11
 		if 0 < arg1.ClientItem:Get("Ammo") then
 			var11 = 0
@@ -2959,7 +2959,7 @@ end
 		end
 	end
 
-	function arg1._Init() -- Line 43
+	function arg1._Init(non) -- Line 43
 		--[[ Upvalues[2]:
 			[1]: Players_upvr (readonly)
 			[2]: _G.utility (readonly)
@@ -3039,7 +3039,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 29
+	function arg1._Init(non) -- Line 29
 		--[[ Upvalues[2]:
 			[1]: _G.utility (readonly)
 			[2]: _G.r (readonly)
@@ -3084,7 +3084,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -3104,7 +3104,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -3124,7 +3124,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -3144,7 +3144,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._UpdateViewModelAnimations() -- Line 26
+	function arg1._UpdateViewModelAnimations(non) -- Line 26
 		local var4
 		if 0 < arg1.ClientItem:Get("Ammo") then
 			var4 = "RareInspect"
@@ -3154,7 +3154,7 @@ end
 		arg1.Animator:ChangeRareInspectAnimation(var4)
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 		table.insert(arg1._connections, arg1.ClientItem:GetDataChangedSignal("Ammo"):Connect(function() -- Line 31
 			--[[ Upvalues[1]:
 				[1]: arg1 (readonly)
@@ -3179,7 +3179,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -3197,14 +3197,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetFriendlyTracerColor() -- Line 22
+	function arg1.GetFriendlyTracerColor(non) -- Line 22
 		--[[ Upvalues[1]:
 			[1]: ColorSequence_new_result1_upvr (readonly)
 		]]
 		return ColorSequence_new_result1_upvr
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 	end
 
 	arg1._Init()
@@ -3222,14 +3222,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetFriendlyTracerColor() -- Line 22
+	function arg1.GetFriendlyTracerColor(non) -- Line 22
 		--[[ Upvalues[1]:
 			[1]: ColorSequence_new_result1_upvr (readonly)
 		]]
 		return ColorSequence_new_result1_upvr
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 	end
 
 	arg1._Init()
@@ -3247,14 +3247,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetFriendlyTracerColor() -- Line 22
+	function arg1.GetFriendlyTracerColor(non) -- Line 22
 		--[[ Upvalues[1]:
 			[1]: ColorSequence_new_result1_upvr (readonly)
 		]]
 		return ColorSequence_new_result1_upvr
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 	end
 
 	arg1._Init()
@@ -3272,7 +3272,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -3302,14 +3302,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetFriendlyTracerColor() -- Line 29
+	function arg1.GetFriendlyTracerColor(non) -- Line 29
 		--[[ Upvalues[1]:
 			[1]: ColorSequence_new_result1_upvr (readonly)
 		]]
 		return ColorSequence_new_result1_upvr
 	end
 
-	function arg1._UpdateAmmoVisual() -- Line 37
+	function arg1._UpdateAmmoVisual(non) -- Line 37
 		-- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
 		local var5
 		if arg1._destroyed then
@@ -3335,7 +3335,7 @@ end
 		end
 	end
 
-	function arg1._Init() -- Line 55
+	function arg1._Init(non) -- Line 55
 		arg1.ClientItem:GetDataChangedSignal("AmmoReserve"):Connect(function() -- Line 56
 			--[[ Upvalues[1]:
 				[1]: arg1 (readonly)
@@ -3378,7 +3378,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -3396,14 +3396,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetFriendlyTracerColor() -- Line 22
+	function arg1.GetFriendlyTracerColor(non) -- Line 22
 		--[[ Upvalues[1]:
 			[1]: ColorSequence_new_result1_upvr (readonly)
 		]]
 		return ColorSequence_new_result1_upvr
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 	end
 
 	arg1._Init()
@@ -3436,14 +3436,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetFriendlyTracerColor() -- Line 22
+	function arg1.GetFriendlyTracerColor(non) -- Line 22
 		--[[ Upvalues[1]:
 			[1]: ColorSequence_new_result1_upvr (readonly)
 		]]
 		return ColorSequence_new_result1_upvr
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 	end
 
 	arg1._Init()
@@ -3461,7 +3461,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -3479,14 +3479,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetFriendlyTracerColor() -- Line 22
+	function arg1.GetFriendlyTracerColor(non) -- Line 22
 		--[[ Upvalues[1]:
 			[1]: ColorSequence_new_result1_upvr (readonly)
 		]]
 		return ColorSequence_new_result1_upvr
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 	end
 
 	arg1._Init()
@@ -3504,14 +3504,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetFriendlyTracerColor() -- Line 22
+	function arg1.GetFriendlyTracerColor(non) -- Line 22
 		--[[ Upvalues[1]:
 			[1]: ColorSequence_new_result1_upvr (readonly)
 		]]
 		return ColorSequence_new_result1_upvr
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 	end
 
 	arg1._Init()
@@ -3529,14 +3529,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetFriendlyTracerColor() -- Line 22
+	function arg1.GetFriendlyTracerColor(non) -- Line 22
 		--[[ Upvalues[1]:
 			[1]: ColorSequence_new_result1_upvr (readonly)
 		]]
 		return ColorSequence_new_result1_upvr
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 	end
 
 	arg1._Init()
@@ -3554,7 +3554,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -3572,7 +3572,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -3682,7 +3682,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 28
+	function arg1._Init(non) -- Line 28
 	end
 
 	arg1._Init()
@@ -3718,7 +3718,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._UpdateUseBar() -- Line 48
+	function arg1._UpdateUseBar(non) -- Line 48
 		local var5
 		if arg1._use_bar.AbsoluteSize.X <= 1 then
 			var5 = "• • •"
@@ -3728,7 +3728,7 @@ end
 		arg1._use_text.Text = var5
 	end
 
-	function arg1._UpdateUseGui() -- Line 52
+	function arg1._UpdateUseGui(non) -- Line 52
 		--[[ Upvalues[1]:
 			[1]: _G.animLib (readonly)
 		]]
@@ -3771,7 +3771,7 @@ end
 		end
 	end
 
-	function arg1._UpdateCatGui() -- Line 101
+	function arg1._UpdateCatGui(non) -- Line 101
 		arg1._play_cat_gif_hash += 1
 		arg1._cat_surface_gui.Enabled = arg1:IsAnimationPlaying("RareInspect")
 		if not arg1._cat_surface_gui.Enabled then
@@ -3784,12 +3784,12 @@ end
 		end
 	end
 
-	function arg1._Setup() -- Line 129
+	function arg1._Setup(non) -- Line 129
 		arg1._cat_image_label.Image = "rbxassetid://120426879154579"
 		arg1._cat_image_label.Size = UDim2.new(arg1._cat_image_label.Size.X.Scale * Vector3.new(4, 4, -2).X, arg1._cat_image_label.Size.X.Offset * Vector3.new(4, 4, -2).X, arg1._cat_image_label.Size.Y.Scale * Vector3.new(4, 4, -2).Y, arg1._cat_image_label.Size.Y.Offset * Vector3.new(4, 4, -2).Y)
 	end
 
-	function arg1._Init() -- Line 141
+	function arg1._Init(non) -- Line 141
 		arg1.AnimationPlayed:Connect(function(arg1_2) -- Line 142
 			--[[ Upvalues[1]:
 				[1]: arg1 (readonly)
@@ -3836,7 +3836,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -3856,7 +3856,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -3876,7 +3876,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -3900,7 +3900,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 32
+	function arg1._Init(non) -- Line 32
 		--[[ Upvalues[1]:
 			[1]: _G.utility (readonly)
 		]]
@@ -3934,7 +3934,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -3971,28 +3971,28 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetFriendlyTracerColor() -- Line 27
+	function arg1.GetFriendlyTracerColor(non) -- Line 27
 		--[[ Upvalues[1]:
 			[1]: ColorSequence_new_result1_upvr (readonly)
 		]]
 		return ColorSequence_new_result1_upvr
 	end
 
-	function arg1.PlayReloadStartParticles() -- Line 31
+	function arg1.PlayReloadStartParticles(non) -- Line 31
 		--[[ Upvalues[1]:
 			[1]: _G.utility (readonly)
 		]]
 		_G.utility:PlayParticles(arg1._reload_start_attachment)
 	end
 
-	function arg1.PlayReloadFinishParticles() -- Line 35
+	function arg1.PlayReloadFinishParticles(non) -- Line 35
 		--[[ Upvalues[1]:
 			[1]: _G.utility (readonly)
 		]]
 		_G.utility:PlayParticles(arg1._reload_finish_attachment)
 	end
 
-	function arg1._Init() -- Line 43
+	function arg1._Init(non) -- Line 43
 	end
 
 	arg1._Init()
@@ -4010,7 +4010,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -4028,14 +4028,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetFriendlyTracerColor() -- Line 22
+	function arg1.GetFriendlyTracerColor(non) -- Line 22
 		--[[ Upvalues[1]:
 			[1]: ColorSequence_new_result1_upvr (readonly)
 		]]
 		return ColorSequence_new_result1_upvr
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 	end
 
 	arg1._Init()
@@ -4059,7 +4059,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.PlayHornEffect() -- Line 28
+	function arg1.PlayHornEffect(non) -- Line 28
 		--[[ Upvalues[1]:
 			[1]: _G.animLib (readonly)
 		]]
@@ -4067,7 +4067,7 @@ end
 		task.delay(_G.animLib.Info[arg1.Info.Animations.Use].ActionTimestamp, arg1._IncrementParticlesActive, arg1, -1)
 	end
 
-	function arg1._IncrementParticlesActive(, arg2) -- Line 37
+	function arg1._IncrementParticlesActive(non, arg2) -- Line 37
 		arg1._horn_particles_active += arg2
 		for _, v in pairs(arg1._horn_particles) do
 			local var13
@@ -4080,7 +4080,7 @@ end
 		end
 	end
 
-	function arg1._Setup() -- Line 45
+	function arg1._Setup(non) -- Line 45
 		--[[ Upvalues[1]:
 			[1]: WarHornEffects_upvr (readonly)
 		]]
@@ -4095,7 +4095,7 @@ end
 		end
 	end
 
-	function arg1._Init() -- Line 53
+	function arg1._Init(non) -- Line 53
 		arg1:_Setup()
 	end
 
@@ -4120,7 +4120,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -4144,7 +4144,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -4168,7 +4168,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -4192,7 +4192,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -4255,7 +4255,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -4273,7 +4273,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -4291,7 +4291,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -4317,7 +4317,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.Unequip(, ...) -- Line 30
+	function arg1.Unequip(non, ...) -- Line 30
 		--[[ Upvalues[1]:
 			[1]: Battle Axe_upvr (readonly)
 		]]
@@ -4325,7 +4325,7 @@ end
 		Battle Axe_upvr.Unequip(arg1, ...)
 	end
 
-	function arg1.Destroy() -- Line 35
+	function arg1.Destroy(non) -- Line 35
 		--[[ Upvalues[1]:
 			[1]: Battle Axe_upvr (readonly)
 		]]
@@ -4333,7 +4333,7 @@ end
 		Battle Axe_upvr.Destroy(arg1)
 	end
 
-	function arg1._EquipEffect(, arg2) -- Line 44
+	function arg1._EquipEffect(non, arg2) -- Line 44
 		--[[ Upvalues[1]:
 			[1]: _G.utility (readonly)
 		]]
@@ -4360,7 +4360,7 @@ end
 		end
 	end
 
-	function arg1._Init() -- Line 78
+	function arg1._Init(non) -- Line 78
 		arg1.Equipped:Connect(function(arg1_2) -- Line 79
 			--[[ Upvalues[1]:
 				[1]: arg1 (readonly)
@@ -4399,7 +4399,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		task.defer(function() -- Line 27
 			--[[ Upvalues[1]:
 				[1]: arg1 (readonly)
@@ -4444,7 +4444,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -4494,7 +4494,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._UpdateAmmoVisual() -- Line 29
+	function arg1._UpdateAmmoVisual(non) -- Line 29
 		if arg1._destroyed then
 		else
 			for i, v in pairs(arg1._registered_ammo_visuals) do
@@ -4526,11 +4526,11 @@ end
 		end
 	end
 
-	function arg1._RegisterAmmoVisual(, arg2, arg3) -- Line 46
+	function arg1._RegisterAmmoVisual(non, arg2, arg3) -- Line 46
 		arg1._registered_ammo_visuals[arg2] = arg3
 	end
 
-	function arg1._Init() -- Line 50
+	function arg1._Init(non) -- Line 50
 		arg1.ClientItem:GetDataChangedSignal("Ammo"):Connect(function() -- Line 51
 			--[[ Upvalues[1]:
 				[1]: arg1 (readonly)
@@ -4569,7 +4569,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("LeftBody"):WaitForChild("MeshPart1"), 1)
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("LeftBody"):WaitForChild("MeshPart2"), 1)
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("RightBody"):WaitForChild("MeshPart1"), 2)
@@ -4593,7 +4593,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("LeftBody"):WaitForChild("MeshPart1"), 1)
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("LeftBody"):WaitForChild("MeshPart2"), 1)
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("LeftBody"):WaitForChild("MeshPart3"), 1)
@@ -4619,7 +4619,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		for i, v in pairs({"LeftBody", "RightBody"}) do
 			for i_2 = 1, 7 do
 				arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild(v):WaitForChild("MeshPart"..i_2), i)
@@ -4644,7 +4644,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("LeftBody"):WaitForChild("MeshPart"), 1)
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("RightBody"):WaitForChild("MeshPart"), 2)
 	end
@@ -4666,7 +4666,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("LeftBody"):WaitForChild("MeshPart"), 1)
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("RightBody"):WaitForChild("MeshPart"), 2)
 	end
@@ -4688,7 +4688,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("LeftBody"):WaitForChild("MeshPart1"), 1)
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("LeftBody"):WaitForChild("MeshPart2"), 1)
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("RightBody"):WaitForChild("MeshPart1"), 2)
@@ -4725,7 +4725,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Stick"), 1)
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Tip"), 1)
 	end
@@ -4745,7 +4745,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Feather"), 1)
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Stick"), 1)
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Tip"), 1)
@@ -4766,7 +4766,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Stick"), 1)
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Tip"), 1)
 	end
@@ -4786,7 +4786,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Fins"), 1)
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Metal"), 1)
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("Stick"), 1)
@@ -4807,7 +4807,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("Arrow"):WaitForChild("MeshPart"), 1)
 	end
 
@@ -4828,7 +4828,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 28
+	function arg1._Init(non) -- Line 28
 	end
 
 	arg1._Init()
@@ -4848,7 +4848,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -4868,7 +4868,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -4888,7 +4888,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -4908,7 +4908,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -4928,7 +4928,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -4946,14 +4946,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetTracerTemplate() -- Line 22
+	function arg1.GetTracerTemplate(non) -- Line 22
 		--[[ Upvalues[1]:
 			[1]: EnergyBeamTracerEffect_upvr (readonly)
 		]]
 		return EnergyBeamTracerEffect_upvr
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 	end
 
 	arg1._Init()
@@ -4971,14 +4971,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetTracerTemplate() -- Line 22
+	function arg1.GetTracerTemplate(non) -- Line 22
 		--[[ Upvalues[1]:
 			[1]: HackerBeamTracerEffect_upvr (readonly)
 		]]
 		return HackerBeamTracerEffect_upvr
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 	end
 
 	arg1._Init()
@@ -4996,14 +4996,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetTracerTemplate() -- Line 22
+	function arg1.GetTracerTemplate(non) -- Line 22
 		--[[ Upvalues[1]:
 			[1]: ApexBeamTracerEffect_upvr (readonly)
 		]]
 		return ApexBeamTracerEffect_upvr
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 	end
 
 	arg1._Init()
@@ -5021,14 +5021,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetTracerTemplate() -- Line 22
+	function arg1.GetTracerTemplate(non) -- Line 22
 		--[[ Upvalues[1]:
 			[1]: 2025BeamTracerEffect_upvr (readonly)
 		]]
 		return 2025BeamTracerEffect_upvr
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 	end
 
 	arg1._Init()
@@ -5046,7 +5046,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -5064,14 +5064,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetTracerTemplate() -- Line 22
+	function arg1.GetTracerTemplate(non) -- Line 22
 		--[[ Upvalues[1]:
 			[1]: VoidBeamTracerEffect_upvr (readonly)
 		]]
 		return VoidBeamTracerEffect_upvr
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 	end
 
 	arg1._Init()
@@ -5089,7 +5089,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -5107,14 +5107,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetFriendlyTracerColor() -- Line 22
+	function arg1.GetFriendlyTracerColor(non) -- Line 22
 		--[[ Upvalues[1]:
 			[1]: ColorSequence_new_result1_upvr (readonly)
 		]]
 		return ColorSequence_new_result1_upvr
 	end
 
-	function arg1.PlayAimSound(, arg2) -- Line 26
+	function arg1.PlayAimSound(non, arg2) -- Line 26
 		local var5
 		if arg2 then
 			var5 = 0.1
@@ -5125,7 +5125,7 @@ end
 		arg1:CreateSound("rbxassetid://96253147006478", 0.375, 2 + var5, true, var5)
 	end
 
-	function arg1._Init() -- Line 34
+	function arg1._Init(non) -- Line 34
 	end
 
 	arg1._Init()
@@ -5143,7 +5143,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._UpdateDefaultAnimationsFromAmmo() -- Line 26
+	function arg1._UpdateDefaultAnimationsFromAmmo(non) -- Line 26
 		-- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
 		local var4
 		if arg1.ClientItem:Get("Ammo") > 0 then
@@ -5168,7 +5168,7 @@ end
 		end
 	end
 
-	function arg1._Init() -- Line 44
+	function arg1._Init(non) -- Line 44
 		arg1.ClientItem:GetDataChangedSignal("AmmoReserve"):Connect(function() -- Line 45
 			--[[ Upvalues[1]:
 				[1]: arg1 (readonly)
@@ -5214,7 +5214,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1.Animator.AnimationStopped:Connect(function(arg1_2) -- Line 27
 			--[[ Upvalues[1]:
 				[1]: arg1 (readonly)
@@ -5250,7 +5250,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -5268,7 +5268,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -5286,7 +5286,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.ExplosionEffect(, arg2, arg3) -- Line 22
+	function arg1.ExplosionEffect(non, arg2, arg3) -- Line 22
 		--[[ Upvalues[2]:
 			[1]: Molotov_upvr (readonly)
 			[2]: _G.utility (readonly)
@@ -5294,7 +5294,7 @@ end
 		_G.utility:CreateSound("rbxassetid://100889848836357", 1, 1 + 0.25 * math.random(), Molotov_upvr.ExplosionEffect(arg1, arg2, arg3), true, 10)
 	end
 
-	function arg1._Init() -- Line 31
+	function arg1._Init(non) -- Line 31
 	end
 
 	arg1._Init()
@@ -5312,7 +5312,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -5330,11 +5330,11 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.AbsorbedHit() -- Line 20
+	function arg1.AbsorbedHit(non) -- Line 20
 		arg1:CreateSound("rbxassetid://131693414206770", 1, 0.9 + 0.2 * math.random(), true, 5)
 	end
 
-	function arg1._Init() -- Line 28
+	function arg1._Init(non) -- Line 28
 	end
 
 	arg1._Init()
@@ -5352,11 +5352,11 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.AbsorbedHit() -- Line 22
+	function arg1.AbsorbedHit(non) -- Line 22
 		arg1:CreateSound("rbxassetid://110086876051279", 1, 0.9 + 0.2 * math.random(), true, 5)
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 	end
 
 	arg1._Init()
@@ -5374,7 +5374,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -5392,7 +5392,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -5412,19 +5412,19 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetImage() -- Line 29
+	function arg1.GetImage(non) -- Line 29
 		return arg1._painting_data[2]
 	end
 
-	function arg1.AbsorbedHit() -- Line 33
+	function arg1.AbsorbedHit(non) -- Line 33
 		arg1:CreateSound("rbxassetid://134671375134755", 1, 0.9 + 0.2 * math.random(), true, 5)
 	end
 
-	function arg1._Setup() -- Line 41
+	function arg1._Setup(non) -- Line 41
 		arg1.ItemModel:WaitForChild("Body"):WaitForChild("Canvas"):WaitForChild("Decal").Texture = arg1._painting_data[1]
 	end
 
-	function arg1._Init() -- Line 45
+	function arg1._Init(non) -- Line 45
 		arg1:_Setup()
 	end
 
@@ -5443,7 +5443,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -5461,7 +5461,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1.Animator:OverridePreviousAnimationsOnPlay(true)
 	end
 
@@ -5480,7 +5480,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -5498,14 +5498,14 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.GetFriendlyTracerColor() -- Line 22
+	function arg1.GetFriendlyTracerColor(non) -- Line 22
 		--[[ Upvalues[1]:
 			[1]: ColorSequence_new_result1_upvr (readonly)
 		]]
 		return ColorSequence_new_result1_upvr
 	end
 
-	function arg1._Init() -- Line 30
+	function arg1._Init(non) -- Line 30
 	end
 
 	arg1._Init()
@@ -5523,7 +5523,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
@@ -5549,7 +5549,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1.Update(, arg2, arg3, arg4) -- Line 27
+	function arg1.Update(non, arg2, arg3, arg4) -- Line 27
 		--[[ Upvalues[1]:
 			[1]: Gunblade_upvr (readonly)
 		]]
@@ -5575,7 +5575,7 @@ end
 		end
 	end
 
-	function arg1._PlayIdleSound() -- Line 48
+	function arg1._PlayIdleSound(non) -- Line 48
 		local any_CreateSound_result1 = arg1:CreateSound("rbxassetid://13645858587", 0.375, 1, true, nil, 10, 40)
 		if any_CreateSound_result1 then
 			any_CreateSound_result1.Looped = true
@@ -5590,7 +5590,7 @@ end
 		end
 	end
 
-	function arg1._Init() -- Line 68
+	function arg1._Init(non) -- Line 68
 		arg1.Equipped:Connect(function() -- Line 69
 			--[[ Upvalues[1]:
 				[1]: arg1 (readonly)
@@ -5616,7 +5616,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._UpdateAmmoVisual() -- Line 28
+	function arg1._UpdateAmmoVisual(non) -- Line 28
 		-- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
 		local var4
 		if var4 then
@@ -5636,7 +5636,7 @@ end
 		end
 	end
 
-	function arg1._Init() -- Line 39
+	function arg1._Init(non) -- Line 39
 		arg1.ClientItem:GetDataChangedSignal("Ammo"):Connect(function() -- Line 40
 			--[[ Upvalues[1]:
 				[1]: arg1 (readonly)
@@ -5663,7 +5663,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("LeftBody"):WaitForChild("MeshPart1"), 1)
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("LeftBody"):WaitForChild("MeshPart2"), 1)
 		arg1:_RegisterAmmoVisual(arg1.ItemModel:WaitForChild("RightBody"):WaitForChild("MeshPart1"), 2)
@@ -5685,7 +5685,7 @@ for name, v in pairs(shar) do
 	arg1[name]=v
 end
 	
-	function arg1._Init() -- Line 26
+	function arg1._Init(non) -- Line 26
 	end
 
 	arg1._Init()
