@@ -16,8 +16,11 @@ ADDING NEW SKINS:
 
 - Copying rivals ItemLibrary to WeaponTypes 'str'
 - Run Clipboard script and pasting to Github
-- Put new add_animations from AnimLib to Github
-- Put add_viewmodel from CosmeticLibrary to Github
+- Put new 'add_animations' from AnimLib to Github
+- Put new WeaponTypes 'add_gun' from ItemLibrary to Github
+- Put new 'add_viewmodel' from ItemLibrary to SkinChanger
+- Put 'add_cosmetic_upvr' from CosmeticLibrary to Github
+- DO EXTRAFUNCS SETTER (OR NOT)
 
 ADDING NEW ITEMS:
 
@@ -73,6 +76,8 @@ _G.hd = hitmarkerSounds.ChildAdded:Connect(function(v : Sound)
 		end
 	end
 end)
+
+_G.r = game:GetService('RunService')
 
 local skinmodx = not load and _G.skinmod
 if not skinmodx then
@@ -360,7 +365,7 @@ local function cchar(id)
 			end
 
 			local suc, z = false, 'Lid Exists'
-			if not (lid and (not lid.inff)) then
+			if not lid or not lid.inff then
 				suc, z = pcall(function()
 					return game:GetService('UserService'):GetUserInfosByUserIdsAsync({id})
 				end)
@@ -369,17 +374,6 @@ local function cchar(id)
 			local inf = lid and lid.inff or suc and z
 
 			if not inf or typeof(inf) == 'boolean' then ui:Notify({Title = 'Name,Displayname Error', Content = tostring(z), Duration = 10, Image = 'search-x'}) return end
-
-			if not inf or typeof(inf) == 'boolean' then
-				inf = {
-					{
-						HasVerifiedBadge = false,
-						Username = 'HTTP_429',
-						DisplayName = 'error429'
-					},
-					isfake = true
-				}
-			end
 
 			inff = inf
 			loadedids[id].inff = inf
@@ -1396,9 +1390,10 @@ if not _G.selectChanged then
 	task.spawn(function()
 		local function checkfor(v)
 			task.spawn(function()
-				if v.Name == 'PickWeapons' and not v:HasTag('Econ') then
+				local typ = v.Name == 'PickWeapons' and 1 or v.Name == 'PickWeaponsList' and 2 or 0
+				if typ>0 and not v:HasTag('Econ') then
 					local chosen = v:WaitForChild('ChosenWeapons')
-					local list = v:WaitForChild('List')
+					local list = typ == 1 and v:WaitForChild('List') or v:WaitForChild('ListContainer').List
 
 					v:AddTag'Econ'
 
@@ -1411,7 +1406,7 @@ if not _G.selectChanged then
 
 						local function handle(v)
 							task.spawn(function()
-								local b = v.Name == 'PickWeaponSlot' and v:WaitForChild('Button')
+								local b = v.Name:find('PickWeapon') and v:WaitForChild('Button')
 								if b and b:FindFirstChild('Icon') and b.Icon:FindFirstChild('Picture') then
 									b = b.Icon.Picture
 									b.Name = 'OPic'
@@ -1442,7 +1437,7 @@ if not _G.selectChanged then
 
 						local function handle2(v)
 							task.spawn(function()
-								if v.Name == 'PickWeaponChosenSlot' then
+								if v.Name:find('ChosenSlot') then
 									local b = v.Button.Picture
 									local function calc()
 										local ts = icoToSikn[b.Image]
@@ -1851,6 +1846,14 @@ function applySkin(skinName, cs)
 					function asev:Connect(func)
 						table.insert(stopcons, func)
 					end
+					
+					-- // Equiped
+					
+					local eqev = {}
+					local equipcons = {}
+					function eqev:Connect(func)
+						table.insert(equipcons, func)
+					end
 
 					-- // Table
 
@@ -1858,8 +1861,13 @@ function applySkin(skinName, cs)
 						ItemModel = clone,
 						_destroyed = false,
 						AnimationPlayed = apev,
-						AnimationStopped = asev
+						AnimationStopped = asev,
+						Equipped = eqev,
 					}
+					
+					function tb:_RegisterAmmoVisual()
+						
+					end
 
 					local playii = {}
 					function tb:IsAnimationPlaying(n)
@@ -1869,6 +1877,8 @@ function applySkin(skinName, cs)
 					if ef then
 						ef = ef.new(tb)
 					end
+					
+					local tovis = {}
 
 					for _, v in pairs(clone:GetChildren()) do
 						if v:FindFirstChild("Primary") then
@@ -1887,8 +1897,9 @@ function applySkin(skinName, cs)
 
 							newMotor.C0 = v:GetAttribute('C0') or CFrame.new()
 							newMotor.C1 = v:GetAttribute('C1') or CFrame.new()
-
-							v.Parent = vm.ItemVisual
+							
+							v.Parent = game:GetService('CoreGui')
+							table.insert(tovis, v)
 						end
 					end
 
@@ -2102,7 +2113,10 @@ function applySkin(skinName, cs)
 								local ls = scr and loadstring(scr)
 
 								task.spawn(function()
-									repeat wait() until anim.Length > 0
+									if anim.Length == 0 then
+										repeat run.Stepped:Wait() until anim.Length > 0
+									end
+									
 									zx += 1
 								end)
 
@@ -2216,6 +2230,10 @@ function applySkin(skinName, cs)
 						if not c or c == vm or not table.find(_G.applied, c) then
 							soundOn = p ~= vms
 							soundGroup.Volume = soundOn and ss.Other.Volume or 0
+							
+							for _, v in pairs(equipcons) do
+								v()
+							end
 
 							if soundOn then
 								for _, v in pairs(animtbl) do
@@ -2253,10 +2271,19 @@ function applySkin(skinName, cs)
 							_G.skinToAnimCon[name] = nil
 						end
 					end)
-
-					if vm == vms:GetChildren()[1] and _G.frr then
-						_G.frr()
-					end
+					
+					-- // ADD
+					
+					task.spawn(function()
+						repeat run.Stepped:Wait() until zx >= mx or not vm.Parent
+						for _, v in pairs(tovis) do
+							v.Parent = vm.ItemVisual
+						end
+						
+						if vm == vms:GetChildren()[1] and _G.frr then
+							_G.frr()
+						end
+					end)
 				end
 			end)
 		end
