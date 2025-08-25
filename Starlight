@@ -319,14 +319,14 @@ local function BlurModule(Frame : Frame)
 	end
 
 	function BlurredGui.updateAll()
-		blurObject.NearIntensity = tonumber(Frame:GetAttribute("BlurIntensity"))
+		--blurObject.NearIntensity = tonumber(Frame:GetAttribute("BlurIntensity"))
 
-		for i = 1, #BlursList do
-			updateGui(BlursList[i])
-		end
+		--for i = 1, #BlursList do
+		--	updateGui(BlursList[i])
+		--end
 
-		local cframes = table.create(#BlursList, workspace.CurrentCamera.CFrame)
-		workspace:BulkMoveTo(PartsList, cframes, Enum.BulkMoveMode.FireCFrameChanged)
+		--local cframes = table.create(#BlursList, workspace.CurrentCamera.CFrame)
+		--workspace:BulkMoveTo(PartsList, cframes, Enum.BulkMoveMode.FireCFrameChanged)
 
 		--blurObject.FocusDistance = 0.25 - Camera.NearPlaneZ
 	end
