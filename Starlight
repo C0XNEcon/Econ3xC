@@ -4661,6 +4661,11 @@ function Starlight:CreateWindow(WindowSettings)
 			if gpe then return end
 			if input.KeyCode == Enum.KeyCode[Starlight.WindowKeybind] then
 				local _min = Starlight.Minimized
+				local toggleCallback = Starlight.Window.Values.Callback :: (open:boolean)->()
+				if toggleCallback then
+					task.spawn(toggleCallback,_min)
+				end
+				
 				if Starlight.Minimized then
 					Unhide(mainWindow)
 					Unhide(StarlightUI.Drag)				
@@ -4673,11 +4678,6 @@ function Starlight:CreateWindow(WindowSettings)
 					Hide(StarlightUI.Drag, false, false, Starlight.WindowKeybind)
 					Resources["un-fps"].Modal = false
 					Resources["un-fps"].Visible = false
-				end
-				
-				local toggleCallback = Starlight.Window.Values.Callback :: (open:boolean)->()
-				if toggleCallback then
-					toggleCallback(not _min)
 				end
 			end
 		end)
