@@ -35,10 +35,11 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 	-- ONLY PARTS WITH WRAP GROUP ATTRIBUTE ARE AFFECTED
 	-- INVERTED: 2 > 1 | 1 > 2 | 3 > 3
 	
-	if ITEM_WRAPS[item] and ITEM_WRAPS[item][2] == wrapx then return end
+	local CURR = ITEM_WRAPS[item]
+	if CURR and CURR[2] == wrapx and CURR[3] == inverted then return end
 	
-	local CURR_IND = ITEM_WRAPS[item] and ITEM_WRAPS[item][1]+1 or 1
-	ITEM_WRAPS[item] = {CURR_IND,wrapx}
+	local CURR_IND = CURR and CURR[1]+1 or 1
+	ITEM_WRAPS[item] = {CURR_IND,wrapx,inverted}
 	
 	local function IS_CURRENT()
 		return ITEM_WRAPS[item][1] == CURR_IND
