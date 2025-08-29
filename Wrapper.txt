@@ -29,10 +29,21 @@ end
 
 _G.speed = .008
 
+local ITEM_WRAPS = {}
+
 function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 	-- ONLY PARTS WITH WRAP GROUP ATTRIBUTE ARE AFFECTED
 	-- INVERTED: 2 > 1 | 1 > 2 | 3 > 3
-
+	
+	if ITEM_WRAPS[item] and ITEM_WRAPS[2] == wrapx then return end
+	
+	local CURR_IND = ITEM_WRAPS[item] and ITEM_WRAPS[item][1]+1 or 1
+	ITEM_WRAPS[item] = {CURR_IND,wrapx}
+	
+	local function IS_CURRENT()
+		return ITEM_WRAPS[item][1] == CURR_IND
+	end
+	
 	local wrap = wraps[wrapx]
 
 	if not wrap and wrapx ~= 'None' then return end
@@ -116,9 +127,9 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 		['Neon Lights'] = function()
 			local z
 			z = run.Heartbeat:Connect(function()
-				if #new > 0 and new[1].Parent then
+				if #new > 0 and new[1].Parent and IS_CURRENT() then
 					local add = math.floor(tick() * 10) * 0.027 % 0.25
-					for _, v in pairs(new) do
+					for _, v in new do
 						v.OffsetStudsV = add
 					end
 				else
@@ -130,8 +141,8 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 		Solar = function()
 			local z
 			z = run.Heartbeat:Connect(function()
-				if #new > 0 and new[1].Parent then
-					for _, v in pairs(new) do
+				if #new > 0 and new[1].Parent and IS_CURRENT() then
+					for _, v in new do
 						if v.Name == 'Wireframe' then
 							v.OffsetStudsU = (math.random() - 0.5) * 0.01
 							v.OffsetStudsV = (math.random() - 0.5) * 0.01
@@ -146,8 +157,8 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 		Celestial = function()
 			local z
 			z = run.Heartbeat:Connect(function()
-				if #new > 0 and new[1].Parent then
-					for i, v in pairs(new) do
+				if #new > 0 and new[1].Parent and IS_CURRENT() then
+					for i, v in new do
 						local var9 = (tick() * 0.01 + (v.Name == 'Big' and .5 or 0)) % 1
 						local var10 = 0.05 + 1.075 * var9 ^ 2
 						v.Transparency = math.sin(math.pi * var9 - (math.pi/2)) ^ 20 * 0.75 + 0.25
@@ -165,9 +176,9 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 			local _shift = 0
 			local arg2 = 1
 			z = run.Heartbeat:Connect(function()
-				if #new > 0 and new[1].Parent then
+				if #new > 0 and new[1].Parent and IS_CURRENT() then
 					_shift = (_shift + 1 * (math.sin(tick() * 1) ^ 20 * 0.75 + 0.25))-- % 0.2
-					for i, v in pairs(new) do
+					for i, v in new do
 						v.OffsetStudsU = _shift * (v.Name == 'Left' and 1 or -1) * _G.speed
 					end
 				else
@@ -179,7 +190,7 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 		['Dark Matter'] = function()
 			local z
 			z = run.Heartbeat:Connect(function()
-				if #new > 0 and new[1].Parent then
+				if #new > 0 and new[1].Parent and IS_CURRENT() then
 					for i, v in new do
 						local speed, dir = v:GetAttribute('Speed'), v:GetAttribute('Direction')
 						if speed and dir then
