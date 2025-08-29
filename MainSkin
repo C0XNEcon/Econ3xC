@@ -20,6 +20,11 @@ ADDING NEW SKINS:
 - Put new 'add_viewmodel' from ItemLibrary to  -- << TODO:Econ/Skin >>
 - Put 'add_cosmetic_upvr' from CosmeticLibrary to -- << TODO:Econ/SkinInfo >>
 
+
+ADDING NEW WRAPS:
+
+- Put 'add_wrap' from CosmeticLibrary to -- << TODO:Econ/Wrapper.txt >>
+
 - / Not Necessary: Extrafuncs /
 
 ADDING NEW ITEMS:
@@ -224,7 +229,7 @@ local wrapper = loadstring(game:HttpGet(z..'Wrapper.txt'))()
 function readSkinFile()
 	local rf = isfile('cSkin') 
 	if rf then
-		local splits = string.split(readfile('cSkin'), '.')
+		local splits = string.split(readfile('cSkin'), '�')
 		for _, v in pairs(splits) do
 			local inf = string.split(v, '`')
 			wrapSkinInfo[inf[1]] = {
@@ -240,7 +245,7 @@ end
 function writeSkinFile()
 	local str = ''
 	for skin, inf in pairs(wrapSkinInfo) do
-		str..=skin..'`'..(inf.wrap or 'None')..'`'..tostring(inf.inverted)..'.'
+		str..=skin..'`'..(inf.wrap or 'None')..'`'..tostring(inf.inverted)..'�'
 	end
 	writefile('cSkin', str)
 end
@@ -257,7 +262,7 @@ local cid = plr.UserId
 function readsfile()
 	local rf = isfile('cSkinchanged') 
 	if rf then
-		local splits = string.split(readfile('cSkinchanged'), '.')
+		local splits = string.split(readfile('cSkinchanged'), '�')
 		for _, v in pairs(splits) do
 			local inf = string.split(v, '`')
 			if weaponToButton[inf[1]] then
@@ -276,7 +281,7 @@ end
 function writesfile()
 	local str = tostring(cid)..'.'
 	for weapon, skin in pairs(_G.toskin) do
-		str..=weapon..'`'..skin..'.'
+		str..=weapon..'`'..skin..'�'
 	end
 	writefile('cSkinchanged', str)
 end
