@@ -49,10 +49,10 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 
 	local ogWeapon = ogw:FindFirstChild(spl[3], true)
 	local ind = 0
-	
+
 	local new = {}
 	_G.cn = new
-	
+
 	for _, v in pairs(item:GetDescendants()) do
 		local wg = v:GetAttribute('WrapGroup')
 
@@ -111,7 +111,7 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 			end
 		end
 	end
-	
+
 	local funcs = {
 		['Neon Lights'] = function()
 			local z
@@ -126,7 +126,7 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 				end
 			end)
 		end,
-		
+
 		Solar = function()
 			local z
 			z = run.Heartbeat:Connect(function()
@@ -142,7 +142,7 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 				end
 			end)
 		end,
-		
+
 		Celestial = function()
 			local z
 			z = run.Heartbeat:Connect(function()
@@ -159,7 +159,7 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 				end
 			end)
 		end,
-		
+
 		Speed = function()
 			local z
 			local _shift = 0
@@ -175,8 +175,25 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 				end
 			end)
 		end,
+		
+		['Dark Matter'] = function()
+			local z
+			z = run.Heartbeat:Connect(function()
+				if #new > 0 and new[1].Parent then
+					for i, v in pairs(new) do
+						local speed, dir = v:GetAttribute('Speed'), v:GetAttribute('Direction')
+						if speed and dir then
+							i.OffsetStudsU = tick() * speed * dir.X % i.StudsPerTileU
+							i.OffsetStudsV = tick() * speed * dir.Y % i.StudsPerTileV
+						end
+					end
+				else
+					z:Disconnect()
+				end
+			end)
+		end,
 	}
-	
+
 	if funcs[wrapx] then funcs[wrapx]() end
 end
 
@@ -186,12 +203,14 @@ mod:add_wrap("Unique", "Cream", {nil, Color3.fromRGB(255, 209, 157), 0, 0, nil},
 mod:add_wrap("Unique", "Danger", {Enum.Material.Neon, Color3.fromRGB(168, 0, 0), 0, 0, "Danger1"}, {Enum.Material.Neon, Color3.fromRGB(17, 17, 17), 0, 0, "Danger2"}, {Enum.Material.Neon, Color3.fromRGB(161, 47, 47), 0, 0, nil}, nil, "Earned by completing a special challenge during the Roblox 2024 Winter Spotlight")
 mod:add_wrap("Unique", "Glacier", {"Glacier", Color3.fromRGB(175, 221, 255), 0, 0, nil}, {"Glacier", Color3.fromRGB(231, 231, 236), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(130, 157, 166), 0, 0, nil}, nil, "Earned from the 2024 Festive Event Advent Calendar")
 mod:add_wrap("Unique", "Pine", {Enum.Material.SmoothPlastic, Color3.fromRGB(58, 115, 55), 0, 0, "Pine"}, {"Pine", Color3.fromRGB(72, 51, 40), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(158, 162, 121), 0, 0, nil}, nil, "Earned from the 2024 Festive Event Advent Calendar")
+mod:add_wrap("Unique", "Glamour", {Enum.Material.SmoothPlastic, Color3.fromRGB(86, 36, 36), 0, 0, "Glamour"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(117, 0, 0), 0, 0.1, nil}, {Enum.Material.Neon, Color3.fromRGB(170, 128, 99), 0, 0, nil}, nil, "Earned by watching a quick video ad in the Shop")
 mod:add_wrap("Unique", "Sensite", {"Developore", Color3.fromRGB(255, 180, 30), 0, 0, nil}, {"Developore", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(255, 172, 99), nil, nil, nil})
 mod:add_wrap("Unique", "Nosnite", {"Developore", Color3.fromRGB(180, 128, 255), 0, 0, nil}, {"Developore", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(136, 114, 202), nil, nil, nil})
 mod:add_wrap("Unique", "Nekore", {"Developore", Color3.fromRGB(6, 100, 150), 0, 0, nil}, {"Developore", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(102, 144, 236), nil, nil, nil})
 mod:add_wrap("Unique", "Shadore", {"Developore", Color3.fromRGB(203, 51, 51), 0, 0, nil}, {"Developore", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(248, 108, 108), nil, nil, nil})
 mod:add_wrap("Unique", "Brianore", {"Developore", Color3.fromRGB(101, 255, 93), 0, 0, nil}, {"Developore", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(157, 248, 163), nil, nil, nil})
 mod:add_wrap("Unique", "Boomore", {"Developore", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {"Developore", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(175, 175, 175), nil, nil, nil})
+mod:add_wrap("Unique", "Beggar", {Enum.Material.Pebble, Color3.fromRGB(255, 176, 0), 0.05, 0, "dude"}, {Enum.Material.CorrodedMetal, Color3.fromRGB(255, 176, 0), 0.1, 0, "bruh"}, {Enum.Material.Neon, Color3.fromRGB(9, 137, 207), 0, 1000, "epic"}, nil, "Beggars can't be choosers")
 mod:add_wrap("Common", "Red", {nil, Color3.fromRGB(255, 50, 50), 0, 0, nil})
 mod:add_wrap("Common", "Orange", {nil, Color3.fromRGB(255, 110, 0), 0, 0, nil})
 mod:add_wrap("Common", "Yellow", {nil, Color3.fromRGB(255, 215, 0), 0, 0, nil})
@@ -240,7 +259,7 @@ mod:add_wrap("Common", "Normal", {Enum.Material.Neon, Color3.fromRGB(138, 0, 148
 mod:add_wrap("Common", "Rust", {Enum.Material.CorrodedMetal, nil, 0, 0, nil}, {Enum.Material.CorrodedMetal, nil, 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(159, 159, 159), 0, 0.1, nil})
 mod:add_wrap("Common", "Tawny", {Enum.Material.Neon, Color3.fromRGB(255, 233, 111), 0, 0, "Tawny1"}, {Enum.Material.Neon, Color3.fromRGB(68, 44, 7), 0, 0, "Tawny2"}, {Enum.Material.Neon, Color3.fromRGB(167, 118, 78), 0, 0, nil})
 mod:add_wrap("Common", "Olo", {nil, Color3.fromRGB(0, 254, 202), 0, 0, nil})
-mod:add_wrap("Rare", "Gold", {Enum.Material.Glass, Color3.fromRGB(255, 170, 24), 0, 0.4, nil}, {Enum.Material.Glass, Color3.fromRGB(255, 170, 24), 0, 0.4, nil}, {nil, Color3.fromRGB(255, 165, 120), nil, nil, nil}, nil, "Earned from contracts", "Earned from a contract for this weapon")
+mod:add_wrap("Rare", "Gold", {Enum.Material.Glass, Color3.fromRGB(255, 170, 24), 0, 0.4, nil}, {Enum.Material.Glass, Color3.fromRGB(255, 170, 24), 0, 0.4, nil}, {nil, Color3.fromRGB(255, 165, 120), nil, nil, nil}, nil, "Earned from weapon contracts", "Earned from a weapon contract for this weapon")
 mod:add_wrap("Rare", "Forest Camo", {"Forest Camo", Color3.fromRGB(237, 234, 234), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(17, 17, 17), 0, 0, nil}, {nil, Color3.fromRGB(140, 255, 98), nil, nil, nil})
 mod:add_wrap("Rare", "Honeycomb", {"Honeycomb", Color3.fromRGB(255, 201, 74), 0, 0, nil}, {Enum.Material.SmoothPlastic, Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(170, 121, 72), 0, 0, nil})
 mod:add_wrap("Rare", "Patriot", {"Patriot", Color3.fromRGB(248, 248, 248), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(17, 17, 17), 0, 0, nil}, {nil, Color3.fromRGB(168, 168, 168), nil, nil, nil})
@@ -349,7 +368,7 @@ mod:add_wrap("Rare", "TIX", {Enum.Material.SmoothPlastic, Color3.fromRGB(19, 21,
 mod:add_wrap("Rare", "Tealur", {Enum.Material.Neon, Color3.fromRGB(73, 166, 138), 0, 0, "Tealur"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(23, 23, 23), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(70, 159, 131), 0, 0, nil})
 mod:add_wrap("Rare", "Waste", {Enum.Material.Neon, Color3.fromRGB(0, 168, 67), 0, 0, "Waste1"}, {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 0, 0, "Waste2"}, {Enum.Material.Neon, Color3.fromRGB(58, 158, 58), 0, 0, nil})
 mod:add_wrap("Rare", "Lovely Leopard", {Enum.Material.SmoothPlastic, Color3.fromRGB(248, 248, 248), 0, 0, "LovelyLeopard1"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(17, 17, 17), 0, 0, "LovelyLeopard2"}, {Enum.Material.Neon, Color3.fromRGB(161, 119, 162), 0, 0, nil})
-mod:add_wrap("Legendary", "Diamond", {"Diamond", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(255, 170, 24), 0, 0.4, nil}, {nil, Color3.fromRGB(255, 165, 120), nil, nil, nil}, nil, "Earned from contracts", "Earned from a contract for this weapon")
+mod:add_wrap("Legendary", "Diamond", {"Diamond", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(255, 170, 24), 0, 0.4, nil}, {nil, Color3.fromRGB(255, 165, 120), nil, nil, nil}, nil, "Earned from weapon contracts", "Earned from a weapon contract for this weapon")
 mod:add_wrap("Legendary", "Scorched", {"Scorched", Color3.fromRGB(171, 171, 171), 0, 0, nil}, {"Scorched", Color3.fromRGB(43, 43, 43), 0, 0, nil}, {nil, Color3.fromRGB(255, 79, 25), nil, nil, nil})
 mod:add_wrap("Legendary", "Glass", {Enum.Material.Glass, Color3.fromRGB(255, 255, 255), 0.5, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(255, 255, 255), 0.5, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(255, 255, 255), 0.5, 0, nil})
 mod:add_wrap("Legendary", "Malevolent", {"Malevolent", Color3.fromRGB(163, 162, 165), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(25, 15, 39), 0, 0, nil}, {nil, Color3.fromRGB(78, 43, 168), nil, nil, nil})
@@ -404,10 +423,14 @@ mod:add_wrap("Legendary", "Damascus", {"Damascus", Color3.fromRGB(255, 255, 255)
 mod:add_wrap("Legendary", "Black Damascus", {"BlackDamascus", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 0, 0, nil}, nil, "Used to be purchased from the Shop")
 mod:add_wrap("Legendary", "Pixel Blight", {Enum.Material.Neon, nil, 0, 0, "PixelBlight", "PixelBlight"}, {Enum.Material.Neon, nil, 0, 0, "PixelBlight", "PixelBlight"}, {Enum.Material.Neon, nil, 0, 0, nil}, nil, "Used to be purchased from the Shop")
 mod:add_wrap("Legendary", "Empress", {Enum.Material.Neon, Color3.fromRGB(255, 255, 255), 0, 0, "Empress"}, {Enum.Material.Neon, Color3.fromRGB(255, 255, 255), 0, 0, "Empress"}, {Enum.Material.Neon, Color3.fromRGB(172, 150, 181), 0, 0, nil}, nil, "Used to be purchased from the Shop")
-mod:add_wrap("Legendary", "Arena", {Enum.Material.SmoothPlastic, Color3.fromRGB(151, 153, 163), 0, 0, "ArenaTex"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(132, 134, 143), 0, 0, "ArenaTex"}, {Enum.Material.Neon, Color3.fromRGB(151, 153, 163), 0, 0, nil}, nil, "Purchased in the Shop")
+mod:add_wrap("Legendary", "Arena", {Enum.Material.SmoothPlastic, Color3.fromRGB(151, 153, 163), 0, 0, "ArenaTex"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(132, 134, 143), 0, 0, "ArenaTex"}, {Enum.Material.Neon, Color3.fromRGB(151, 153, 163), 0, 0, nil}, nil, "Purchased from the Shop")
 mod:add_wrap("Legendary", "Simulation", {Enum.Material.Neon, Color3.fromRGB(30, 98, 153), 0, 0, "Simulation_1"}, {Enum.Material.Neon, Color3.fromRGB(16, 51, 81), 0, 0, "Simulation_2"}, {Enum.Material.Neon, Color3.fromRGB(80, 122, 170), 0, 0, nil}, nil, "Used to be purchased from the Shop")
-mod:add_wrap("Legendary", "Sunset Sparkle", {Enum.Material.Neon, Color3.fromRGB(255, 137, 137), 0, 0, "SunsetSparkle1"}, {Enum.Material.Neon, Color3.fromRGB(88, 0, 117), 0, 0, "SunsetSparkle2"}, {Enum.Material.Neon, Color3.fromRGB(161, 122, 90), 0, 0, nil}, nil, "Purchased in the Shop")
-mod:add_wrap("Legendary", "Messis", {Enum.Material.SmoothPlastic, Color3.fromRGB(17, 17, 17), 0, 0, "Messis1"}, {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 0, 0, "Messis2"}, {Enum.Material.Neon, Color3.fromRGB(82, 159, 72), 0, 0, nil}, nil, "Purchased in the Shop")
+mod:add_wrap("Legendary", "Sunset Sparkle", {Enum.Material.Neon, Color3.fromRGB(255, 137, 137), 0, 0, "SunsetSparkle1"}, {Enum.Material.Neon, Color3.fromRGB(88, 0, 117), 0, 0, "SunsetSparkle2"}, {Enum.Material.Neon, Color3.fromRGB(161, 122, 90), 0, 0, nil}, nil, "Used to be purchased from the Shop")
+mod:add_wrap("Legendary", "Messis", {Enum.Material.SmoothPlastic, Color3.fromRGB(17, 17, 17), 0, 0, "Messis1"}, {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 0, 0, "Messis2"}, {Enum.Material.Neon, Color3.fromRGB(82, 159, 72), 0, 0, nil}, nil, "Used to be purchased from the Shop")
+mod:add_wrap("Legendary", "Birthday Wrapping", {"WrappingPaper_01c", Color3.fromRGB(68, 117, 223), 0, 0, nil}, {"Pearlescent_01c", Color3.fromRGB(255, 173, 32), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(173, 150, 110), 0, 0, nil}, nil, "Purchased from the Shop during the RIVALS Birthday Party")
+mod:add_wrap("Legendary", "RIVALS Wrapping", {"WrappingPaper_01c", Color3.fromRGB(255, 148, 26), 0, 0, "RivalsWrapping"}, {"Pearlescent_01d", Color3.fromRGB(161, 18, 166), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(145, 114, 172), 0, 0, nil}, nil, "Purchased from the Shop during the RIVALS Birthday Party")
+mod:add_wrap("Legendary", "Shadow Ink", {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 0, 0, "ShadowInk1"}, {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 0, 0, "ShadowInk2"}, {Enum.Material.Neon, Color3.fromRGB(91, 76, 171), 0, 0, nil}, nil, "Purchased from the Shop")
+mod:add_wrap("Legendary", "Triplaser", {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 255, 255), 0, 0.5, "Tripwire1"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(199, 199, 199), 0, 0.5, nil}, {Enum.Material.Neon, Color3.fromRGB(163, 73, 73), 0, 0, nil}, nil, "Purchased from the Shop")
 mod:add_wrap("Legendary", "Resolute", {"Resolute", Color3.fromRGB(0, 16, 176), 0, 0, nil}, {"Resolute", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(0, 0, 255), 0, 0, nil})
 mod:add_wrap("Legendary", "Thunderburst", {Enum.Material.Neon, Color3.fromRGB(253, 234, 141), 0, 0, "Thunderburst"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(0, 0, 0), 0, 0.05, nil}, {Enum.Material.Neon, Color3.fromRGB(163, 160, 130), 0, 0, nil})
 mod:add_wrap("Legendary", "Encrypt", {"Encrypt", Color3.fromRGB(0, 172, 57), 0, 0, nil}, {"Encrypt", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(131, 255, 129), 0, 0, nil})
@@ -417,7 +440,7 @@ mod:add_wrap("Legendary", "Frankenstein", {"Frankenstein", Color3.fromRGB(83, 13
 mod:add_wrap("Legendary", "Hallow", {nil, Color3.fromRGB(0, 0, 0), 0, 0.05, nil}, {nil, Color3.fromRGB(255, 119, 0), 0, 0.1, nil}, {Enum.Material.Neon, Color3.fromRGB(255, 119, 0), 0, 0, nil}, nil, "Used to be purchased from the Shop")
 mod:add_wrap("Legendary", "Greenflame", {Enum.Material.Neon, Color3.fromRGB(0, 255, 0), 0, 0, "Greenflame1"}, {Enum.Material.Neon, Color3.fromRGB(117, 162, 48), 0, 0, "Greenflame2"}, {nil, Color3.fromRGB(122, 255, 14), nil, nil, nil}, nil, "Used to be included in Candy Bundles")
 mod:add_wrap("Legendary", "Aurora", {Enum.Material.Neon, Color3.fromRGB(129, 255, 110), 0, 0, "Aurora"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(17, 17, 17), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(129, 255, 110), 0, 0, nil})
-mod:add_wrap("Legendary", "Wintergreen", {"GlossyCandyCane2", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {"GlossyGeneric", Color3.fromRGB(0, 134, 19), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(102, 167, 104), 0, 0, nil}, nil, "Purchased in the Shop")
+mod:add_wrap("Legendary", "Wintergreen", {"GlossyCandyCane2", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {"GlossyGeneric", Color3.fromRGB(0, 134, 19), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(102, 167, 104), 0, 0, nil}, nil, "Used to be purchased from the Shop")
 mod:add_wrap("Legendary", "Gingerbread", {"Gingerbread", Color3.fromRGB(225, 156, 107), 0, 0, "Gingerbread"}, {"Gingerbread", Color3.fromRGB(86, 66, 54), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(167, 153, 130), 0, 0, nil})
 mod:add_wrap("Legendary", "Peppermint", {"GlossyCandyCane", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {"GlossyGeneric", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(161, 52, 52), 0, 0, nil})
 mod:add_wrap("Legendary", "Crystallized", {Enum.Material.Glass, Color3.fromRGB(18, 238, 212), 0.85, 0, "Crystallized"}, {Enum.Material.Glass, Color3.fromRGB(18, 238, 212), 0.85, 0, "Crystallized"}, {Enum.Material.Glass, Color3.fromRGB(175, 221, 255), 0.5, 0, nil}, nil, "Used to be included in Crystal Bundles")
@@ -432,6 +455,7 @@ mod:add_wrap("Legendary", "Rift", {Enum.Material.Neon, Color3.fromRGB(17, 17, 17
 mod:add_wrap("Legendary", "Spectral", {Enum.Material.Neon, Color3.fromRGB(55, 255, 95), 0, 0, "Spectral"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(71, 255, 203), 0, 0.4, nil}, {Enum.Material.Neon, Color3.fromRGB(92, 158, 119), 0, 0, nil})
 mod:add_wrap("Legendary", "Hologram", {Enum.Material.Neon, Color3.fromRGB(84, 138, 255), 0.6, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(84, 138, 255), 0.6, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(84, 138, 255), 0.6, 0, nil})
 mod:add_wrap("Legendary", "Bubbles", {Enum.Material.ForceField, Color3.fromRGB(255, 255, 255), 0.9, 0, "Bubbles"}, {Enum.Material.ForceField, Color3.fromRGB(255, 255, 255), 0.9, 0, "Bubbles"}, {Enum.Material.ForceField, Color3.fromRGB(255, 255, 255), 0.9, 0, "Bubbles"}, nil, "Earned by gifting other players")
+mod:add_wrap("Mythical", "Dark Matter", {"CandyGlossy", Color3.fromRGB(129, 107, 255), 0, 0, "DarkMatter1", nil, "Dark Matter"}, {"CandyGlossy", Color3.fromRGB(129, 107, 255), 0, 0, "DarkMatter2", nil, "Dark Matter"}, {Enum.Material.Neon, Color3.fromRGB(142, 98, 238), 0, 0, "DarkMatter3", nil, "Dark Matter"}, nil, "Earned from weapon contracts", "Earned from a weapon contract for this weapon")
 mod:add_wrap("Mythical", "Neon Lights", {Enum.Material.SmoothPlastic, Color3.fromRGB(42, 46, 49), 0, 0, "NeonLights1", nil, "Neon Lights"}, {Enum.Material.Neon, Color3.fromRGB(21, 0, 65), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(125, 111, 165), 0, 0, nil})
 mod:add_wrap("Mythical", "Solar", {Enum.Material.SmoothPlastic, Color3.fromRGB(98, 15, 0), 0, 0, "Solar1", nil, "Solar"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(120, 52, 21), 0, 0, "Solar2", nil, "Solar"}, {Enum.Material.Neon, Color3.fromRGB(168, 116, 78), 0, 0, nil})
 mod:add_wrap("Mythical", "Speed", {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 255, 255), 0, 0, "Speed2", nil, "Speed"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(161, 105, 73), 0, 0, nil})
