@@ -6,21 +6,21 @@ local module = {
 		--'rbxassetid://13159969353'
 	},
 
-	headshotid = 'rbxassetid://16537337310',
-	bodyshotid = 'rbxassetid://13110130082'
+	headshotid = 'rbxassetid://16537337310', -- RIVALS | Headshot SoundId
+	bodyshotid = 'rbxassetid://13110130082' -- RIVALS | Bodyshot SoundId
 }
 
 --[[
 
 ADDING NEW SKINS:
 
-- Copying rivals ItemLibrary to WeaponTypes 'str'
-- Run Clipboard script and pasting to Github
-- Put new 'add_animations' from AnimLib to Github
-- Put new WeaponTypes 'add_gun' from ItemLibrary to Github
-- Put new 'add_viewmodel' from ItemLibrary to SkinChanger
-- Put 'add_cosmetic_upvr' from CosmeticLibrary to Github
-- DO EXTRAFUNCS SETTER (OR NOT)
+- Copying rivals ItemLibrary to -- << TODO:Econ/WeaponTypes >>
+- Run Clipboard script and pasting to -- << TODO:Econ/AnimSound >>
+- Put new 'add_animations' from AnimLib to -- << TODO:Econ/Anim >>
+- Put new 'add_viewmodel' from ItemLibrary to  -- << TODO:Econ/Skin >>
+- Put 'add_cosmetic_upvr' from CosmeticLibrary to -- << TODO:Econ/SkinInfo >>
+
+- / Not Necessary: Extrafuncs /
 
 ADDING NEW ITEMS:
 
@@ -138,7 +138,7 @@ _G.pl = cs.SendingMessage:Connect(function(msg)
 	if string.sub(msg, 1, 1) == 'a' then
 		local anim = string.sub(msg, 2, -1)
 		local t = _G.topre[vms:GetChildren()[1]]
-		
+
 		for name, v in pairs(t) do
 			if string.lower(name) == string.lower(anim) then
 				v:play({
@@ -620,10 +620,69 @@ end
 
 local redfile = false
 
+local function getcodes()
+	task.spawn(function()
+		local rep = game:GetService("ReplicatedStorage")
+
+		local function r(c,nt)
+			local function f()
+				local res = rep.Remotes.Data.RedeemCode:InvokeServer(c:lower())	
+				return res
+			end
+
+			if nt then
+				wait()
+				return f()
+			end
+		end
+
+		rep.Remotes.Data.ClaimLikeReward:FireServer()
+		rep.Remotes.Data.ClaimGroupReward:InvokeServer()
+
+		rep.Remotes.Data.VerifyTwitter:FireServer()
+		rep.Remotes.Data.ClaimFavoriteReward:FireServer()
+		rep.Remotes.Data.ClaimNotificationsReward:FireServer()
+		rep.Remotes.Data.ClaimWelcomeBackGift:FireServer()
+
+		r'THANKYOU_1BVISITS!'
+		r'100MVisits'
+		r'BONUS'
+		r'5B_VISITS_WHATTTTTT'
+
+		-- free..
+		local currenthighest = 93
+		for i = 1, 10 do
+			local ret = r('free'..currenthighest+i-1, true)	
+			if ret == 'Success' then break end
+		end
+
+		-- UPDATE .. code
+		local currenthighest = 12
+		for i = 1, 10 do
+			local ret = r('UPDATE '..currenthighest+i-1 .. ' code', true)	
+			if ret == 'Success' then break end
+		end
+
+		-- community
+		local currenthighest = 15
+		for i = 1, 10 do
+			local ret = r('COMMUNITY'..currenthighest+i-1, true)	
+			if ret == 'Success' then break end
+		end
+	end)
+end
+
 for t, weapons in pairs(weapontypes.typeToWeapons) do
 	local gameplayTab = Window:CreateTab(to[t], nil)
 
 	if t == 1 then
+		local sec = gameplayTab:CreateSection('Code Redeeming')
+
+		gameplayTab:CreateButton({
+			Name = 'Redeem',
+			Callback = getcodes
+		})
+
 		local sec = gameplayTab:CreateSection('Character Changer')
 
 		local charchanger = gameplayTab:CreateInput({
@@ -1846,9 +1905,9 @@ function applySkin(skinName, cs)
 					function asev:Connect(func)
 						table.insert(stopcons, func)
 					end
-					
+
 					-- // Equiped
-					
+
 					local eqev = {}
 					local equipcons = {}
 					function eqev:Connect(func)
@@ -1864,9 +1923,9 @@ function applySkin(skinName, cs)
 						AnimationStopped = asev,
 						Equipped = eqev,
 					}
-					
+
 					function tb:_RegisterAmmoVisual()
-						
+
 					end
 
 					local playii = {}
@@ -1877,7 +1936,7 @@ function applySkin(skinName, cs)
 					if ef then
 						ef = ef.new(tb)
 					end
-					
+
 					local tovis = {}
 
 					for _, v in pairs(clone:GetChildren()) do
@@ -1897,8 +1956,8 @@ function applySkin(skinName, cs)
 
 							newMotor.C0 = v:GetAttribute('C0') or CFrame.new()
 							newMotor.C1 = v:GetAttribute('C1') or CFrame.new()
-							
-							v.Parent = game:GetService('CoreGui')
+
+							v.Parent = vm.ItemVisual --game:GetService('CoreGui')
 							table.insert(tovis, v)
 						end
 					end
@@ -1928,7 +1987,7 @@ function applySkin(skinName, cs)
 
 							local ref = args.reference :: AnimationTrack
 							if ref and not ref.IsPlaying then return end
-							
+
 							if not special(b.name) and not args.isSpecial then
 								for _, v : AnimationTrack in pairs(animator:GetPlayingAnimationTracks()) do
 									if table.find(_G.ourAnims, v) and not special(toname[v.Animation.AnimationId]) then
@@ -1943,9 +2002,9 @@ function applySkin(skinName, cs)
 							loaded:Play()
 							loaded:AdjustWeight(1)
 							loaded:AdjustSpeed(b.relinfo.Speed)
-							
+
 							-- // Connections
-							
+
 							task.spawn(function()
 								local ttb = {
 									inspect = 'Inspect',
@@ -1973,9 +2032,9 @@ function applySkin(skinName, cs)
 									end
 								end))
 							end)
-							
+
 							-- // Rest
-							
+
 							local norm = loaded.Speed
 							prs[loaded] = loaded.Priority
 
@@ -2074,7 +2133,7 @@ function applySkin(skinName, cs)
 							local ls = scr and loadstring(scr)
 
 							task.spawn(function()
-								repeat wait() until anim.Length > 0
+								--repeat wait() until anim.Length > 0
 								zx += 1
 							end)
 
@@ -2113,10 +2172,10 @@ function applySkin(skinName, cs)
 								local ls = scr and loadstring(scr)
 
 								task.spawn(function()
-									if anim.Length == 0 then
-										repeat run.Stepped:Wait() until anim.Length > 0
-									end
-									
+									--	if anim.Length == 0 then
+									--	repeat run.Stepped:Wait() until anim.Length > 0
+									--end
+
 									zx += 1
 								end)
 
@@ -2230,7 +2289,7 @@ function applySkin(skinName, cs)
 						if not c or c == vm or not table.find(_G.applied, c) then
 							soundOn = p ~= vms
 							soundGroup.Volume = soundOn and ss.Other.Volume or 0
-							
+
 							for _, v in pairs(equipcons) do
 								v()
 							end
@@ -2271,17 +2330,18 @@ function applySkin(skinName, cs)
 							_G.skinToAnimCon[name] = nil
 						end
 					end)
-					
+
 					-- // ADD
-					
+
+					if vm == vms:GetChildren()[1] and _G.frr then
+						_G.frr()
+					end
+
 					task.spawn(function()
 						repeat run.Stepped:Wait() until zx >= mx or not vm.Parent
+						if not vm.Parent then return end
 						for _, v in pairs(tovis) do
 							v.Parent = vm.ItemVisual
-						end
-						
-						if vm == vms:GetChildren()[1] and _G.frr then
-							_G.frr()
 						end
 					end)
 				end
