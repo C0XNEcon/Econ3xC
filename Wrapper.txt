@@ -180,11 +180,11 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 			local z
 			z = run.Heartbeat:Connect(function()
 				if #new > 0 and new[1].Parent then
-					for i, v in pairs(new) do
+					for i, v in new do
 						local speed, dir = v:GetAttribute('Speed'), v:GetAttribute('Direction')
 						if speed and dir then
-							i.OffsetStudsU = tick() * speed * dir.X % i.StudsPerTileU
-							i.OffsetStudsV = tick() * speed * dir.Y % i.StudsPerTileV
+							v.OffsetStudsU = tick() * speed * dir.X % v.StudsPerTileU
+							v.OffsetStudsV = tick() * speed * dir.Y % v.StudsPerTileV
 						end
 					end
 				else
