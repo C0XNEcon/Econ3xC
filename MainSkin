@@ -59,29 +59,34 @@ local hitmarkerSounds = weaponSounds.ClientViewModel
 
 ----------- [ Main ] -----------
 
+local URL_ROOT = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/'
+local CURRENT_ID = plr.UserId -- // Default
+
 local updatedCharFuncs = {}
 local ANIM_TO_NAME = {
-	inspect = 'Inspect',
-	equip = 'Equip',
-	idle = 'Idle',
-	sprint = 'Sprint',
-	rareinspect = 'RareInspect'
+	inspect = 'Inspect', equip = 'Equip', idle = 'Idle',
+	sprint = 'Sprint', rareinspect = 'RareInspect'
+}
+
+local WEAPON_TYPES = {
+	'Primary', 'Secondary', 'Melee', 'Utility'
+}
+
+_G.ECON_VARS = _G.ECON_VARS or {
+	SAVED_ICONS = {}; PLR_ICONS = {}; ID_PLR = {}; NAME_ID = {}; APPLIED_VMS = {};
+	ECON_ANIMS = {}; HEADSHOT_FUNCS = {}; VMS_CONS = {}; CHAR_UGC = {}
 }
 
 -- // Loading
 
-if _G.hd then
-	_G.hd:Disconnect()
-end
-
-local RELOAD = {}
+local RELOAD = {'ECON_UI'}
 local UTILS = {}
 local TOTAL_UTILS = 0
 local __REQUIRE = function(name:string, URL:string)
 	TOTAL_UTILS += 1
 
 	task.spawn(function()
-		local REQUIRED_URL = not RELOAD[name] and _G[name] or loadstring(game:HttpGet(URL))()
+		local REQUIRED_URL = not RELOAD[name] and _G[name] or loadstring(game:HttpGet(`{URL_ROOT}{URL}`))()
 		UTILS[name] = REQUIRED_URL;
 		_G[name] = REQUIRED_URL;
 
@@ -89,97 +94,16 @@ local __REQUIRE = function(name:string, URL:string)
 	end)
 end
 
-local URL_ROOT = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/'
-__REQUIRE('SKIN_MOD',`{URL_ROOT}Skin`);
-__REQUIRE('RIVALS_UTILS',`{URL_ROOT}UtilityFake`);
-__REQUIRE('SKIN_INFO',`{URL_ROOT}SkinInfo`);
-__REQUIRE('SKIN_SOUND_CODE',`{URL_ROOT}AnimSound`);
-__REQUIRE('WEAPON_TYPES',`{URL_ROOT}WeaponTypes`);
-__REQUIRE('EXTRA_FUNCS',`{URL_ROOT}ExtraFunc`);
-__REQUIRE('WRAPPER_MOD',`{URL_ROOT}Wrapper.txt`);
-__REQUIRE('ECON_UI',`{URL_ROOT}Econ%20UI.txt`)
+__REQUIRE('SKIN_MOD','Skin'); __REQUIRE('RIVALS_UTILS','UtilityFake'); __REQUIRE('SKIN_INFO','SkinInfo');
+__REQUIRE('SKIN_SOUND_CODE','AnimSound'); __REQUIRE('WEAPON_TYPES','WeaponTypes'); __REQUIRE('EXTRA_FUNCS','ExtraFunc');
+__REQUIRE('WRAPPER_MOD','Wrapper.txt'); __REQUIRE('ECON_UI','Econ%20UI.txt');
 
 if TOTAL_UTILS > 0 then repeat run.Stepped:Wait() until TOTAL_UTILS == 0 end
-
--- // Global
-
-_G.ourrrs = _G.ourrrs or {}
-
-_G.lt = tick()
-_G.nametoid = _G.nametoid or {}
-_G.skinanim = _G.skinanim or {}
-_G.applied = _G.applied or {}
-_G.ourAnims = _G.ourAnims or {}
-_G.skinToAnimCon = _G.skinToAnimCon or {}
-_G.headshotFuncs = {}
-
-_G.hd = hitmarkerSounds.ChildAdded:Connect(function(v : Sound)
-	if v:IsA('Sound') and v.SoundId == module.headshotid then
-		for _, v in _G.headshotFuncs do
-			v()
-		end
-	end
-end)
-
-_G.r = run
-_G.saved = _G.saved or {}
-_G.is = _G.is or {};
-_G.at = _G.at or {};
-_G.ogim = _G.ogim or {}
-_G.inf = _G.inf or {
-	idtoname = {}
-}
-
--- // ChatFunc
-
-if _G.pl then
-	_G.pl:Disconnect()
-else
-	_G.topre = {}
-end
-
-_G.pl = cs.SendingMessage:Connect(function(msg)
-	msg = msg.Text:lower()
-	if msg:sub(1,1) == 'a' then
-		local anim = msg:sub(2,-1)
-		local t = _G.topre[vms:GetChildren()[1]]
-
-		for name, v in t do
-			if name:lower() == anim:lower() then
-				v:play({
-					reference = t.idle.tbl.anim,
-					silenceReference = 1,
-					unsilenceAfter = 1,
-				})
-			end
-		end
-	end
-end)
-
--- // Rest
-
-local sound = Instance.new('Sound')
-sound.Volume = 1
-sound.SoundId = 'rbxassetid://6895079853'
-
-local function playSound(sp, rep, vol)
-	local new = (rep or sound):Clone()
-	new.Parent = workspace
-	new.Volume = vol or 1
-	new.PlaybackSpeed = sp or 1
-	new:Play()
-
-	new.Ended:Connect(function()
-		new:Destroy()
-	end)
-end
-
-playSound()
 
 -- // UI
 
 local UI_WINDOW = UTILS.ECON_UI:CreateWindow({
-	Name = 'Econ Skinchanger',
+	Name = 'Econ',
 	Icon = nil,
 	LoadingTitle = '',
 	LoadingSubtitle = "by ConePartyy",
@@ -193,26 +117,9 @@ local UI_WINDOW = UTILS.ECON_UI:CreateWindow({
 		FolderName = 'cone',
 		FileName = "econ"
 	},
-
-	Discord = {
-		Enabled = false,
-		Invite = "acv8tdb8",
-		RememberJoins = true
-	},
-
-	KeySystem = false,
-	KeySettings = {
-		Title = 'Econ | Password',
-		Subtitle = '',
-		Note = nil,
-		FileName = 'econK',
-		SaveKey = true,
-		GrabKeyFromSite = true,
-		Key = {}
-	}
 })
 
--- // WRAP CHANGER CONTROL
+-- // Wrap Controller
 
 local wrapSkinInfo = {}
 
@@ -242,12 +149,10 @@ end
 
 readSkinFile()
 
--- // Skinchanger Filing
+-- // Skinchanger File Work
 
 local weaponToButton = {}
 local charapb = {}
-
-local cid = plr.UserId
 
 function readsfile()
 	local rf = isfile('cSkinchanged') 
@@ -259,8 +164,8 @@ function readsfile()
 				_G.toskin[inf[1]] = inf[2]
 				weaponToButton[inf[1]]:Set({inf[2]}, true)
 			elseif tonumber(inf[1]) and not inf[2] then
-				cid = tonumber(inf[1])
-				charapb:Set(cid)
+				CURRENT_ID = tonumber(inf[1])
+				charapb:Set(CURRENT_ID)
 			end
 		end
 	else
@@ -269,26 +174,62 @@ function readsfile()
 end
 
 function writesfile()
-	local str = tostring(cid)..'.'
+	local str = tostring(CURRENT_ID)..'�'
 	for weapon, skin in pairs(_G.toskin) do
 		str..=weapon..'`'..skin..'�'
 	end
 	writefile('cSkinchanged', str)
 end
 
--- // Rest
+-- // Hitmarkers Event
 
-local ps = plr.PlayerScripts:WaitForChild('Assets')
+if _G.hd then
+	_G.hd:Disconnect()
+end
+
+_G.hd = hitmarkerSounds.ChildAdded:Connect(function(v : Sound)
+	if v:IsA('Sound') and v.SoundId == module.headshotid then
+		for _, v in _G.ECON_VARS.HEADSHOT_FUNCS do
+			v()
+		end
+	end
+end)
+
+-- // ChatFunc
+
+if _G.pl then
+	_G.pl:Disconnect()
+else
+	_G.topre = {}
+end
+
+_G.pl = cs.SendingMessage:Connect(function(msg)
+	msg = msg.Text:lower()
+	if msg:sub(1,1) == 'a' then
+		local anim = msg:sub(2,-1)
+		local t = _G.topre[vms:GetChildren()[1]]
+
+		for name, v in t do
+			if name:lower() == anim:lower() then
+				v:play({
+					reference = t.idle.tbl.anim,
+					silenceReference = 1,
+					unsilenceAfter = 1,
+				})
+			end
+		end
+	end
+end)
+
+-- // Rest
 
 local function gt()
 	local inf = wrapSkinInfo[string.split(cw.Name, ' - ')[3]]
-	UTILS.WRAPPER_MOD:wrapThis(cw, (inf and inf.wrap or 'None'), (inf and inf.inverted), ps.ViewModels, ps.WrapTextures)
+	UTILS.WRAPPER_MOD:wrapThis(cw, (inf and inf.wrap or 'None'), (inf and inf.inverted), assets.ViewModels, assets.WrapTextures)
 end
 
 local function check(v)
-	if string.find(v.Name, plr.Name) then
-		local rest = string.split(v.Name, ' - ')
-
+	if v.Name:find(plr.Name) then
 		cw = v
 		gt()
 	end
@@ -300,18 +241,12 @@ end
 
 -- // REST
 
-local to = {
-	'Primary', 'Secondary', 'Melee', 'Utility'
-}
-
 local toskin = {}
 _G.toskin = toskin
 
 local initConnections = {}
 
 -- // CHARACTER CHANGER
-
-local p = game:GetService('Players')
 
 local loadedids = {}
 
@@ -325,7 +260,7 @@ local usn = plr.Name
 
 local function cchar(id)
 	task.spawn(function()
-		local id = typeof(id) == 'number' and id or cid
+		local id = typeof(id) == 'number' and id or CURRENT_ID
 		if not id then return end
 
 		local lid = loadedids[id]
@@ -333,7 +268,7 @@ local function cchar(id)
 		local suc, z = false, 'Lid Exists'
 		if not (lid and lid.apr) then
 			suc, z = pcall(function()
-				return p:GetCharacterAppearanceAsync(id)
+				return players:GetCharacterAppearanceAsync(id)
 			end)
 		end
 
@@ -432,7 +367,7 @@ local function cchar(id)
 			local suc, z = false, 'Lid Exists'
 			if not (lid and lid.ap) then
 				suc, z = pcall(function()
-					return p:GetHumanoidDescriptionFromUserId(id)
+					return players:GetHumanoidDescriptionFromUserId(id)
 				end)
 			end
 
@@ -552,7 +487,7 @@ local function cchar(id)
 
 		local con2
 		local con = char.ChildAdded:Connect(function(v)
-			if not table.find(_G.ourrrs, v) then
+			if not table.find(_G.ECON_VARS.CHAR_UGC, v) then
 				hand(v)
 			end
 		end)
@@ -572,7 +507,7 @@ local function cchar(id)
 			if table.find(names, v.ClassName) then
 				if v:IsA('Accessory') then
 					local v = v:Clone()
-					for _, v in pairs(v:GetChildren()) do
+					for _, v in v:GetChildren() do
 						if v:IsA('BasePart') then
 							v.CanCollide = false
 							v.CanQuery = false
@@ -582,11 +517,11 @@ local function cchar(id)
 						end
 					end
 
-					table.insert(_G.ourrrs, v)
+					table.insert(_G.ECON_VARS.CHAR_UGC, v)
 					caa(char, v)
 				else 
 					local cl = v:Clone() :: BodyColors
-					table.insert(_G.ourrrs, cl)
+					table.insert(_G.ECON_VARS.CHAR_UGC, cl)
 					cl.Parent = char
 				end
 			end
@@ -606,35 +541,35 @@ end
 local READ_FILE = false
 
 for t, weapons in UTILS.WEAPON_TYPES.typeToWeapons do
-	local gameplayTab = UI_WINDOW:CreateTab(to[t])
+	local gameplayTab = UI_WINDOW:CreateTab(WEAPON_TYPES[t])
 
 	if t == 1 then
 		local sec = gameplayTab:CreateSection'Character Changer'
 
 		local charchanger = gameplayTab:CreateInput({
 			Name = 'Player ID / Name',
-			CurrentValue = tostring(cid),
+			CurrentValue = tostring(CURRENT_ID),
 			PlaceholderText = 'ConePartyy',
 			RemoveTextAfterFocusLost = false,
 			Flag = 'appearancechangerid',
 			Callback = function(t)
 				local suc, z = false, 'Lid Exists'
-				if not (tonumber(t) or tonumber(_G.nametoid[t])) then
+				if not (tonumber(t) or tonumber(_G.ECON_VARS.NAME_ID[t])) then
 					suc, z = pcall(function()
-						return p:GetUserIdFromNameAsync(t)
+						return players:GetUserIdFromNameAsync(t)
 					end)
 				end
 
-				local id = tonumber(t) or tonumber(_G.nametoid[t] or suc and z)
+				local id = tonumber(t) or tonumber(_G.ECON_VARS.NAME_ID[t] or suc and z)
 
 				if not id then UTILS.ECON_UI:Notify({Title = 'Name>ID Error', Content = tostring(z), Duration = 10, Image = 'search-x'}) return end
 
 				if id then
-					_G.nametoid[t] = id
-					cid = id
+					_G.ECON_VARS.NAME_ID[t] = id
+					CURRENT_ID = id
 					cchar(id)
 
-					if redfile then
+					if READ_FILE then
 						writesfile()
 					end
 				end
@@ -928,15 +863,15 @@ local is = _G.selectChanged
 function getIcon()
 	local content = nil
 	local isReady = nil
-	local id = cid or plr.UserId
-	local s = _G.saved[id]
+	local id = CURRENT_ID or plr.UserId
+	local s = _G.ECON_VARS.SAVED_ICONS[id]
 
 	if s then
 		content = s.content
 		isReady = s.isReady
 	else
 		local suc, c, r = pcall(function()
-			return game:GetService('Players'):GetUserThumbnailAsync(id, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+			return players:GetUserThumbnailAsync(id, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
 		end)
 
 		if not suc or not r then UTILS.ECON_UI:Notify({Title = 'PlrIcon Error', Content = tostring(c), Duration = 10, Image = 'search-x'}) return end
@@ -944,7 +879,7 @@ function getIcon()
 		content = c
 		r = r
 
-		_G.saved[id] = {
+		_G.ECON_VARS.SAVED_ICONS[id] = {
 			content = c, isReady = r
 		}
 	end
@@ -955,12 +890,12 @@ end
 -- // FUNCTIONS
 
 function idtplr(id)
-	local d = _G.inf.idtoname[id]
+	local d = _G.ECON_VARS.ID_PLR[id]
 	if d then return d end
 
 	for _, v in players:GetPlayers() do
 		if v.UserId == id then
-			_G.inf.idtoname[id] = v
+			_G.ECON_VARS.ID_PLR[id] = v
 			return v
 		end
 	end
@@ -990,12 +925,12 @@ task.spawn(function()
 
 			local content, isReady = getIcon()
 
-			if not _G.ogim[_headshot] then
-				_G.ogim[_headshot] = _headshot.Image
+			if not _G.ECON_VARS.PLR_ICONS[_headshot] then
+				_G.ECON_VARS.PLR_ICONS[_headshot] = _headshot.Image
 			end
 
 			local function hn(changedim)
-				if string.find(_G.ogim[_headshot], tostring(plr.UserId)) then
+				if string.find(_G.ECON_VARS.PLR_ICONS[_headshot], tostring(plr.UserId)) then
 					_display.Text = dn
 					_username.Text = '@'..usn
 					if isReady and _headshot.Image ~= content then
@@ -1003,7 +938,7 @@ task.spawn(function()
 						_headshot.Image = content
 					end
 				else
-					local str = string.sub(_G.ogim[_headshot], 56, -1)
+					local str = string.sub(_G.ECON_VARS.PLR_ICONS[_headshot], 56, -1)
 					local id = tonumber(string.sub(str, 1, string.find(str, '&')-1))
 					if id and idtplr(id) then
 						_username.Text = '@'..idtplr(id).Name
@@ -1022,7 +957,7 @@ task.spawn(function()
 							b.Name = 'OPic'
 
 							local function calc()
-								if string.find(_G.ogim[_headshot], tostring(plr.UserId)) then
+								if string.find(_G.ECON_VARS.PLR_ICONS[_headshot], tostring(plr.UserId)) then
 									local ts = UTILS.SKIN_MOD.its[b.Image]
 									local tog = UTILS.SKIN_INFO.skinToOg[ts] or ts
 									local tocur = _G.toskin[tog]
@@ -1054,7 +989,7 @@ task.spawn(function()
 			table.insert(updatedCharFuncs, hn)
 			table.insert(prcons, _headshot:GetPropertyChangedSignal('Image'):Connect(function()
 				if not _G.ignorenext then
-					_G.ogim[_headshot] = _headshot.Image
+					_G.ECON_VARS.PLR_ICONS[_headshot] = _headshot.Image
 				else
 					_G.ignorenext = false
 				end
@@ -1575,9 +1510,9 @@ function applySkin(skinName, cs)
 
 					local name = vm.name
 
-					local clean = _G.skinToAnimCon[name] or _G.skinToAnimCon[last]
+					local clean = _G.ECON_VARS.VMS_CONS[name] or _G.ECON_VARS.VMS_CONS[last]
 					if clean then
-						for _, v in pairs(clean) do
+						for _, v in clean do
 							v:Disconnect()
 						end
 					end
@@ -1629,7 +1564,7 @@ function applySkin(skinName, cs)
 					local toname = {}
 					local prs = {}
 
-					local sn = _G.skinanim[name] or _G.skinanim[last]
+					local sn = _G.ECON_VARS.ECON_ANIMS[name] or _G.ECON_VARS.ECON_ANIMS[last]
 					if sn then
 						for _, v in sn do
 							if v.anim then
@@ -1827,7 +1762,7 @@ function applySkin(skinName, cs)
 
 							if not special(b.name) and not args.isSpecial then
 								for _, v : AnimationTrack in pairs(animator:GetPlayingAnimationTracks()) do
-									if table.find(_G.ourAnims, v) and not special(toname[v.Animation.AnimationId]) then
+									if table.find(_G.ECON_VARS.ECON_ANIMS, v) and not special(toname[v.Animation.AnimationId]) then
 										v:Stop()
 									end
 								end
@@ -1878,7 +1813,7 @@ function applySkin(skinName, cs)
 								-- // REST
 
 								if ref then
-									table.insert(_G.skinToAnimCon[name], ref.Stopped:Once(function()
+									table.insert(_G.ECON_VARS.VMS_CONS[name], ref.Stopped:Once(function()
 										if args.unsilenceAfter then
 											table.remove(_G.silenced, table.find(_G.silenced, ref))
 										end
@@ -1904,7 +1839,7 @@ function applySkin(skinName, cs)
 									local con = hum:GetPropertyChangedSignal('FloorMaterial'):Connect(upd)
 									upd()
 
-									table.insert(_G.skinToAnimCon[name], con)
+									table.insert(_G.ECON_VARS.VMS_CONS[name], con)
 
 									loaded.Stopped:Once(function()
 										con:Disconnect()
@@ -1950,7 +1885,7 @@ function applySkin(skinName, cs)
 							LOADED_ANIM.Parent = econAnim
 							LOADED_ANIM = animator:LoadAnimation(LOADED_ANIM)
 
-							table.insert(_G.ourAnims, LOADED_ANIM)
+							table.insert(_G.ECON_VARS.ECON_ANIMS, LOADED_ANIM)
 
 							toname[nowid.AnimationID] = name
 
@@ -1980,7 +1915,7 @@ function applySkin(skinName, cs)
 								LOADED_ANIM.Parent = econAnim
 								LOADED_ANIM = animator:LoadAnimation(LOADED_ANIM)
 
-								table.insert(_G.ourAnims, LOADED_ANIM)
+								table.insert(_G.ECON_VARS.ECON_ANIMS, LOADED_ANIM)
 
 								toname[nowid.AnimationID] = name
 
@@ -2002,7 +1937,7 @@ function applySkin(skinName, cs)
 
 					local h = _precontr.anims.HeavyAttackAnimationHit
 					if h then
-						table.insert(_G.headshotFuncs, function()
+						table.insert(_G.ECON_VARS.HEADSHOT_FUNCS, function()
 							if vms:GetChildren()[1] == vm then
 								h:play({
 									reference = _precontr.anims.HeavyAttack1.tbl.anim,
@@ -2019,7 +1954,7 @@ function applySkin(skinName, cs)
 					local playing = {}
 
 					local function ct(track : AnimationTrack)
-						if not table.find(_G.ourAnims, track) then
+						if not table.find(_G.ECON_VARS.ECON_ANIMS, track) then
 							local pr = track.Priority
 							track:AdjustWeight(0.0001, 0)
 							track:AdjustSpeed(0)
@@ -2041,42 +1976,34 @@ function applySkin(skinName, cs)
 								z = _precontr.anims.inspect
 								rare = true
 
-								local s = 1 + 0.25 * math.random()
+								local s = 1 + 0.25*math.random()
 								UTILS.RIVALS_UTILS:CreateSound('rbxassetid://13159969353', .25, s, nil, true)
 							end
 
 							if b or z then
 								local z = z or _precontr.anims[b.prename]
 								if z then
-									local basicPlayed = z.tbl.prename
-									local basic = z.tbl.anim
-
 									local tbl = {
 										pos = track.TimePosition,
 										priority = prs[z.tbl.anim] or pr,
 										reference = track
 									}
 
-									z:play(tbl)
-
 									if ri and rare then
-										basicPlayed = 'rareinspect'
-										basic = ri.tbl.anim
-
 										ri:play({
-											reference = _precontr.anims.inspect.tbl.anim,
+											reference = track,
 											isSpecial = 1,
-											silenceReference = 1,
-											unsilenceAfter = 1,
-											stopref = 1,
+											priority = tbl.priority,
 										})
+									else
+										z:play(tbl)
 									end
 								end
 							end
 						end
 					end
 
-					table.insert(_G.applied, vm)
+					table.insert(_G.ECON_VARS.APPLIED_VMS, vm)
 
 					local function pt(p)
 						local c = vms:GetChildren()[1]
@@ -2089,7 +2016,7 @@ function applySkin(skinName, cs)
 							end
 						end
 
-						if not c or c == vm or not table.find(_G.applied, c) then
+						if not c or c == vm or not table.find(_G.ECON_VARS.APPLIED_VMS, c) then
 							soundOn = p ~= vms
 							soundGroup.Volume = soundOn and ss.Other.Volume or 0
 
@@ -2105,14 +2032,13 @@ function applySkin(skinName, cs)
 						end
 					end
 
-					_G.skinanim[name] = animtbl
-					_G.skinToAnimCon[name] = {}
-					_G.skinToAnimCon[name][1] = animator.AnimationPlayed:Connect(ct)
+					_G.ECON_VARS.VMS_CONS[name] = {}
+					_G.ECON_VARS.VMS_CONS[name][1] = animator.AnimationPlayed:Connect(ct)
 					for _, v in animator:GetPlayingAnimationTracks() do
 						ct(v)
 					end
 
-					_G.skinToAnimCon[name][3] = vm:GetPropertyChangedSignal('Parent'):Connect(function()
+					_G.ECON_VARS.VMS_CONS[name][3] = vm:GetPropertyChangedSignal('Parent'):Connect(function()
 						if not vm.Parent then
 							tb._destroyed = true
 						end
@@ -2124,13 +2050,13 @@ function applySkin(skinName, cs)
 
 					-- // REMOVING
 
-					_G.skinToAnimCon[name][2] = vm:GetPropertyChangedSignal('Parent'):Once(function()
+					_G.ECON_VARS.VMS_CONS[name][2] = vm:GetPropertyChangedSignal('Parent'):Once(function()
 						if not vm.Parent then
 							pt()
-							for _, v in _G.skinToAnimCon[name] do
+							for _, v in _G.ECON_VARS.VMS_CONS[name] do
 								v:Disconnect()
 							end
-							_G.skinToAnimCon[name] = nil
+							_G.ECON_VARS.VMS_CONS[name] = nil
 						end
 					end)
 
@@ -2152,8 +2078,8 @@ function applySkin(skinName, cs)
 		if first and z[1] == plr.Name and z[2] == ogitem then
 			apl(first)
 		end
-
-		for _, v in game:GetService('ReplicatedStorage').Assets.Temp.ViewModels:GetChildren() do
+		
+		for _, v in rep.Assets.Temp.ViewModels:GetChildren() do
 			local z = v.Name:split' - '
 			if v and z[1] == plr.Name and z[2] == ogitem then
 				apl(v)
