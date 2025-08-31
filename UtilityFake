@@ -1,5 +1,12 @@
+local ut = {
+	EnergyPistolsShootSoundCooldown = 0;
+}
+
+-- // Services
+
 local SoundService_upvr = game:GetService("SoundService")
-local ut = {}
+
+-- // Main
 
 function debris(thing, dur)
 	task.delay(dur, function()
@@ -15,11 +22,7 @@ local plr = game:GetService('Players').LocalPlayer
 local scripts = plr.PlayerScripts
 local weaponSounds = scripts.Modules.ClientReplicatedClasses.ClientFighter.ClientItem
 
-_G.durr = .92
-
-if not _G.silenced then
-	_G.silenced = {}
-end
+-- // Globals
 
 _G.ffunc = function(name, anim, dur)
 	if anim and not table.find(_G.silenced, anim) then
@@ -35,38 +38,18 @@ _G.ffunc = function(name, anim, dur)
 	end
 end
 
+_G.durr = .92
+_G.silenced = _G.silenced or {}
+_G.si = _G.si or {}
+_G.soundToWeapon = _G.soundToWeapon or {}
+
+-- // Functions
+
 function ut:_AnimationWait(name, anim, dur)
 	return _G.ffunc(name, anim, dur)
 end
 
-if not _G.si then
-	_G.si = {}
-end
-
-if not _G.soundToWeapon then
-	_G.soundToWeapon = {}
-end
-
 function ut:CreateSound(id, vol, speed, pos, play, dur, mind, maxd, soundserv, extra)
-	--if typeof(pos) == "Vector3" then
-	--	local p = Instance.new("Part")
-	--	p.CFrame = CFrame.new(pos)
-	--	p.Size = Vector3.one
-	--	p.Transparency = 1
-	--	p.CastShadow = false
-	--	p.CanCollide = false
-	--	p.CanTouch = false
-	--	p.CanQuery = false
-	--	p.Anchored = true
-	--	p.Parent = workspace
-	--	pos = p
-	--	debris(p, dur or 60)
-	--else
-	--	pos = weaponSounds
-	--end
-
-	--pos = pos or weaponSounds
-
 	local s = Instance.new("Sound")
 	s.SoundId = typeof(id) == 'table' and id.id or id
 	s.Volume = vol or 1
@@ -98,25 +81,6 @@ function ut:CreateSound(id, vol, speed, pos, play, dur, mind, maxd, soundserv, e
 end
 
 function ut:CreateSpectatorSound(id, vol, speed, pos, play, dur, mind, maxd, soundserv, extra)
-	--if typeof(pos) == "Vector3" then
-	--	local p = Instance.new("Part")
-	--	p.CFrame = CFrame.new(pos)
-	--	p.Size = Vector3.one
-	--	p.Transparency = 1
-	--	p.CastShadow = false
-	--	p.CanCollide = false
-	--	p.CanTouch = false
-	--	p.CanQuery = false
-	--	p.Anchored = true
-	--	p.Parent = workspace
-	--	pos = p
-	--	debris(p, dur or 60)
-	--else
-	--	pos = weaponSounds
-	--end
-
-	--pos = pos or weaponSounds
-
 	local s = Instance.new("Sound")
 	s.SoundId = typeof(id) == 'table' and id.id or id
 	s.Volume = vol or 1
