@@ -59,37 +59,21 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 
 	if not spl or not spl[3] then spl = string.split(item.Name, ' - ') end
 
-	local ogWeapon = ogw:FindFirstChild(spl[3], true)
-	local ind = 0
-
 	local new = {}
 	_G.cn = new
 
-	for _, v in pairs(item:GetDescendants()) do
+	for _, v in item:GetDescendants() do
 		local wg = v:GetAttribute('WrapGroup')
-
-		if ogWeapon:FindFirstChild(v.Name, true) then
-			ind += 1
-		end
 
 		if v:IsA('BasePart') and wg then
 			wg = tonumber(wg)
 
-			local gd = mod:findPartInModel(v, ogWeapon) --ogWeapon:GetDescendants()[ind]
-			if gd then
-				v.Material = gd.Material
-				v.Color = gd.Color
-				v.Transparency = gd.Transparency
-				v.Reflectance = gd.Reflectance
-
-				for _, v in pairs(v:GetChildren()) do
-					if (v:IsA('Texture') or v:IsA('Decal') or v:IsA('ParticleEmitter')) then
-						v:Destroy()
-					end
+			for _, v in v:GetChildren() do
+				if (v:IsA('Texture') or v:IsA('Decal') or v:IsA('ParticleEmitter')) then
+					v:Destroy()
 				end
-
 			end
-
+			
 			if wrapx ~= 'None' then
 				local part = v
 				if inverted then
