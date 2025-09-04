@@ -10,12 +10,7 @@ local module = {
 	bodyshotid = 'rbxassetid://13110130082' -- RIVALS | Bodyshot SoundId
 }
 
-type OGVMs = {
-	fromName:table;
-	all:table
-}
-
-type OGMisc = {}
+type _OGMISC = {fold:Folder,all:table,toClone:table,toReal:table}
 
 --[[ ADDING NEW SKINS ]|
 
@@ -24,20 +19,6 @@ type OGMisc = {}
 - Put new 'add_animations' from AnimLib to -- << TODO:Econ/Anim >>
 - Put new 'add_viewmodel' from ItemLibrary to  -- << TODO:Econ/Skin >>
 - Put 'add_cosmetic_upvr' from CosmeticLibrary to -- << TODO:Econ/SkinInfo >>
-
---[[ Custom Functions Idea ]|
-
-- << Normal Weapon Modules >> When Rivals tries to find its module script, it uses FindFirstChild with the *SKIN NAME* which means, we can
-  TODO: Duplicate the Modules -> ViewModels folder and rename the *ORIGINAL FOLDER* to something random, when we have this, we can
-  TODO: Get each module from every weapon and store them by weapon name [Not in folder], now, the final step: 
-  TODO: When we change a skin in the skinchanger, parent the module that belongs to the skin in the folder and call it the base weapon's name [Katana, Knife, etc.], so Rivals will pick it up and use it.
-  
-- << Base Weapon Modules [Base...] >> This time, Rivals will use a Base... script and find the skin name inside of it. This one is fairly simple:
-  TODO: Once again, store all of their children but this time leave them in the same parent, when we change a skin in the skinchanger, rename the module with the skin's name to their BaseWeapon, [Bow, Crossbow, etc]
-        and rename the rest to something random, like 'Mekbok'
-        
-- TODO: Finally, when we change a skin in the skinchanger, we need to change the model of the skin's name in Assets -> ViewModels -> Weapons to the BaseWeapon [Katan Knife, etc] and rename the BaseWeapon's model to something random,
-        because Rivals does all of the skin modules *BEFORE* it gets put into Workspace -> ViewModels, which means it will keep waiting for a part that gets added *AFTER* the process
 
 --[[ ADDING NEW WRAPS ]|
 
@@ -64,8 +45,11 @@ local scripts = plr.PlayerScripts
 
 local assets = scripts:WaitForChild'Assets'
 local modules = scripts:WaitForChild'Modules'
+local repAssets = rep:WaitForChild'Assets'
+local temp = repAssets:WaitForChild'Temp'
 
 local vms = workspace:WaitForChild('ViewModels').FirstPerson
+local tempvms = temp:WaitForChild('ViewModels')
 
 local misc = assets:WaitForChild('Misc')
 local throwables = assets:WaitForChild('Throwables')
@@ -85,8 +69,8 @@ local URL_ROOT = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/
 local CURRENT_ID = plr.UserId
 
 local VARS = _G.ECON_VARS
-local OG_MISC = (VARS and VARS.OG_MISC or {}) :: OGMisc
-local OG_VMS = (VARS and VARS.OG_VMS or {fromName = {}, all = {}}) :: OGVMs
+local OG_MISC = (VARS and VARS.OG_MISC or {}) :: {fromWeapon:table, all:table}
+local OG_VMS = (VARS and VARS.OG_VMS or {fromName = {}, all = {}}) ::  {fromName:table, all:table}
 local ID_CHANGED_FUNCS = {}
 local ANIM_TO_NAME = {
 	inspect = 'Inspect', equip = 'Equip', idle = 'Idle',
@@ -99,8 +83,8 @@ local WEAPON_TYPES = {
 
 _G.ECON_VARS = _G.ECON_VARS or {
 	SAVED_ICONS = {}; PLR_ICONS = {}; ID_PLR = {}; NAME_ID = {}; APPLIED_VMS = {};
-	ECON_ANIMS = {}; HEADSHOT_FUNCS = {}; VMS_CONS = {}; CHAR_UGC = {}; 
-	OG_VMS = nil; OG_MISC = nil;
+	ECON_ANIMS = {}; HEADSHOT_FUNCS = {}; VMS_CONS = {}; CHAR_UGC = {}; RIVALS_BYTEPLR = {};
+	OG_VMS = nil; OG_MISC = nil; NAMES_SHOWN = false;
 }
 
 -- // Loading
@@ -124,6 +108,12 @@ __REQUIRE('SKIN_MOD','Skin'); __REQUIRE('RIVALS_UTILS','UtilityFake'); __REQUIRE
 __REQUIRE('SKIN_SOUND_CODE','AnimSound'); __REQUIRE('WEAPON_TYPES','WeaponTypes');
 __REQUIRE('WRAPPER_MOD','Wrapper.txt'); __REQUIRE('ECON_UI','Econ%20UI.txt');
 
+-- // Extra Vars
+
+local mainUI = plr.PlayerGui:WaitForChild'MainGui'.MainFrame
+
+local fighterInterfaces = mainUI:WaitForChild('FighterInterfaces')
+
 if TOTAL_UTILS > 0 or plr.PlayerGui:FindFirstChild('LoadingScreen') then repeat run.Stepped:Wait() until TOTAL_UTILS == 0 and not plr.PlayerGui:FindFirstChild('LoadingScreen') end
 
 -- // Modules -> ViewModels
@@ -133,15 +123,49 @@ function __updVMMod(weapon, enabled)
 	local all = UTILS.SKIN_INFO.skinInfo[weapon]
 	table.insert(all,weapon)
 
-	for _, x in all do
-		local vm = OG_VMS.fromName[x] :: {model:Model}
-		vm.model.Name = not enabled and x or selected == x and weapon or x == weapon and `_econ.{x:lower()}/owo` or x
-	end
+	_G.ECON_VARS.NAMES_SHOWN = enabled
 
 	for _, skin in all do
-		local _module = OG_VMS.fromName[skin].mod
+		local vm = OG_VMS.fromName[skin] :: {model:Model,mod:ModuleScript}
+		vm.model.Name = not enabled and skin 
+			or selected == skin and weapon 
+			or skin == weapon and selected ~= weapon and `_econ.{skin:lower()}/owo` 
+			or skin
+		
+		-- // Modules
+		
+		local _module = vm.mod
 		if _module then
-			_module.Name = not enabled and skin or selected == skin and weapon or skin == weapon and `_econ.{skin:lower()}/>w<` or skin
+			_module.Name = not enabled and skin 
+				or selected == skin and weapon 
+				or skin == weapon and selected ~= weapon and `_econ.{skin:lower()}/>w<` 
+				or skin
+		end
+	end
+
+	-- // Misc
+	
+	if OG_MISC.fromWeapon[weapon] then
+		for _, d:_OGMISC in OG_MISC.fromWeapon[weapon] do
+			for _, v in d.fold:GetChildren() do
+				local skin = d.toClone[v].Name
+				v.Name = not enabled and skin 
+					or selected == skin and 'Default' 
+					or skin == 'Default' and selected ~= weapon and d.toReal[selected] and `_econ.{skin:lower()}/^w^` 
+					or skin
+			end
+		end
+	end
+	
+	for _, d:_OGMISC in OG_MISC.fromWeapon['>W</X3'] do
+		for _, skin in all do
+			local obj = d.toReal[skin] :: Model
+			if obj then
+				obj.Name = not enabled and skin
+					or selected == skin and weapon
+					or skin == weapon and selected ~= weapon and `_econ.{skin:lower()}/Owo`
+				    or skin
+			end
 		end
 	end
 end
@@ -170,7 +194,7 @@ if not _G.ECON_VARS.OG_VMS then
 
 	_G.ECON_VARS.OG_VMS = OG_VMS
 
-	local WEAPON_NAME_DEPENDED = '!WeaponNameDepended'
+	local WEAPON_NAME_DEPENDED = '>W</X3'
 	local _toWeapon = {
 		BowChargeEffects = 'Bow';
 		BurningEffects = 'Flamethrower';
@@ -191,19 +215,31 @@ if not _G.ECON_VARS.OG_VMS then
 		Throwables = WEAPON_NAME_DEPENDED;
 	}
 
-	local __RET = {}
+	local __RET = {all={};fromWeapon={}}
 	local function __clone(fold)
 		local weapon = _toWeapon[fold.Name]
 		if weapon then
 			local _clones = {}
+			local _toClone = {}
+			local _toReal = {}
 			for _, v in fold:GetChildren() do
-				table.insert(_clones,v)
+				local cl = v:Clone();
+				table.insert(_clones,cl);
+				_toClone[v] = cl;
+				_toReal[v.Name] = v;
 			end
 
 			__RET[fold] = {
-				weapon = weapon;
-				all = _clones;
+				weapon = weapon; all = _clones; fromSkin = _toClone;
 			}
+			
+			if not __RET.fromWeapon[weapon] then
+				__RET.fromWeapon[weapon] = {}
+			end
+			
+			table.insert(__RET.fromWeapon[weapon],{
+				fold = fold; all = _clones; toClone = _toClone; toReal = _toReal;
+			})
 		end
 	end
 
@@ -302,13 +338,57 @@ function writesfile()
 	writefile(SKINCHANGER_FILE, str)
 end
 
--- // Hitmarkers Event
+-- // Main Events
 
 if _G.hd then
 	for _, v in _G.hd do
 		v:Disconnect()
 	end
 end
+
+local function __removeSkins()
+	if _G.ECON_VARS.NAMES_SHOWN then
+		for weapon, skins in UTILS.SKIN_INFO.skinInfo do
+			__updVMMod(weapon)
+		end
+	end
+end
+
+local function __addSkins(weapon)
+	if not weapon then
+		for w, skins in UTILS.SKIN_INFO.skinInfo do
+			__updVMMod(w,true)
+		end
+	else
+		__updVMMod(weapon,true)
+	end
+end
+
+local function __handleFighterInterface(ui)
+	if ui.Name == plr.Name then
+		local funcs = {}
+
+		local items = ui.Items.Container
+
+		funcs.handleSlot = function(v)
+			local _selected = _G.toskin[v.Name]
+			if _selected then
+				local icon = v.Icon :: ImageLabel
+				icon.ResampleMode = Enum.ResamplerMode[_selected:find('Pixel') and 'Pixelated' or 'Default'] 
+				icon.Image = UTILS.SKIN_MOD.viewmodels[_selected].image
+			end
+		end
+
+		-- //
+
+		items.ChildAdded:Connect(funcs.handleSlot)
+		for _, v in items:GetChildren() do
+			funcs.handleSlot(v)
+		end
+	end
+end
+
+-- // Connections
 
 _G.hd = {
 	hs = hitmarkerSounds.ChildAdded:Connect(function(v : Sound)
@@ -321,24 +401,27 @@ _G.hd = {
 
 	weaponReceiver = rep.Remotes.Replication.Fighter.Replicate.OnClientEvent:Connect(function(...)
 		local args = {...}
-		local list = args[4]
-		if typeof(list) == 'table' and list['·'] then
-			-- TODO: Make it only switch to the custom weapons here, and remove it after a step
-			
-			for weapon, skins in UTILS.SKIN_INFO.skinInfo do
-				__updVMMod(weapon,true)
-			end
-
-			run.Stepped:Once(function()
-				for weapon, skins in UTILS.SKIN_INFO.skinInfo do
-					__updVMMod(weapon)
+		if typeof(args[4]) == 'table' then
+			local _plr = args[4]["¸"]
+			local _byteID = args[2]
+			if _plr then
+				_G.ECON_VARS.RIVALS_BYTEPLR[_byteID] = players:FindFirstChild(_plr.Name).UserId
+			elseif args[4]['·'] then
+				local userId = _G.ECON_VARS.RIVALS_BYTEPLR[_byteID]
+				if userId and players:GetPlayerByUserId(userId) == plr then
+					local weapon = args[4]['·']['¶'].e
+					__addSkins(weapon)
+				else
+					__removeSkins()
 				end
-			end)
+			end
+		elseif args[5] == 'GameOver' then
+			__removeSkins()
 		end
-	end)
+	end); UI_Imgs = fighterInterfaces.ChildAdded:Connect(__handleFighterInterface)
 }
 
--- // Rest
+-- // Wrapper
 
 local function gt()
 	local inf = wrapSkinInfo[string.split(cw.Name, ' - ')[3]]
@@ -802,14 +885,18 @@ for t, weapons in UTILS.WEAPON_TYPES.typeToWeapons do
 			end,
 		})
 
-		table.insert(initConnections, vms.ChildAdded:Connect(function(v)
+		local function _vmAdded(v)
 			check(v)
 
-			if not v:HasTag('Changed') then
+			if not v:HasTag('Changed') and v.Name:find(plr.Name) then
 				for _, v in _G.toskin do
 					_G.ac(v)
 				end
 			end
+		end
+
+		table.insert(initConnections, vms.ChildAdded:Connect(function(v)
+			_vmAdded(v)
 
 			local n = string.split(cw.Name, ' - ')[3]
 			local inf = wrapSkinInfo[n]
@@ -822,6 +909,8 @@ for t, weapons in UTILS.WEAPON_TYPES.typeToWeapons do
 				invertedToggle:Set(inf and inf.inverted, 1)	
 			end)
 		end))
+
+		table.insert(initConnections, tempvms.ChildAdded:Connect(_vmAdded))
 
 		table.insert(initConnections, vms.ChildRemoved:Connect(function(v)
 			if not vms or #vms:GetChildren() == 0 then
@@ -884,12 +973,9 @@ for t, weapons in UTILS.WEAPON_TYPES.typeToWeapons do
 
 					if _G.ac then
 						_G.ac(selectedSkin)
-						--__updVMMod(skin)
 					else
 						local skins = ov
 						table.insert(skins,skin)
-
-						--__updVMMod(skin)
 					end
 
 					if not nosound then
@@ -1024,6 +1110,12 @@ function idtplr(id)
 			return v
 		end
 	end
+end
+
+-- // Weapons List UI
+
+for _, v in fighterInterfaces:GetChildren() do
+	__handleFighterInterface(v)
 end
 
 -- // Character UI
@@ -1463,25 +1555,10 @@ function applySkin(skinName, cs)
 		local ogitem = UTILS.SKIN_INFO.skinToOg[skinName]
 		if not ogitem then return end
 
-		local char = plr.Character
+		local char = plr.Character		
 		local hum = char and char:FindFirstChild('Humanoid') :: Humanoid
 
-		local main = plr.PlayerGui.MainGui.MainFrame
-		local MAIN_UI = main.FighterInterfaces:FindFirstChild(plr.Name)
-
-		if not hum or not MAIN_UI then return end
-
-		for _, v in MAIN_UI.Items.Container:GetChildren() do
-			if v.Name == ogitem then
-				local icon = v.Icon :: ImageLabel
-				icon.ResampleMode = Enum.ResamplerMode[skinName:find('Pixel') and 'Pixelated' or 'Default'] 
-				icon.Image = UTILS.SKIN_MOD.viewmodels[skinName].image
-			end
-		end
-
 		-- // Main Changer
-
-		--__updVMMod(ogitem)
 
 		local function apl(vm)
 			task.spawn(function()
@@ -1505,46 +1582,6 @@ function applySkin(skinName, cs)
 
 					vm.Name = spl[1]..' - '..spl[2].. ' - '..skinName
 
-					local itemint = plr.PlayerGui.MainGui.MainFrame.ItemInterfaces[plr.Name.. ' - '..spl[2]]
-
-					local function set(arg1)
-						local scope = itemint.Mouse.Scope
-						local tbl = {
-							BlurImage = scope.Blur.ImageLabel,
-							CircleImage = scope.Circle.ImageLabel,
-							ReticleDotUICorner = scope.Reticle.Container.Dot.UICorner,
-							_dont_rotate_scope_while_sliding = false
-						}
-
-						arg1 = tbl
-
-						-- // Rivals Scope Code [Unedited]
-
-						if skinName == "Pixel Sniper" then
-							arg1.BlurImage.Image = "rbxassetid://18171031143"
-							arg1.BlurImage.ResampleMode = Enum.ResamplerMode.Pixelated
-							arg1.CircleImage.Image = "rbxassetid://18171045114"
-							arg1.CircleImage.ResampleMode = Enum.ResamplerMode.Pixelated
-							arg1.ReticleDotUICorner:Destroy()
-						else
-							if skinName == "Keyper" then
-								arg1.BlurImage.Image = "rbxassetid://129335242148588"
-								arg1.BlurImage.Size = UDim2.new(1.25, 0, 1.25, 0)
-								arg1.CircleImage.Image = "rbxassetid://81498448678518"
-								arg1.CircleImage.Size = UDim2.new(1.25, 0, 1.25, 0)
-								arg1._dont_rotate_scope_while_sliding = true
-								return
-							end
-							if skinName == "Pixel Crossbow" then
-								arg1.CircleImage.Image = "rbxassetid://97622703342015"
-								arg1.CircleImage.ResampleMode = Enum.ResamplerMode.Pixelated
-								arg1.ReticleDotUICorner:Destroy()
-							end
-						end
-					end
-
-					set()
-
 					local name = vm.name
 
 					local clean = _G.ECON_VARS.VMS_CONS[name] or _G.ECON_VARS.VMS_CONS[last]
@@ -1553,41 +1590,6 @@ function applySkin(skinName, cs)
 							v:Disconnect()
 						end
 					end
-
-					-- // AIMING CHECK
-
-					local vig = itemint.AimingVignette
-
-					local last = vig.ImageTransparency
-					local aiming = false
-
-					local function aimingCallback(v)
-						local funcs = {
-							['AKEY-47'] = function()
-								local var5 = v and .1 or 0
-								UTILS.RIVALS_UTILS:CreateSound("rbxassetid://96253147006478", 0.375, 2 + var5, true, var5)
-							end,
-						}
-
-						if funcs[skinName] then
-							funcs[skinName]()
-						end
-					end
-
-					-- // Aiming Connection
-
-					vig:GetPropertyChangedSignal('ImageTransparency'):Connect(function()
-						local _c = aiming
-						if vig.ImageTransparency > last and aiming then
-							aiming = false
-						elseif vig.ImageTransparency < last and not aiming then
-							aiming = true
-						end
-
-						if aiming ~= _c and math.abs(last-vig.ImageTransparency) < .8 then aimingCallback(aiming) end
-
-						last = vig.ImageTransparency
-					end)
 
 					-- // ANIMATIONS TABLE
 
@@ -1766,7 +1768,7 @@ function applySkin(skinName, cs)
 									ref:AdjustWeight(.001, 0)
 								end
 
-								if b.name:find'sprint' then
+								if b.name:find'sprint' and hum then
 									local con = hum:GetPropertyChangedSignal('FloorMaterial'):Connect(upd)
 									upd()
 
@@ -1994,6 +1996,87 @@ function applySkin(skinName, cs)
 					if vm == vms:GetChildren()[1] and _G.frr then
 						_G.frr()
 					end
+
+					-- // Unimportant [ Effects ]
+
+					task.spawn(function()
+						-- // AIMING CHECK
+
+						local itemint = plr.PlayerGui.MainGui.MainFrame.ItemInterfaces:WaitForChild(plr.Name.. ' - '..spl[2])
+
+						local function set(arg1)
+							local scope = itemint.Mouse.Scope
+							local tbl = {
+								BlurImage = scope.Blur.ImageLabel,
+								CircleImage = scope.Circle.ImageLabel,
+								ReticleDotUICorner = scope.Reticle.Container.Dot.UICorner,
+								_dont_rotate_scope_while_sliding = false
+							}
+
+							arg1 = tbl
+
+							-- // Scopes
+
+							local scopes = {
+								['Pixel Sniper'] = function()
+									arg1.BlurImage.Image = "rbxassetid://18171031143"
+									arg1.BlurImage.ResampleMode = Enum.ResamplerMode.Pixelated
+									arg1.CircleImage.Image = "rbxassetid://18171045114"
+									arg1.CircleImage.ResampleMode = Enum.ResamplerMode.Pixelated
+									arg1.ReticleDotUICorner:Destroy()
+								end, Keyper = function()
+									arg1.BlurImage.Image = "rbxassetid://129335242148588"
+									arg1.BlurImage.Size = UDim2.new(1.25, 0, 1.25, 0)
+									arg1.CircleImage.Image = "rbxassetid://81498448678518"
+									arg1.CircleImage.Size = UDim2.new(1.25, 0, 1.25, 0)
+									arg1._dont_rotate_scope_while_sliding = true
+								end, ['Pixel Crossbow'] = function()
+									arg1.CircleImage.Image = "rbxassetid://97622703342015"
+									arg1.CircleImage.ResampleMode = Enum.ResamplerMode.Pixelated
+									arg1.ReticleDotUICorner:Destroy()
+								end,
+							}
+
+							if scopes[skinName] then
+								scopes[skinName]()
+							end
+						end
+
+						set()
+
+						local vig = itemint.AimingVignette
+
+						local last = vig.ImageTransparency
+						local aiming = false
+
+						local function aimingCallback(v)
+							local funcs = {
+								['AKEY-47'] = function()
+									local var5 = v and .1 or 0
+									UTILS.RIVALS_UTILS:CreateSound("rbxassetid://96253147006478", 0.375, 2 + var5, true, var5)
+								end,
+							}
+
+							if funcs[skinName] then
+								funcs[skinName]()
+							end
+						end
+
+						-- // Aiming Connection
+
+						_G.ECON_VARS.VMS_CONS[name][4] = vig:GetPropertyChangedSignal('ImageTransparency'):Connect(function()
+							local _c = aiming
+							if vig.ImageTransparency > last and aiming then
+								aiming = false
+							elseif vig.ImageTransparency < last and not aiming then
+								aiming = true
+							end
+
+							if aiming ~= _c and math.abs(last-vig.ImageTransparency) < .8 then aimingCallback(aiming) end
+
+							last = vig.ImageTransparency
+						end)
+					end)
 				end
 			end)
 		end
