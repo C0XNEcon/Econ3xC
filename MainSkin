@@ -309,6 +309,10 @@ end
 
 -- // UI
 
+if not UTILS.ECON_UI.CreateWindow then
+	repeat run.Stepped:Wait() until UTILS.ECON_UI.CreateWindow
+end
+
 local UI_WINDOW = UTILS.ECON_UI:CreateWindow({
 	Name = 'Econ',
 	Icon = nil,
