@@ -31,6 +31,8 @@ _G.speed = .008
 
 local ITEM_WRAPS = {}
 
+local save = {'Material','MaterialVariant','Color','Transparency','Reflectance'}
+
 function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 	-- ONLY PARTS WITH WRAP GROUP ATTRIBUTE ARE AFFECTED
 	-- INVERTED: 2 > 1 | 1 > 2 | 3 > 3
@@ -59,21 +61,29 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 
 	if not spl or not spl[3] then spl = string.split(item.Name, ' - ') end
 
+	local ogWeapon = ogw:FindFirstChild(spl[3], true)
+	local ind = 0
+
 	local new = {}
 	_G.cn = new
 
 	for _, v in item:GetDescendants() do
 		local wg = v:GetAttribute('WrapGroup')
-
 		if v:IsA('BasePart') and wg then
 			wg = tonumber(wg)
 
-			for _, v in v:GetChildren() do
-				if (v:IsA('Texture') or v:IsA('Decal') or v:IsA('ParticleEmitter')) then
-					v:Destroy()
+			if v:HasTag('OG') then
+				for n, s in save do
+					v[n] = v:GetAttribute(n)
+				end
+
+				for _, v in v:GetChildren() do
+					if v:HasTag('Wrapped') then
+						v:Destroy()
+					end
 				end
 			end
-			
+
 			if wrapx ~= 'None' then
 				local part = v
 				if inverted then
@@ -83,6 +93,14 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 				local info = wg == 1 and wrap.g1 or wg == 2 and wrap.g2 or wrap.g3
 				if info then
 					-- MATERIAL, COLOR, TRANSPARENCY, REFLECTANCE, TEXTURES (#TABLES ARE WRAP GROUPS 1-3)
+					
+					if not part:HasTag'OG' then
+						part:AddTag('OG')
+						
+						for _, v in save do
+							part:SetAttribute(v,part[v])
+						end
+					end
 
 					if typeof(info[1]) ~= 'string' then
 						part.MaterialVariant = ''
@@ -97,8 +115,9 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 					part.Reflectance = info[4] or part.Reflectance
 
 					if info[5] then
-						for _, v in pairs(ogt[info[5]]:GetChildren()) do
+						for _, v in ogt[info[5]]:GetChildren() do
 							local c = v:Clone()
+							c:AddTag'Wrapped'
 							c.Parent = part
 							table.insert(new, c)
 						end
