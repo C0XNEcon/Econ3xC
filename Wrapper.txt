@@ -58,7 +58,7 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 
 			if v:HasTag('OG') then
 				for n, s in save do
-					v[s] = v:GetAttribute(n)
+					v[s] = v:GetAttribute(s)
 				end
 
 				for _, v in v:GetChildren() do
