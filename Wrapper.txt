@@ -17,16 +17,6 @@ function mod:getAll()
 	return wraps
 end
 
-function mod:findPartInModel(part, model)
-	for _, descendant in model:GetDescendants() do
-		if descendant:IsA("BasePart") and descendant.Name == part.Name then
-			if descendant.Size == part.Size then
-				return descendant
-			end
-		end
-	end
-end
-
 _G.speed = .008
 
 local ITEM_WRAPS = {}
@@ -56,13 +46,6 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 		1,
 		3
 	}
-
-	local spl = string.split(item.Parent.Name, ' - ')
-
-	if not spl or not spl[3] then spl = string.split(item.Name, ' - ') end
-
-	local ogWeapon = ogw:FindFirstChild(spl[3], true)
-	local ind = 0
 
 	local new = {}
 	_G.cn = new
