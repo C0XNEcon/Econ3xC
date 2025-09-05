@@ -73,7 +73,6 @@ local VARS = _G.ECON_VARS
 local OG_MISC = (VARS and VARS.OG_MISC or {}) :: {fromWeapon:table, all:table}
 local OG_VMS = (VARS and VARS.OG_VMS or {fromName = {}, all = {}}) ::  {fromName:table, all:table}
 
-local BYTE_WEAPONS = {}
 local ID_CHANGED_FUNCS = {}
 local ANIM_TO_NAME = {
 	inspect = 'Inspect', equip = 'Equip', idle = 'Idle',
@@ -87,7 +86,7 @@ local WEAPON_TYPES = {
 _G.ECON_VARS = _G.ECON_VARS or {
 	SAVED_ICONS = {}; PLR_ICONS = {}; ID_PLR = {}; NAME_ID = {}; APPLIED_VMS = {};
 	ECON_ANIMS = {}; HEADSHOT_FUNCS = {}; VMS_CONS = {}; CHAR_UGC = {}; RIVALS_BYTEPLR = {};
-	HANDLED_WEAPONS = {}; PROJ_THROW_ACTIVE = {};
+	HANDLED_WEAPONS = {}; PROJ_THROW_ACTIVE = {}; BYTE_WEAPONS = {};
 	OG_VMS = nil; OG_MISC = nil; NAMES_SHOWN = false; OUR_BYTEID = nil;
 }
 
@@ -125,32 +124,36 @@ if TOTAL_UTILS > 0 or plr.PlayerGui:FindFirstChild('LoadingScreen') then repeat 
 local HANDLED_WEAPONS = _G.ECON_VARS.HANDLED_WEAPONS
 local PROJ_THROW_ACTIVE = _G.ECON_VARS.PROJ_THROW_ACTIVE
 
-local TIMES = 0
-
 function __updVMMod(weapon, enabled, PROJ_THROW)
-	if typeof(PROJ_THROW) ~= 'boolean' then
-		PROJ_THROW = false;
-	end
+	local BOTH = typeof(PROJ_THROW)  ~= 'boolean'
 	
-	if not PROJ_THROW and (HANDLED_WEAPONS[weapon] and enabled or not HANDLED_WEAPONS[weapon] and not enabled) 
-		or PROJ_THROW and (PROJ_THROW_ACTIVE[weapon] and enabled or not PROJ_THROW_ACTIVE[weapon] and not enabled) then
-		TIMES += 1
-		--warn(`[{math.ceil(TIMES/4)*4}] | Tried to: {enabled and 'enable' or 'disable'}, while current state is: {PROJ_THROW and 'ProjThrow' or 'Normal'}: {PROJ_THROW and PROJ_THROW_ACTIVE[weapon] or not PROJ_THROW and HANDLED_WEAPONS[weapon]}`)
-		return
+	local NORM, PROJ = (not PROJ_THROW or BOTH) and (HANDLED_WEAPONS[weapon] and enabled or not HANDLED_WEAPONS[weapon] and not enabled), PROJ_THROW and (PROJ_THROW_ACTIVE[weapon] and enabled or not PROJ_THROW_ACTIVE[weapon] and not enabled)
+	if NORM or PROJ then
+		if BOTH then
+			BOTH = false
+			
+			if NORM and PROJ then return `Both, Action: {enabled and 'Enable' or 'Disable'}` end
+			if PROJ then PROJ_THROW = false end
+		else
+			return `Error: {NORM and 'Normal' or PROJ and 'Projectiles'}, Action: {enabled and 'Enable' or 'Disable'}`
+		end
 	end
 
 	local selected = _G.toskin[weapon]::string
 	local all = UTILS.SKIN_INFO.skinInfo[weapon]
 	table.insert(all,weapon)
-	
-	if not PROJ_THROW then
+
+	if BOTH then
+		HANDLED_WEAPONS[weapon] = enabled
+		PROJ_THROW_ACTIVE[weapon] = enabled
+	elseif not PROJ_THROW then
 		HANDLED_WEAPONS[weapon] = enabled
 	else
 		PROJ_THROW_ACTIVE[weapon] = enabled
 	end
-	
+
 	-- // Funcs
-	
+
 	local function __handleMultiWeaponFolder(foldName)
 		for _, d:_OGMISC in OG_MISC.fromWeapon[foldName] do
 			for _, skin in all do
@@ -164,14 +167,14 @@ function __updVMMod(weapon, enabled, PROJ_THROW)
 			end
 		end
 	end
-	
+
 	-- // Main
-	
-	if PROJ_THROW then -- // For Projectiles and Throwables
+
+	if PROJ_THROW or BOTH then -- // For Projectiles and Throwables
 		__handleMultiWeaponFolder'ProjectileOrThrowable'
 	end
-	
-	if not PROJ_THROW then
+
+	if not PROJ_THROW or BOTH then
 		_G.ECON_VARS.NAMES_SHOWN = enabled
 
 		for _, skin in all do
@@ -208,6 +211,8 @@ function __updVMMod(weapon, enabled, PROJ_THROW)
 
 		__handleMultiWeaponFolder'MuzzleFlashes'
 	end
+	
+	return `Succesfuly {enabled and 'Enabled' or 'Disabled'} {BOTH and 'Both' or PROJ_THROW and 'Projectiles' or 'Skin'}`
 end
 
 -- // ViewModels
@@ -271,11 +276,11 @@ if not _G.ECON_VARS.OG_VMS then
 			__RET[fold] = {
 				weapon = weapon; all = _clones; fromSkin = _toClone;
 			}
-			
+
 			if not __RET.fromWeapon[weapon] then
 				__RET.fromWeapon[weapon] = {}
 			end
-			
+
 			table.insert(__RET.fromWeapon[weapon],{
 				fold = fold; all = _clones; toClone = _toClone; toReal = _toReal;
 			})
@@ -438,61 +443,79 @@ _G.hd = {
 					local _lastByteID = _G.ECON_VARS.OUR_BYTEID
 					_G.ECON_VARS.OUR_BYTEID = _byteID
 
-					if _byteID ~= _lastByteID then
-						table.clear(BYTE_WEAPONS)
+					if _byteID ~= _lastByteID and _G.ECON_VARS.BYTE_WEAPONS[plr.UserId] then
+						table.clear(_G.ECON_VARS.BYTE_WEAPONS[plr.UserId])
 					end
 				end
-				
+
 				_G.ECON_VARS.RIVALS_BYTEPLR[_byteID] = players:FindFirstChild(_plr.Name).UserId
 			elseif args[4]['·'] then -- Player Weapon Equipped
 				local userId = _G.ECON_VARS.RIVALS_BYTEPLR[_byteID]
-				if userId and players:GetPlayerByUserId(userId) == plr then
-					local weaponData = args[4]['¶']
-					BYTE_WEAPONS[weaponData['¾']] = weaponData.e
-					__updVMMod(weaponData.e,true,1)
+				local weaponData = args[4]['¶']
+
+				if userId == plr.UserId then
+					__updVMMod(weaponData.e,true)
 				else
 					__removeSkins()
 				end
+
+				if not _G.ECON_VARS.BYTE_WEAPONS[userId] then
+					_G.ECON_VARS.BYTE_WEAPONS[userId] = {}
+				elseif args[5] == 1 then
+					table.clear(_G.ECON_VARS.BYTE_WEAPONS[userId])
+				end
+
+				_G.ECON_VARS.BYTE_WEAPONS[userId][weaponData['¾']] = weaponData.e
 			end
 		elseif args[3] == '' then -- Throwable / Projectile
-			local _weapon = BYTE_WEAPONS[args[4]]
 			local _byteID = args[2]
-			local _isValidProjectile = typeof(args[6]) == 'Instance' or _weapon and table.find({'Slingshot'},_weapon)
 
 			local userId = _G.ECON_VARS.RIVALS_BYTEPLR[_byteID]
-			local isOurs = userId and players:GetPlayerByUserId(userId) == plr
+			local isOurs = plr.UserId == userId
 			
-			if (not _weapon or not isOurs) and _isValidProjectile then -- // Not Ours
-				for weapon, val in PROJ_THROW_ACTIVE do
-					if val then
-						__updVMMod(weapon,false,true)
+			local list = {
+				[''] = 'Other';
+				[''] = 'Projectile';
+				['C'] = 'Throwable';
+			}
+
+			local _weapon = _G.ECON_VARS.BYTE_WEAPONS[userId][args[4]]
+			local _isValidProjectile = list[_weapon == 'Slingshot' and args[6] or args[5]] and (typeof(args[6]) == 'Instance' or _weapon and table.find({'Slingshot'},_weapon))
+
+			if not _weapon or not isOurs and _isValidProjectile then -- // If there's no weapon, data receiving has failed | [ When you load Econ in the middle of a match ]
+				local function __removeWeapon(w)
+					__updVMMod(w,false,true)
+					--UTILS.ECON_UI:Notify({
+					--	Title = 'Disable Projectiles',
+					--	Content = __updVMMod(w,false,true),
+					--	Duration = 3,
+					--	Image = 'check'
+					--})
+				end
+				
+				if _weapon then
+					if PROJ_THROW_ACTIVE[_weapon] then
+						__removeWeapon(_weapon)
+					end
+				else
+					for weapon, val in PROJ_THROW_ACTIVE do
+						if val then
+							__removeWeapon(weapon)
+						end
 					end
 				end
-
+				
 				return
 			end
-			
-			if not _isValidProjectile then return end
 
-			if isOurs then
-				local symbolToName = {
-					[''] = 'Other';
-					[''] = 'Projectile';
-					['C'] = 'Throwable';
-				}
-
-				UTILS.ECON_UI:Notify({
-					Title = symbolToName[_weapon == 'Slingshot' and args[6] or 	args[5]],
-					Content = _weapon,
-					Duration = .5,
-					Image = 'check'
-				})
-				
-				for weapon, val in HANDLED_WEAPONS do
-					if val then
-						__updVMMod(weapon,true,true)
-					end
-				end
+			if _isValidProjectile and isOurs and not PROJ_THROW_ACTIVE[_weapon] then
+				__updVMMod(_weapon,true,true)
+				--UTILS.ECON_UI:Notify({
+				--	Title = `Enable {_weapon}`,
+				--	Content = __updVMMod(_weapon,true,true),
+				--	Duration = 3,
+				--	Image = 'check'
+				--})
 			end
 		elseif args[5] == 'GameOver' then
 			__removeSkins()
