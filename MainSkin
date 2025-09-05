@@ -94,6 +94,9 @@ _G.ECON_VARS = _G.ECON_VARS or {
 	OG_VMS = nil; OG_MISC = nil; NAMES_SHOWN = false; OUR_BYTEID = nil;
 }
 
+local toskin = {}
+_G.toskin = toskin
+
 -- // Loading
 
 local RELOAD = {'ECON_UI'}
@@ -144,6 +147,8 @@ function __updVMMod(weapon, enabled, PROJ_THROW)
 	end
 
 	local selected = _G.toskin[weapon]::string
+	selected = selected == 'Dont Change' and weapon or selected or weapon
+
 	local all = UTILS.SKIN_INFO.skinInfo[weapon]
 	table.insert(all,weapon)
 
@@ -323,67 +328,48 @@ local UI_WINDOW = UTILS.ECON_UI:CreateWindow({
 
 -- // Wrap File Work
 
-local SKINCHANGER_FILE = 'cSkinchanged'
-local WRAPPER_FILE = 'cSkin'
+local ECON_FILE = 'EconContainer'
 
 local wrapSkinInfo = {}
-
-function readSkinFile()
-	local rf = isfile(WRAPPER_FILE)
-	if rf then
-		local splits = readfile(WRAPPER_FILE):split'�'
-		for _, v in splits do
-			local inf = v:split'`'
-			wrapSkinInfo[inf[1]] = {
-				wrap = inf[2],
-				inverted = inf[3] == 'true'
-			}
-		end
-	else
-		writefile(WRAPPER_FILE, '')
-	end
-end
-
-function writeSkinFile()
-	local str = ''
-	for skin, inf in wrapSkinInfo do
-		str..=skin..'`'..(inf.wrap or 'None')..'`'..tostring(inf.inverted)..'�'
-	end
-	writefile(WRAPPER_FILE, str)
-end
-
-readSkinFile()
-
--- // Skinchanger File Work
-
 local weaponToButton = {}
 local charapb = {}
 
-function readsfile()
-	local rf = isfile(SKINCHANGER_FILE) 
+function readFile()
+	local rf = isfile(ECON_FILE)
 	if rf then
-		local splits = readfile(SKINCHANGER_FILE):split'�'
-		for _, v in splits do
-			local inf = v:split('`')
-			if weaponToButton[inf[1]] then
-				_G.toskin[inf[1]] = inf[2]
-				weaponToButton[inf[1]]:Set({inf[2]}, true)
-			elseif tonumber(inf[1]) and not inf[2] then
-				CURRENT_ID = tonumber(inf[1])
-				charapb:Set(CURRENT_ID)
+		local splits = readfile(ECON_FILE):split''
+		for i, v in splits do
+			if i == 1 then
+				CURRENT_ID = tonumber(v)
+				--charapb:Set(CURRENT_ID)
+			else
+				local inf = v:split(string.char(1))
+				local b = weaponToButton[inf[1]]
+				if b then
+					_G.toskin[inf[1]] = inf[2]
+					b:Set({inf[2]}, true)
+
+					local inf = v:split''
+					wrapSkinInfo[inf[1]] = {
+						wrap = inf[3] or 'None',
+						inverted = inf[4]
+					}
+				end
 			end
 		end
 	else
-		writefile(SKINCHANGER_FILE, '')
+		writefile(ECON_FILE, '')
 	end
 end
 
-function writesfile()
-	local str = `{CURRENT_ID}�`
+function writeFile()
+	local str = `{CURRENT_ID}`
 	for weapon, skin in _G.toskin do
-		str..=weapon..'`'..skin..'�'
+		local wrap = wrapSkinInfo[weapon]
+		str ..= `{weapon}{skin}{wrap and wrap.wrap ~= 'None' and `{wrap.wrap}{wrap.inverted and '' or ''}` or ''}`
 	end
-	writefile(SKINCHANGER_FILE, str)
+	
+	writefile(ECON_FILE, str)
 end
 
 -- // Main Events
@@ -534,7 +520,7 @@ _G.hd = {
 -- // Wrapper
 
 local function gt()
-	local inf = wrapSkinInfo[string.split(cw.Name, ' - ')[3]]
+	local inf = wrapSkinInfo[string.split(cw.Name, ' - ')[2]]
 	UTILS.WRAPPER_MOD:wrapThis(cw, (inf and inf.wrap or 'None'), (inf and inf.inverted), assets.ViewModels, assets.WrapTextures)
 end
 
@@ -550,9 +536,6 @@ if vms:GetChildren()[1] then
 end
 
 -- // REST
-
-local toskin = {}
-_G.toskin = toskin
 
 local initConnections = {}
 
@@ -880,7 +863,7 @@ for t, weapons in UTILS.WEAPON_TYPES.typeToWeapons do
 					cchar(id)
 
 					if READ_FILE then
-						writesfile()
+						writeFile()
 					end
 				end
 			end,
@@ -900,13 +883,13 @@ for t, weapons in UTILS.WEAPON_TYPES.typeToWeapons do
 		end
 
 		function updateSkin()
-			local name = string.split(cw.Name, ' - ')[3]
+			local name = cw.Name:split' - '[2]
 			wrapSkinInfo[name] = {
 				wrap = selectedWrap,
 				inverted = inverted,
 			}
 
-			writeSkinFile()
+			writeFile()
 			gt()
 		end
 
@@ -996,8 +979,6 @@ for t, weapons in UTILS.WEAPON_TYPES.typeToWeapons do
 		})
 
 		local function _vmAdded(v)
-			check(v)
-
 			if not v:HasTag('Changed') and v.Name:find(plr.Name) then
 				for _, v in _G.toskin do
 					_G.ac(v)
@@ -1007,8 +988,9 @@ for t, weapons in UTILS.WEAPON_TYPES.typeToWeapons do
 
 		table.insert(initConnections, vms.ChildAdded:Connect(function(v)
 			_vmAdded(v)
+			check(v)
 
-			local n = string.split(cw.Name, ' - ')[3]
+			local n = string.split(cw.Name, ' - ')[2]
 			local inf = wrapSkinInfo[n]
 			visualSection:Set(n and 'Wrap Changer - '..n or 'Wrap Changer - Hold a weapon')
 			task.spawn(function()
@@ -1040,7 +1022,7 @@ for t, weapons in UTILS.WEAPON_TYPES.typeToWeapons do
 			if v then
 				check(v)
 
-				local n = string.split(cw.Name, ' - ')[3]
+				local n = string.split(cw.Name, ' - ')[2]
 				local inf = wrapSkinInfo[n]
 				visualSection:Set(n and 'Wrap Changer - '..n or 'Wrap Changer - Hold a weapon')
 				task.spawn(function()
@@ -1090,7 +1072,7 @@ for t, weapons in UTILS.WEAPON_TYPES.typeToWeapons do
 
 					if not nosound then
 						if READ_FILE then
-							writesfile()
+							writeFile()
 						end
 					end
 				end,
@@ -2206,16 +2188,19 @@ function applySkin(skinName, cs)
 	end)
 end
 
+-- // Main
+
+_G.ac = applySkin
+
 -- // Skinchanger Save
 
-readsfile()
+readFile()
 READ_FILE = true
 
 -- // Rest
 
 cchar()
 table.insert(initConnections, plr.CharacterAdded:Connect(cchar))
-_G.ac = applySkin
 
 queue_on_teleport(game:HttpGet(URL_ROOT..'MainSkin'))
 
