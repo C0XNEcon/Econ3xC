@@ -1,16 +1,4 @@
-local module = {
-	canPlay = {
-		'rbxassetid://13158735106', 
-		'rbxassetid://13158734943', 
-		'rbxassetid://13158735037',
-		--'rbxassetid://13159969353'
-	},
-
-	headshotid = 'rbxassetid://16537337310', -- RIVALS | Headshot SoundId
-	bodyshotid = 'rbxassetid://13110130082' -- RIVALS | Bodyshot SoundId
-}
-
-type _OGMISC = {fold:Folder,all:table,toClone:table,toReal:table}
+-- This script was made by @ConePartyy on Roblox, TODO: do not use this without my permission.
 
 --[[ ADDING NEW SKINS ]|
 
@@ -24,9 +12,25 @@ type _OGMISC = {fold:Folder,all:table,toClone:table,toReal:table}
 
 - Put 'add_wrap' from CosmeticLibrary to -- << TODO:Econ/UTILS.WRAPPER_MOD.txt >>
 
--- [[ ADDING NEW ITEMS ]|
+--[[ ADDING NEW ITEMS ]|
 
-- Primary, Secondary, Melee, Utility from ItemLib to WeaponTypes 'str' ]]
+- Primary, Secondary, Melee, Utility from ItemLib to WeaponTypes 'str'
+
+]]
+
+local module = {
+	canPlay = {
+		'rbxassetid://13158735106', 
+		'rbxassetid://13158734943', 
+		'rbxassetid://13158735037',
+		--'rbxassetid://13159969353'
+	},
+
+	headshotid = 'rbxassetid://16537337310', -- RIVALS | Headshot SoundId
+	bodyshotid = 'rbxassetid://13110130082' -- RIVALS | Bodyshot SoundId
+}
+
+type _OGMISC = {fold:Folder,all:table,toClone:table,toReal:table}
 
 ----------- [ Services ] -----------
 
@@ -576,7 +580,7 @@ local function cchar(id)
 
 		local cha = lid and lid.apr or suc and z
 
-		if not cha then UTILS.ECON_UI:Notify({Title = 'CharacterAppearance Error', Content = tostring(z), Duration = 10, Image = 'search-x'}) return end
+		if not cha then --[[Appearance Error]] return end
 
 		local char = plr.Character
 
@@ -599,7 +603,7 @@ local function cchar(id)
 
 			local inf = lid and lid.inff or suc and z
 
-			if not inf or typeof(inf) == 'boolean' then UTILS.ECON_UI:Notify({Title = 'Name,Displayname Error', Content = tostring(z), Duration = 10, Image = 'search-x'}) return end
+			if not inf or typeof(inf) == 'boolean' then --[[Name, DisplayName Error]] return end
 
 			inff = inf
 			loadedids[id].inff = inf
@@ -675,7 +679,7 @@ local function cchar(id)
 
 			local ap = lid and lid.ap or suc and z
 
-			if not ap then UTILS.ECON_UI:Notify({Title = 'FaceDecal Error', Content = tostring(z), Duration = 10, Image = 'search-x'}) return end
+			if not ap then --[[Face Error]] return end
 
 			if not ap then
 				ap = {
@@ -864,7 +868,7 @@ for t, weapons in UTILS.WEAPON_TYPES.typeToWeapons do
 
 				local id = tonumber(t) or tonumber(_G.ECON_VARS.NAME_ID[t] or suc and z)
 
-				if not id then UTILS.ECON_UI:Notify({Title = 'Name>ID Error', Content = tostring(z), Duration = 10, Image = 'search-x'}) return end
+				if not id then --[[Name To ID Error]] return end
 
 				if id then
 					_G.ECON_VARS.NAME_ID[t] = id
@@ -1187,7 +1191,7 @@ function getIcon()
 			return players:GetUserThumbnailAsync(id, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
 		end)
 
-		if not suc or not r then UTILS.ECON_UI:Notify({Title = 'PlrIcon Error', Content = tostring(c), Duration = 10, Image = 'search-x'}) return end
+		if not suc or not r then --[[Icon Error]] return end
 
 		content = c
 		r = r
