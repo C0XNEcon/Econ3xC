@@ -30,16 +30,17 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 	local CURR = ITEM_WRAPS[item]
 	if CURR and CURR[2] == wrapx and CURR[3] == inverted then return end
 	
-	local CURR_IND = CURR and CURR[1]+1 or 1
-	ITEM_WRAPS[item] = {CURR_IND,wrapx,inverted}
+	local wrap = wraps[wrapx]
+
+	if not wrap and wrapx ~= 'None' then return end
 	
+	local CURR_IND = CURR and CURR[1]+1 or 1
+
 	local function IS_CURRENT()
 		return ITEM_WRAPS[item][1] == CURR_IND
 	end
 	
-	local wrap = wraps[wrapx]
-
-	if not wrap and wrapx ~= 'None' then return end
+	ITEM_WRAPS[item] = {CURR_IND,wrapx,inverted}
 
 	local invertedT = {
 		2,
@@ -57,7 +58,7 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 
 			if v:HasTag('OG') then
 				for n, s in save do
-					v[n] = v:GetAttribute(n)
+					v[s] = v:GetAttribute(n)
 				end
 
 				for _, v in v:GetChildren() do
