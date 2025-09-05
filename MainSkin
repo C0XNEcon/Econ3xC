@@ -462,14 +462,16 @@ _G.hd = {
 				else
 					__removeSkins()
 				end
+				
+				if userId then 
+					if not _G.ECON_VARS.BYTE_WEAPONS[userId] then
+						_G.ECON_VARS.BYTE_WEAPONS[userId] = {}
+					elseif args[5] == 1 then
+						table.clear(_G.ECON_VARS.BYTE_WEAPONS[userId])
+					end
 
-				if not _G.ECON_VARS.BYTE_WEAPONS[userId] then
-					_G.ECON_VARS.BYTE_WEAPONS[userId] = {}
-				elseif args[5] == 1 then
-					table.clear(_G.ECON_VARS.BYTE_WEAPONS[userId])
+					_G.ECON_VARS.BYTE_WEAPONS[userId][weaponData['¾']] = weaponData.e
 				end
-
-				_G.ECON_VARS.BYTE_WEAPONS[userId][weaponData['¾']] = weaponData.e
 			end
 		elseif args[3] == '' then -- Throwable / Projectile
 			local _byteID = args[2]
@@ -482,6 +484,8 @@ _G.hd = {
 				[''] = 'Projectile';
 				['C'] = 'Throwable';
 			}
+			
+			if not _G.ECON_VARS.BYTE_WEAPONS[userId] then return end
 
 			local _weapon = _G.ECON_VARS.BYTE_WEAPONS[userId][args[4]]
 			local _isValidProjectile = list[_weapon == 'Slingshot' and args[6] or args[5]] and (typeof(args[6]) == 'Instance' or _weapon and table.find({'Slingshot'},_weapon))
