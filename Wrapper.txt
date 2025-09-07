@@ -126,9 +126,7 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 					z:Disconnect()
 				end
 			end)
-		end,
-
-		Solar = function()
+		end;Solar = function()
 			local z
 			z = run.Heartbeat:Connect(function()
 				if #new > 0 and new[1].Parent and IS_CURRENT() then
@@ -142,9 +140,7 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 					z:Disconnect()
 				end
 			end)
-		end,
-
-		Celestial = function()
+		end;Celestial = function()
 			local z
 			z = run.Heartbeat:Connect(function()
 				if #new > 0 and new[1].Parent and IS_CURRENT() then
@@ -159,9 +155,7 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 					z:Disconnect()
 				end
 			end)
-		end,
-
-		Speed = function()
+		end;Speed = function()
 			local z
 			local _shift = 0
 			local arg2 = 1
@@ -175,9 +169,7 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 					z:Disconnect()
 				end
 			end)
-		end,
-		
-		['Dark Matter'] = function()
+		end;['Dark Matter'] = function()
 			local z
 			z = run.Heartbeat:Connect(function()
 				if #new > 0 and new[1].Parent and IS_CURRENT() then
@@ -186,6 +178,20 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 						if speed and dir then
 							v.OffsetStudsU = tick() * speed * dir.X % v.StudsPerTileU
 							v.OffsetStudsV = tick() * speed * dir.Y % v.StudsPerTileV
+						end
+					end
+				else
+					z:Disconnect()
+				end
+			end)
+		end;['Burning, Churning'] = function()
+			local z
+			z = run.Heartbeat:Connect(function()
+				if #new > 0 and new[1].Parent and IS_CURRENT() then
+					for i, v in new do
+						local speed, dir = v:GetAttribute('Speed'), v:GetAttribute('Direction')
+						if speed and dir then
+							v.OffsetStudsU = tick() * speed * dir.X % v.StudsPerTileU
 						end
 					end
 				else
