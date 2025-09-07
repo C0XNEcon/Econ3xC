@@ -143,8 +143,8 @@ local __REQUIRE = function(name:string, URL:string)
 			
 			add_texture({Name = 'Coneova'; StudsPerTileU = 1.5; StudsPerTileV = 1; Color3 = Color3.fromRGB(255,218,133); Texture = 'rbxassetid://105834110571067'})
 			add_texture({Name = 'Sky'; StudsPerTileU = 1.5; StudsPerTileV = 1; Color3 = Color3.fromRGB(350,350,350); Texture = 'rbxassetid://102467065142059'})
-			add_texture({Name = 'Churning'; OffsetStudsV = .5; StudsPerTileU = 1; StudsPerTileV = 1; Color3 = Color3.fromRGB(450, 450, 450); Texture = 'rbxassetid://77463405207707', Attributes = {Direction = Vector3.xAxis*1;Speed = .7;}})
-			add_texture({Name = 'AnimatedTest'; OffsetStudsV = .5; StudsPerTileU = 1; StudsPerTileV = 1; Color3 = Color3.fromRGB(350, 350, 350); Texture = 'rbxassetid://77463405207707', Attributes = {Direction = Vector3.xAxis*-1;Speed = .7;}})
+			add_texture({Name = 'Churning'; OffsetStudsV = .5; StudsPerTileU = 1; StudsPerTileV = 1; Color3 = Color3.fromRGB(500, 500, 500); Texture = 'rbxassetid://124258215383148', Attributes = {Direction = Vector3.xAxis*1;Speed = .7;}})
+			add_texture({Name = 'AnimatedTest'; OffsetStudsV = .5; StudsPerTileU = 1; StudsPerTileV = 1; Color3 = Color3.fromRGB(400, 400, 400); Texture = 'rbxassetid://124258215383148', Attributes = {Direction = Vector3.xAxis*-1;Speed = .7;}})
 
 			add_wrap('Unobtainable', 'Burning, Churning', {Enum.Material.Neon, Color3.fromRGB(255, 141, 75), 0, 0, "Churning"}, {Enum.Material.Neon, Color3.fromRGB(255, 141, 75), 0, 0, "AnimatedTest"}, {Enum.Material.Neon, Color3.fromRGB(255, 151, 82), nil, nil, nil}, nil, "Included in the Heavy Duty Bundle")
 			add_wrap('Unobtainable', 'blueorsmt', {Enum.Material.Neon, Color3.fromRGB(102, 105, 255), 0, 0, "Sky"}, {Enum.Material.Neon, Color3.fromRGB(106, 93, 255), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(156, 163, 255), 0, 0, nil})
