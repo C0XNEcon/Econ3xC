@@ -94,6 +94,7 @@ _G.ECON_VARS = _G.ECON_VARS or {
 	OG_VMS = nil; OG_MISC = nil; NAMES_SHOWN = false; OUR_BYTEID = nil;
 }
 
+local specialWraps =  {}
 local toskin = {}
 _G.toskin = toskin
 
@@ -111,9 +112,23 @@ local __REQUIRE = function(name:string, URL:string)
 		_G[name] = REQUIRED_URL;
 		
 		if name == 'WRAPPER_MOD' then
-			local function add_texture(txt,folderName)
-				local _newFolder = Instance.new('Folder',assets:WaitForChild('WrapTextures'))
-				_newFolder.Name = folderName
+			local wrapTextures = assets:WaitForChild('WrapTextures')
+			local function add_texture(specs)
+				local txt = Instance.new('Texture')
+				for n, v in specs do
+					if n ~= 'Attributes' then
+						txt[n] = v
+					end
+				end
+				
+				if specs.Attributes then
+					for n, v in specs.Attributes do
+						txt:SetAttribute(n,v)
+					end
+				end
+				
+				local _newFolder = wrapTextures:FindFirstChild(specs.Name) or Instance.new('Folder',wrapTextures)
+				_newFolder.Name = specs.Name
 				for _, v:Enum.NormalId in Enum.NormalId:GetEnumItems() do
 					local _newText = txt:Clone()
 					_newText.Face = v
@@ -121,18 +136,19 @@ local __REQUIRE = function(name:string, URL:string)
 				end
 			end
 			
-			local _mainTexture = Instance.new('Texture')
-			_mainTexture.StudsPerTileU = 1.5; _mainTexture.StudsPerTileV = 1; _mainTexture.Color3 = Color3.fromRGB(255, 218, 133); _mainTexture.Texture = 'rbxassetid://105834110571067'
-
-			add_texture(_mainTexture,'Coneova')
+			local function add_wrap(...)
+				table.insert(specialWraps,({...})[2])
+				REQUIRED_URL:add_wrap(...)
+			end
 			
-			local _mainTexture = Instance.new('Texture')
-			_mainTexture.StudsPerTileU = 1.5; _mainTexture.StudsPerTileV = 1; _mainTexture.Color3 = Color3.fromRGB(350, 350, 350); _mainTexture.Texture = 'rbxassetid://102467065142059'
+			add_texture({Name = 'Coneova'; StudsPerTileU = 1.5; StudsPerTileV = 1; Color3 = Color3.fromRGB(255,218,133); Texture = 'rbxassetid://105834110571067'})
+			add_texture({Name = 'Sky'; StudsPerTileU = 1.5; StudsPerTileV = 1; Color3 = Color3.fromRGB(350,350,350); Texture = 'rbxassetid://102467065142059'})
+			add_texture({Name = 'Churning'; OffsetStudsV = .5; StudsPerTileU = 1; StudsPerTileV = 1; Color3 = Color3.fromRGB(450, 450, 450); Texture = 'rbxassetid://77463405207707', Attributes = {Direction = Vector3.xAxis*1;Speed = .7;}})
+			add_texture({Name = 'AnimatedTest'; OffsetStudsV = .5; StudsPerTileU = 1; StudsPerTileV = 1; Color3 = Color3.fromRGB(350, 350, 350); Texture = 'rbxassetid://77463405207707', Attributes = {Direction = Vector3.xAxis*-1;Speed = .7;}})
 
-			add_texture(_mainTexture,'Sky')
-
-			REQUIRED_URL:add_wrap('Unobtainable', 'blueorsmt', {Enum.Material.Neon, Color3.fromRGB(102, 105, 255), 0, 0, "Sky"}, {Enum.Material.Neon, Color3.fromRGB(106, 93, 255), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(156, 163, 255), 0, 0, nil})
-			REQUIRED_URL:add_wrap('Unobtainable', 'Coneova', {Enum.Material.Neon, Color3.fromRGB(255, 169, 93), 0, 0, 'Coneova'}, {'Pine', Color3.fromRGB(255, 177, 99), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(255, 174, 103), 0, 0, nil})
+			add_wrap('Unobtainable', 'Burning, Churning', {Enum.Material.Neon, Color3.fromRGB(255, 141, 75), 0, 0, "Churning"}, {Enum.Material.Neon, Color3.fromRGB(255, 141, 75), 0, 0, "AnimatedTest"}, {Enum.Material.Neon, Color3.fromRGB(255, 151, 82), nil, nil, nil}, nil, "Included in the Heavy Duty Bundle")
+			add_wrap('Unobtainable', 'blueorsmt', {Enum.Material.Neon, Color3.fromRGB(102, 105, 255), 0, 0, "Sky"}, {Enum.Material.Neon, Color3.fromRGB(106, 93, 255), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(156, 163, 255), 0, 0, nil})
+			add_wrap('Unobtainable', 'Coneova', {Enum.Material.Neon, Color3.fromRGB(255, 169, 93), 0, 0, 'Coneova'}, {'Pine', Color3.fromRGB(255, 177, 99), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(255, 174, 103), 0, 0, nil})
 		end
 
 		TOTAL_UTILS -= 1
@@ -146,8 +162,7 @@ __REQUIRE('WRAPPER_MOD','Wrapper.txt'); __REQUIRE('ECON_UI','Econ%20UI.txt');
 -- // Extra Vars
 
 local mainUI = plr.PlayerGui:WaitForChild'MainGui'.MainFrame
-
-local fighterInterfaces = mainUI:WaitForChild('FighterInterfaces')
+local fighterInterfaces = mainUI:WaitForChild'FighterInterfaces'
 
 if TOTAL_UTILS > 0 or plr.PlayerGui:FindFirstChild('LoadingScreen') then repeat run.Stepped:Wait() until TOTAL_UTILS == 0 and not plr.PlayerGui:FindFirstChild('LoadingScreen') end
 
@@ -233,11 +248,27 @@ function __updVMMod(weapon, enabled, PROJ_THROW)
 
 		if OG_MISC.fromWeapon[weapon] then
 			for _, d:_OGMISC in OG_MISC.fromWeapon[weapon] do
+				local toName = {
+					FreezeEffects = {
+						['Wrapped Freeze Ray'] = 'Wrapped';
+						['Bubble Ray'] = 'Bubble';
+						['Spider Ray'] = 'Cocoon';
+						['Gum Ray'] = 'Gum';
+						['Temporal Ray'] = 'Temporal';
+						['Freeze Ray'] = 'Freeze Ray';
+					}
+				}
+				
+				local fromName = {}
+				local tn = toName[d.fold.Name]
+				
 				for _, v in d.fold:GetChildren() do
 					local skin = d.toClone[v].Name
+					local __selected = tn and tn[selected] or selected
+					
 					v.Name = not enabled and skin 
-						or selected == skin and 'Default' 
-						or skin == 'Default' and selected ~= weapon and d.toReal[selected] and `_econ.{skin:lower()}/^w^` 
+						or __selected == skin and 'Default' 
+						or skin == 'Default' and __selected ~= weapon and d.toReal[__selected] and `_econ.{skin:lower()}/^w^` 
 						or skin
 				end
 			end
@@ -858,6 +889,53 @@ local function cchar(id)
 	end)
 end
 
+function createSparklesFrame(f)
+	local __ret = {}
+
+	local sparkleCooldown = .75
+	local lastSparkle = tick()
+	local sparkles = {}
+
+	function __ret:Update()
+		if tick()-lastSparkle > sparkleCooldown then
+			lastSparkle = tick()
+
+			local size = 0.375 + 0.25 * math.random() * 3
+			local clone = scripts.UserInterface.PrimeSparkle:Clone()
+			clone.Size = UDim2.new(size, 0, size, 0)
+
+			clone.Position = UDim2.new(0.5, (math.random() - 0.5) * f.AbsoluteSize.X, 0.5, (math.random() - 0.5) * f.AbsoluteSize.Y)
+			clone.Rotation = math.random() * 360
+			clone.Parent = f
+			clone:TweenSize(UDim2.new(), "In", "Back", 2, true)
+
+			table.insert(sparkles,{
+				object = clone;
+				spawnTick = tick();
+			})
+		end
+
+		for i, v in sparkles do
+			if tick()-v.spawnTick > 2 then
+				v.object:Destroy()
+				table.remove(sparkles,i)
+			else
+				v.object.Rotation += .01*180
+			end
+		end
+	end
+
+	function __ret:Destroy()
+		for _, v in sparkles do
+			v.object:Destroy()
+		end
+
+		__ret = nil
+	end
+
+	return __ret
+end
+
 -- // REST
 
 local READ_FILE = false
@@ -904,12 +982,14 @@ for t, weapons in UTILS.WEAPON_TYPES.typeToWeapons do
 
 		local selectedWrap = 'None'
 		local selectedWeapon = 'Assault Rifle'
-		local wrapsX = {'None'}
+		local wrapsX = {}
 		local inverted = false
 
 		for wrap, v in UTILS.WRAPPER_MOD:getAll() do
-			table.insert(wrapsX, wrap)
+			table.insert(wrapsX, v)
 		end
+		
+		table.insert(wrapsX, 'None')
 
 		function updateSkin()
 			local name = cw.Name:split' - '[2]
@@ -927,6 +1007,7 @@ for t, weapons in UTILS.WEAPON_TYPES.typeToWeapons do
 			Name = 'Wrap',
 			Options = wrapsX,
 			CurrentOption = {selectedWrap},
+			SpecialOptions = specialWraps,
 			MultipleOptions = false,
 			Ext = true,
 			Flag = 'wcwcdropdown',
@@ -945,10 +1026,29 @@ for t, weapons in UTILS.WEAPON_TYPES.typeToWeapons do
 				end
 			end,
 		})
+		
+		for _, v in specialWraps do
+			local frame = wrapDropdown.Frames[v]
+			if frame then
+				local txt = frame.Title :: TextLabel
+				
+				txt.FontFace = Font.fromName('Montserrat',Enum.FontWeight.ExtraBold,Enum.FontStyle.Normal)
+				
+				local sparkles = createSparklesFrame(frame)
+				local c
+				c = game:GetService('RunService').RenderStepped:Connect(function()
+					if frame.Parent then
+						sparkles.Update()
+					else
+						c:Disconnect()
+					end
+				end)
+			end
+		end
 
 		local wrapz = {'none'}
 		for wrap, v in UTILS.WRAPPER_MOD:getAll() do
-			table.insert(wrapz, wrap:lower())
+			table.insert(wrapz, v:lower())
 		end
 
 		typeWrap = gameplayTab:CreateInput({
@@ -962,8 +1062,8 @@ for t, weapons in UTILS.WEAPON_TYPES.typeToWeapons do
 				if table.find(wrapz, txt:lower()) then
 					local realWrap = 'None'
 					for w, v in UTILS.WRAPPER_MOD:getAll() do
-						if w:lower() == txt:lower() then
-							realWrap = w
+						if v:lower() == txt:lower() then
+							realWrap = v
 						end
 					end
 
