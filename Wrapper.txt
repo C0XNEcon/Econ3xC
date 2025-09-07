@@ -192,6 +192,7 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 						local speed, dir = v:GetAttribute('Speed'), v:GetAttribute('Direction')
 						if speed and dir then
 							v.OffsetStudsU = tick() * speed * dir.X % v.StudsPerTileU
+							v.OffsetStudsV = tick() * speed * dir.Y % v.StudsPerTileU
 						end
 					end
 				else
