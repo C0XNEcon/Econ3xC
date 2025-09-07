@@ -1,2336 +1,477 @@
--- This script was made by @ConePartyy on Roblox, TODO: do not use this without my permission.
+local mod = {}
+local wraps = {}
+local nameWraps = {}
 
---[[ ADDING NEW SKINS ]|
+local run = game:GetService('RunService')
 
-- Copying rivals ItemLibrary to -- << TODO:Econ/WeaponTypes >>
-- Run Clipboard script and pasting to -- << TODO:Econ/AnimSound >>
-- Put new 'add_animations' from AnimLib to -- << TODO:Econ/Anim >>
-- Put new 'add_viewmodel' from ItemLibrary to  -- << TODO:Econ/Skin >>
-- Put 'add_cosmetic_upvr' from CosmeticLibrary to -- << TODO:Econ/SkinInfo >>
-
---[[ ADDING NEW WRAPS ]|
-
-- Put 'add_wrap' from CosmeticLibrary to -- << TODO:Econ/UTILS.WRAPPER_MOD.txt >>
-
---[[ ADDING NEW ITEMS ]|
-
-- Primary, Secondary, Melee, Utility from ItemLib to WeaponTypes 'str'
-
-]]
-
-local module = {
-	canPlay = {
-		'rbxassetid://13158735106', 
-		'rbxassetid://13158734943', 
-		'rbxassetid://13158735037',
-		--'rbxassetid://13159969353'
-	},
-
-	headshotid = 'rbxassetid://16537337310', -- RIVALS | Headshot SoundId
-	bodyshotid = 'rbxassetid://13110130082' -- RIVALS | Bodyshot SoundId
-}
-
-type _OGMISC = {fold:Folder,all:table,toClone:table,toReal:table}
-
------------ [ Services ] -----------
-
-local players = game:GetService'Players'
-local run = game:GetService'RunService'
-local ss = game:GetService'SoundService'
-local uis = game:GetService'CoreGui'
-local cs = game:GetService'TextChatService'
-local rep = game:GetService'ReplicatedStorage'
-local workspace = game:GetService'Workspace'
-
------------ [ Player Assets ] -----------
-
-local plr = players.LocalPlayer
-local scripts = plr.PlayerScripts
-
-local assets = scripts:WaitForChild'Assets'
-local modules = scripts:WaitForChild'Modules'
-local repAssets = rep:WaitForChild'Assets'
-local temp = repAssets:WaitForChild'Temp'
-
-local vms = workspace:WaitForChild('ViewModels').FirstPerson
-local tempvms = temp:WaitForChild('ViewModels')
-
-local misc = assets:WaitForChild('Misc')
-local throwables = assets:WaitForChild('Throwables')
-local projectiles = assets:WaitForChild('Projectiles')
-local skins = assets:WaitForChild('ViewModels') :: Folder
-
-local vmModsOG = modules:FindFirstChild('OriginalViewModels')
-local vmModules = vmModsOG or modules:WaitForChild('ViewModels') :: Folder
-local modulesCopy = nil :: Folder
-
-local weaponSounds = scripts.Modules.ClientReplicatedClasses.ClientFighter.ClientItem
-local hitmarkerSounds = weaponSounds.ClientViewModel
-
------------ [ Main ] -----------
-
-local URL_ROOT = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/'
-local CURRENT_ID = plr.UserId
-
-local VARS = _G.ECON_VARS
-
-local OG_MISC = (VARS and VARS.OG_MISC or {}) :: {fromWeapon:table, all:table}
-local OG_VMS = (VARS and VARS.OG_VMS or {fromName = {}, all = {}}) ::  {fromName:table, all:table}
-
-local ID_CHANGED_FUNCS = {}
-local ANIM_TO_NAME = {
-	inspect = 'Inspect', equip = 'Equip', idle = 'Idle',
-	sprint = 'Sprint', rareinspect = 'RareInspect'
-}
-
-local WEAPON_TYPES = {
-	'Primary', 'Secondary', 'Melee', 'Utility'
-}
-
-_G.ECON_VARS = _G.ECON_VARS or {
-	SAVED_ICONS = {}; PLR_ICONS = {}; ID_PLR = {}; NAME_ID = {}; APPLIED_VMS = {};
-	ECON_ANIMS = {}; HEADSHOT_FUNCS = {}; VMS_CONS = {}; CHAR_UGC = {}; RIVALS_BYTEPLR = {};
-	HANDLED_WEAPONS = {}; PROJ_THROW_ACTIVE = {}; BYTE_WEAPONS = {};
-	OG_VMS = nil; OG_MISC = nil; NAMES_SHOWN = false; OUR_BYTEID = nil;
-}
-
-local specialWraps =  {}
-local toskin = {}
-_G.toskin = toskin
-
--- // Loading
-
-local RELOAD = {'ECON_UI'}
-local UTILS = {}
-local TOTAL_UTILS = 0
-local __REQUIRE = function(name:string, URL:string)
-	TOTAL_UTILS += 1
-
-	task.spawn(function()
-		local REQUIRED_URL = not RELOAD[name] and _G[name] or loadstring(game:HttpGet(`{URL_ROOT}{URL}`))()
-		UTILS[name] = REQUIRED_URL;
-		_G[name] = REQUIRED_URL;
-		
-		if name == 'WRAPPER_MOD' then
-			local wrapTextures = assets:WaitForChild('WrapTextures')
-			local function add_texture(specs)
-				local txt = Instance.new('Texture')
-				for n, v in specs do
-					if n ~= 'Attributes' then
-						txt[n] = v
-					end
-				end
-				
-				if specs.Attributes then
-					for n, v in specs.Attributes do
-						txt:SetAttribute(n,v)
-					end
-				end
-				
-				local _newFolder = wrapTextures:FindFirstChild(specs.Name) or Instance.new('Folder',wrapTextures)
-				_newFolder.Name = specs.Name
-				for _, v:Enum.NormalId in Enum.NormalId:GetEnumItems() do
-					local _newText = txt:Clone()
-					_newText.Face = v
-					_newText.Parent = _newFolder
-				end
-			end
-			
-			local function add_wrap(...)
-				table.insert(specialWraps,({...})[2])
-				REQUIRED_URL:add_wrap(...)
-			end
-			
-			add_texture({Name = 'Coneova'; StudsPerTileU = 1.5; StudsPerTileV = 1; Color3 = Color3.fromRGB(255,218,133); Texture = 'rbxassetid://105834110571067'})
-			add_texture({Name = 'Sky'; StudsPerTileU = 1.5; StudsPerTileV = 1; Color3 = Color3.fromRGB(350,350,350); Texture = 'rbxassetid://102467065142059'})
-			add_texture({Name = 'Churning'; OffsetStudsV = .5; StudsPerTileU = 1; StudsPerTileV = 1; Color3 = Color3.fromRGB(500, 500, 500); Texture = 'rbxassetid://124258215383148', Attributes = {Direction = Vector3.xAxis*1;Speed = .7;}})
-			add_texture({Name = 'AnimatedTest'; OffsetStudsV = .5; StudsPerTileU = 1; StudsPerTileV = 1; Color3 = Color3.fromRGB(400, 400, 400); Texture = 'rbxassetid://124258215383148', Attributes = {Direction = Vector3.xAxis*-1;Speed = .7;}})
-
-			add_wrap('Unobtainable', 'Burning, Churning', {Enum.Material.Neon, Color3.fromRGB(255, 141, 75), 0, 0, "Churning"}, {Enum.Material.Neon, Color3.fromRGB(255, 141, 75), 0, 0, "AnimatedTest"}, {Enum.Material.Neon, Color3.fromRGB(255, 151, 82), nil, nil, nil}, nil, "Included in the Heavy Duty Bundle")
-			add_wrap('Unobtainable', 'blueorsmt', {Enum.Material.Neon, Color3.fromRGB(102, 105, 255), 0, 0, "Sky"}, {Enum.Material.Neon, Color3.fromRGB(106, 93, 255), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(156, 163, 255), 0, 0, nil})
-			add_wrap('Unobtainable', 'Coneova', {Enum.Material.Neon, Color3.fromRGB(255, 169, 93), 0, 0, 'Coneova'}, {'Pine', Color3.fromRGB(255, 177, 99), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(255, 174, 103), 0, 0, nil})
-		end
-
-		TOTAL_UTILS -= 1
-	end)
+function mod:add_wrap(rarity, name, group1, group2, group3, desc)
+	table.insert(nameWraps,name)
+	wraps[name] = {
+		rarity = rarity,
+		desc = desc,
+		g1 = group1,
+		g2 = group2,
+		g3 = group3,
+	}
 end
 
-__REQUIRE('SKIN_MOD','Skin'); __REQUIRE('RIVALS_UTILS','UtilityFake'); __REQUIRE('SKIN_INFO','SkinInfo');
-__REQUIRE('SKIN_SOUND_CODE','AnimSound'); __REQUIRE('WEAPON_TYPES','WeaponTypes');
-__REQUIRE('WRAPPER_MOD','Wrapper.txt'); __REQUIRE('ECON_UI','Econ%20UI.txt');
-
--- // Extra Vars
-
-local mainUI = plr.PlayerGui:WaitForChild'MainGui'.MainFrame
-local fighterInterfaces = mainUI:WaitForChild'FighterInterfaces'
-
-if TOTAL_UTILS > 0 or plr.PlayerGui:FindFirstChild('LoadingScreen') then repeat run.Stepped:Wait() until TOTAL_UTILS == 0 and not plr.PlayerGui:FindFirstChild('LoadingScreen') end
-
--- // Modules -> ViewModels
-
-local HANDLED_WEAPONS = _G.ECON_VARS.HANDLED_WEAPONS
-local PROJ_THROW_ACTIVE = _G.ECON_VARS.PROJ_THROW_ACTIVE
-
-function __updVMMod(weapon, enabled, PROJ_THROW)
-	local BOTH = typeof(PROJ_THROW)  ~= 'boolean'
-	
-	local NORM, PROJ = (not PROJ_THROW or BOTH) and (HANDLED_WEAPONS[weapon] and enabled or not HANDLED_WEAPONS[weapon] and not enabled), PROJ_THROW and (PROJ_THROW_ACTIVE[weapon] and enabled or not PROJ_THROW_ACTIVE[weapon] and not enabled)
-	if NORM or PROJ then
-		if BOTH then
-			BOTH = false
-			
-			if NORM and PROJ then return `Both, Action: {enabled and 'Enable' or 'Disable'}` end
-			if PROJ then PROJ_THROW = false end
-		else
-			return `Error: {NORM and 'Normal' or PROJ and 'Projectiles'}, Action: {enabled and 'Enable' or 'Disable'}`
-		end
-	end
-
-	local selected = _G.toskin[weapon]::string
-	selected = selected == 'Dont Change' and weapon or selected or weapon
-
-	local all = UTILS.SKIN_INFO.skinInfo[weapon]
-	table.insert(all,weapon)
-
-	if BOTH then
-		HANDLED_WEAPONS[weapon] = enabled
-		PROJ_THROW_ACTIVE[weapon] = enabled
-	elseif not PROJ_THROW then
-		HANDLED_WEAPONS[weapon] = enabled
-	else
-		PROJ_THROW_ACTIVE[weapon] = enabled
-	end
-
-	-- // Funcs
-
-	local function __handleMultiWeaponFolder(foldName)
-		for _, d:_OGMISC in OG_MISC.fromWeapon[foldName] do
-			for _, skin in all do
-				local obj = d.toReal[skin] :: Model
-				if obj then
-					obj.Name = not enabled and skin
-						or selected == skin and weapon
-						or skin == weapon and selected ~= weapon and `_econ.{skin:lower()}/Owo`
-						or skin
-				end
-			end
-		end
-	end
-
-	-- // Main
-
-	if PROJ_THROW or BOTH then -- // For Projectiles and Throwables
-		__handleMultiWeaponFolder'ProjectileOrThrowable'
-	end
-
-	if not PROJ_THROW or BOTH then
-		_G.ECON_VARS.NAMES_SHOWN = enabled
-
-		for _, skin in all do
-			local vm = OG_VMS.fromName[skin] :: {model:Model,mod:ModuleScript}
-			vm.model.Name = not enabled and skin 
-				or selected == skin and weapon 
-				or skin == weapon and selected ~= weapon and `_econ.{skin:lower()}/owo` 
-				or skin
-
-			-- // Modules
-
-			local _module = vm.mod
-			if _module then
-				_module.Name = not enabled and skin 
-					or selected == skin and weapon 
-					or skin == weapon and selected ~= weapon and `_econ.{skin:lower()}/>w<` 
-					or skin
-			end
-		end
-
-		-- // Misc
-
-		if OG_MISC.fromWeapon[weapon] then
-			for _, d:_OGMISC in OG_MISC.fromWeapon[weapon] do
-				local toName = {
-					FreezeEffects = {
-						['Wrapped Freeze Ray'] = 'Wrapped';
-						['Bubble Ray'] = 'Bubble';
-						['Spider Ray'] = 'Cocoon';
-						['Gum Ray'] = 'Gum';
-						['Temporal Ray'] = 'Temporal';
-						['Freeze Ray'] = 'Freeze Ray';
-					}
-				}
-				
-				local fromName = {}
-				local tn = toName[d.fold.Name]
-				
-				for _, v in d.fold:GetChildren() do
-					local skin = d.toClone[v].Name
-					local __selected = tn and tn[selected] or selected
-					
-					v.Name = not enabled and skin 
-						or __selected == skin and 'Default' 
-						or skin == 'Default' and __selected ~= weapon and d.toReal[__selected] and `_econ.{skin:lower()}/^w^` 
-						or skin
-				end
-			end
-		end
-
-		__handleMultiWeaponFolder'MuzzleFlashes'
-	end
-	
-	return `Succesfuly {enabled and 'Enabled' or 'Disabled'} {BOTH and 'Both' or PROJ_THROW and 'Projectiles' or 'Skin'}`
+function mod:getAll()
+	return nameWraps
 end
 
--- // ViewModels
+_G.speed = .008
 
-modulesCopy = vmModsOG and modules.ViewModels or vmModules:Clone()
+local ITEM_WRAPS = {}
 
-vmModules.Name = 'OriginalViewModels'
-modulesCopy.Parent = modules
+local save = {'Material','MaterialVariant','Color','Transparency','Reflectance'}
 
-vmModsOG = vmModsOG or vmModules
+function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
+	-- ONLY PARTS WITH WRAP GROUP ATTRIBUTE ARE AFFECTED
+	-- INVERTED: 2 > 1 | 1 > 2 | 3 > 3
+	
+	local CURR = ITEM_WRAPS[item]
+	if CURR and CURR[2] == wrapx and CURR[3] == inverted then return end
+	
+	local wrap = wraps[wrapx]
 
-if not _G.ECON_VARS.OG_VMS then
-	for _, v in skins:GetDescendants() do
-		if v:IsA('Model') then
-			local FINAL_TB = {
-				model  = v;
-				mod = vmModsOG:FindFirstChild(v.Name,true);
-			}
+	if not wrap and wrapx ~= 'None' then return end
+	
+	local CURR_IND = CURR and CURR[1]+1 or 1
 
-			OG_VMS.fromName[v.Name] = FINAL_TB
-			table.insert(OG_VMS.all, FINAL_TB)
-		end
+	local function IS_CURRENT()
+		return ITEM_WRAPS[item][1] == CURR_IND
 	end
+	
+	ITEM_WRAPS[item] = {CURR_IND,wrapx,inverted}
 
-	_G.ECON_VARS.OG_VMS = OG_VMS
-
-	local _toWeapon = {
-		BowChargeEffects = 'Bow';
-		BurningEffects = 'Flamethrower';
-		ChainsawParticles = 'Chainsaw';
-		DeflectActiveEffects = 'Katana';
-		DeflectHitEffects = 'Katana';
-		FireHitboxes = 'Molotov';
-		FlamethrowerAirblasts = 'Flamethrower';
-		FlamethrowerFlames = 'Flamethrower';
-		JumpPads = 'Jump Pad';
-		FreezeEffects = 'Freeze Ray';
-		MolotovExplosionEffects = 'Molotov';
-		SmokeClouds = 'Smoke Grenade';
-		WarHornEffects = 'War Horn';
-
-		MuzzleFlashes = 'MuzzleFlashes';
-		Projectiles = 'ProjectileOrThrowable';
-		Throwables = 'ProjectileOrThrowable';
+	local invertedT = {
+		2,
+		1,
+		3
 	}
 
-	local __RET = {all={};fromWeapon={}}
-	local function __clone(fold)
-		local weapon = _toWeapon[fold.Name]
-		if weapon then
-			local _clones = {}
-			local _toClone = {}
-			local _toReal = {}
-			for _, v in fold:GetChildren() do
-				local cl = v:Clone();
-				table.insert(_clones,cl);
-				_toClone[v] = cl;
-				_toReal[v.Name] = v;
-			end
+	local new = {}
+	_G.cn = new
 
-			__RET[fold] = {
-				weapon = weapon; all = _clones; fromSkin = _toClone;
-			}
+	for _, v in item:GetDescendants() do
+		local wg = v:GetAttribute('WrapGroup')
+		if v:IsA('BasePart') and wg then
+			wg = tonumber(wg)
 
-			if not __RET.fromWeapon[weapon] then
-				__RET.fromWeapon[weapon] = {}
-			end
-
-			table.insert(__RET.fromWeapon[weapon],{
-				fold = fold; all = _clones; toClone = _toClone; toReal = _toReal;
-			})
-		end
-	end
-
-	for _, v in misc:GetChildren() do
-		__clone(v)
-	end
-
-	__clone(throwables);
-	__clone(projectiles);
-
-	_G.ECON_VARS.OG_MISC = __RET
-	OG_MISC = __RET
-end
-
--- // UI
-
-if not UTILS.ECON_UI.CreateWindow then
-	repeat run.Stepped:Wait() until UTILS.ECON_UI.CreateWindow
-end
-
-local UI_WINDOW = UTILS.ECON_UI:CreateWindow({
-	Name = 'Econ',
-	Icon = nil,
-	LoadingTitle = '',
-	LoadingSubtitle = "by ConePartyy",
-	Theme = "AmberGlow", 
-
-	DisableEconFieldPrompts = true,
-	DisableBuildWarnings = true,
-
-	ConfigurationSaving = {
-		Enabled = true,
-		FolderName = 'cone',
-		FileName = "econ"
-	},
-})
-
--- // Wrap File Work
-
-local ECON_FILE = 'EconContainer'
-
-local wrapSkinInfo = {}
-local weaponToButton = {}
-local charapb = {}
-
-function readFile()
-	local rf = isfile(ECON_FILE)
-	if rf then
-		local splits = readfile(ECON_FILE):split''
-		for i, v in splits do
-			if i == 1 then
-				CURRENT_ID = tonumber(v)
-				--charapb:Set(CURRENT_ID)
-			else
-				local inf = v:split(string.char(1))
-				local b = weaponToButton[inf[1]]
-				if b then
-					_G.toskin[inf[1]] = inf[2]
-					b:Set({inf[2]}, true)
-
-					local inf = v:split''
-					wrapSkinInfo[inf[1]] = {
-						wrap = inf[3] or 'None',
-						inverted = inf[4]
-					}
+			if v:HasTag('OG') then
+				for n, s in save do
+					v[s] = v:GetAttribute(s)
 				end
-			end
-		end
-	else
-		writefile(ECON_FILE, '')
-	end
-end
 
-function writeFile()
-	local str = `{CURRENT_ID}`
-	for weapon, skin in _G.toskin do
-		local wrap = wrapSkinInfo[weapon]
-		str ..= `{weapon}{skin}{wrap and wrap.wrap ~= 'None' and `{wrap.wrap}{wrap.inverted and '' or ''}` or ''}`
-	end
-	
-	writefile(ECON_FILE, str)
-end
-
--- // Main Events
-
-if _G.hd then
-	for _, v in _G.hd do
-		v:Disconnect()
-	end
-end
-
-local function __handleFighterInterface(ui)
-	if ui.Name == plr.Name then
-		local funcs = {}
-
-		local items = ui.Items.Container
-
-		funcs.handleSlot = function(v)
-			local _selected = _G.toskin[v.Name]
-			if _selected then
-				local icon = v.Icon :: ImageLabel
-				icon.ResampleMode = Enum.ResamplerMode[_selected:find('Pixel') and 'Pixelated' or 'Default'] 
-				icon.Image = UTILS.SKIN_MOD.viewmodels[_selected].image
-			end
-		end
-
-		-- //
-
-		items.ChildAdded:Connect(funcs.handleSlot)
-		for _, v in items:GetChildren() do
-			funcs.handleSlot(v)
-		end
-	end
-end
-
-local function __removeSkins()
-	for weapon, val in HANDLED_WEAPONS do
-		if val then
-			__updVMMod(weapon,false,1)
-		end
-	end
-end
-
--- // Connections
-
-_G.hd = {
-	hs = hitmarkerSounds.ChildAdded:Connect(function(v : Sound)
-		if v:IsA('Sound') and v.SoundId == module.headshotid then
-			for _, v in _G.ECON_VARS.HEADSHOT_FUNCS do
-				v()
-			end
-		end
-	end);
-
-	weaponReceiver = rep.Remotes.Replication.Fighter.Replicate.OnClientEvent:Connect(function(...)
-		local args = {...}
-		if typeof(args[4]) == 'table' then -- Player Data
-			local _plr = args[4]["¸"]
-			local _byteID = args[2]
-			if _plr then -- Player Byte ID
-				if _plr.Name == plr.Name then
-					local _lastByteID = _G.ECON_VARS.OUR_BYTEID
-					_G.ECON_VARS.OUR_BYTEID = _byteID
-
-					if _byteID ~= _lastByteID and _G.ECON_VARS.BYTE_WEAPONS[plr.UserId] then
-						table.clear(_G.ECON_VARS.BYTE_WEAPONS[plr.UserId])
+				for _, v in v:GetChildren() do
+					if v:HasTag('Wrapped') then
+						v:Destroy()
 					end
 				end
+			end
 
-				_G.ECON_VARS.RIVALS_BYTEPLR[_byteID] = players:FindFirstChild(_plr.Name).UserId
-			elseif args[4]['·'] then -- Player Weapon Equipped
-				local userId = _G.ECON_VARS.RIVALS_BYTEPLR[_byteID]
-				local weaponData = args[4]['¶']
-
-				if userId == plr.UserId then
-					__updVMMod(weaponData.e,true)
-				else
-					__removeSkins()
+			if wrapx ~= 'None' then
+				local part = v
+				if inverted then
+					wg = invertedT[wg]
 				end
-				
-				if userId then 
-					if not _G.ECON_VARS.BYTE_WEAPONS[userId] then
-						_G.ECON_VARS.BYTE_WEAPONS[userId] = {}
-					elseif args[5] == 1 then
-						table.clear(_G.ECON_VARS.BYTE_WEAPONS[userId])
+
+				local info = wg == 1 and wrap.g1 or wg == 2 and wrap.g2 or wrap.g3
+				if info then
+					-- MATERIAL, COLOR, TRANSPARENCY, REFLECTANCE, TEXTURES (#TABLES ARE WRAP GROUPS 1-3)
+					
+					if not part:HasTag'OG' then
+						part:AddTag('OG')
+						
+						for _, v in save do
+							part:SetAttribute(v,part[v])
+						end
 					end
 
-					_G.ECON_VARS.BYTE_WEAPONS[userId][weaponData['¾']] = weaponData.e
+					if typeof(info[1]) ~= 'string' then
+						part.MaterialVariant = ''
+						part.Material = info[1] or part.Material
+					elseif info[1] then
+						part.MaterialVariant = info[1] or ''
+						part.Material = game:GetService('MaterialService'):FindFirstChild(info[1], true).BaseMaterial
+					end
+
+					part.Color = info[2] or part.Color
+					part.Transparency = info[3] or part.Transparency
+					part.Reflectance = info[4] or part.Reflectance
+
+					if info[5] then
+						for _, v in ogt[info[5]]:GetChildren() do
+							local c = v:Clone()
+							c:AddTag'Wrapped'
+							c.Parent = part
+							table.insert(new, c)
+						end
+					end
 				end
 			end
-		elseif args[3] == '' then -- Throwable / Projectile
-			local _byteID = args[2]
+		end
+	end
 
-			local userId = _G.ECON_VARS.RIVALS_BYTEPLR[_byteID]
-			local isOurs = plr.UserId == userId
-			
-			local list = {
-				[''] = 'Other';
-				[''] = 'Projectile';
-				['C'] = 'Throwable';
-			}
-			
-			if not _G.ECON_VARS.BYTE_WEAPONS[userId] then return end
-
-			local _weapon = _G.ECON_VARS.BYTE_WEAPONS[userId][args[4]]
-			local _isValidProjectile = list[_weapon == 'Slingshot' and args[6] or args[5]] and (typeof(args[6]) == 'Instance' or _weapon and table.find({'Slingshot'},_weapon))
-
-			if not _weapon or not isOurs and _isValidProjectile then -- // If there's no weapon, data receiving has failed | [ When you load Econ in the middle of a match ]
-				local function __removeWeapon(w)
-					__updVMMod(w,false,true)
-					--UTILS.ECON_UI:Notify({
-					--	Title = 'Disable Projectiles',
-					--	Content = __updVMMod(w,false,true),
-					--	Duration = 3,
-					--	Image = 'check'
-					--})
-				end
-				
-				if _weapon then
-					if PROJ_THROW_ACTIVE[_weapon] then
-						__removeWeapon(_weapon)
+	local funcs = {
+		['Neon Lights'] = function()
+			local z
+			z = run.Heartbeat:Connect(function()
+				if #new > 0 and new[1].Parent and IS_CURRENT() then
+					local add = math.floor(tick() * 10) * 0.027 % 0.25
+					for _, v in new do
+						v.OffsetStudsV = add
 					end
 				else
-					for weapon, val in PROJ_THROW_ACTIVE do
-						if val then
-							__removeWeapon(weapon)
-						end
-					end
+					z:Disconnect()
 				end
-				
-				return
-			end
-
-			if _isValidProjectile and isOurs and not PROJ_THROW_ACTIVE[_weapon] then
-				__updVMMod(_weapon,true,true)
-				--UTILS.ECON_UI:Notify({
-				--	Title = `Enable {_weapon}`,
-				--	Content = __updVMMod(_weapon,true,true),
-				--	Duration = 3,
-				--	Image = 'check'
-				--})
-			end
-		elseif args[5] == 'GameOver' then
-			__removeSkins()
-		end
-	end); UI_Imgs = fighterInterfaces.ChildAdded:Connect(__handleFighterInterface)
-}
-
--- // Wrapper
-
-local function gt()
-	local inf = wrapSkinInfo[string.split(cw.Name, ' - ')[2]]
-	UTILS.WRAPPER_MOD:wrapThis(cw, (inf and inf.wrap or 'None'), (inf and inf.inverted), assets.ViewModels, assets.WrapTextures)
-end
-
-local function check(v)
-	if v.Name:find(plr.Name) then
-		cw = v
-		gt()
-	end
-end
-
-if vms:GetChildren()[1] then
-	check(vms:GetChildren()[1])
-end
-
--- // REST
-
-local initConnections = {}
-
--- // CHARACTER CHANGER
-
-local loadedids = {}
-
-local ltagcon = nil
-local lll = nil
-
--- // Character Changer
-
-local dn = (plr.DisplayName or plr.Name)..(plr.HasVerifiedBadge and ' '..utf8.char(0xE000) or '')
-local usn = plr.Name
-
-local function cchar(id)
-	task.spawn(function()
-		local id = typeof(id) == 'number' and id or CURRENT_ID
-		if not id then return end
-
-		local lid = loadedids[id]
-
-		local suc, z = false, 'Lid Exists'
-		if not (lid and lid.apr) then
-			suc, z = pcall(function()
-				return players:GetCharacterAppearanceAsync(id)
 			end)
-		end
-
-		local cha = lid and lid.apr or suc and z
-
-		if not cha then --[[Appearance Error]] return end
-
-		local char = plr.Character
-
-		-- // REST
-
-		local inff = nil
-		task.spawn(function()
-			-- // VISUALS
-
-			for _, v in ID_CHANGED_FUNCS do
-				v()
-			end
-
-			local suc, z = false, 'Lid Exists'
-			if not lid or not lid.inff then
-				suc, z = pcall(function()
-					return game:GetService('UserService'):GetUserInfosByUserIdsAsync({id})
-				end)
-			end
-
-			local inf = lid and lid.inff or suc and z
-
-			if not inf or typeof(inf) == 'boolean' then --[[Name, DisplayName Error]] return end
-
-			inff = inf
-			loadedids[id].inff = inf
-
-			if ltagcon then
-				for _, v in pairs(ltagcon) do
-					v:Disconnect()
-				end
-			end
-
-			if lll then
-				lll:Disconnect()
-			end
-
-			if inf and inf[1] then
-				inf = inf[1]
-
-				local root = char:WaitForChild('HumanoidRootPart')
-
-				local function tagfunc(tag)
-					if not tag or tag.Name ~= 'Nametag' then return end
-
-					if ltagcon then
-						for _, v in pairs(ltagcon) do
-							v:Disconnect()
+		end;Solar = function()
+			local z
+			z = run.Heartbeat:Connect(function()
+				if #new > 0 and new[1].Parent and IS_CURRENT() then
+					for _, v in new do
+						if v.Name == 'Wireframe' then
+							v.OffsetStudsU = (math.random() - 0.5) * 0.01
+							v.OffsetStudsV = (math.random() - 0.5) * 0.01
 						end
-					end
-
-					local frame = tag.Frame or tag:WaitForChild('Frame')
-					local ff = frame.Player
-					local un = ff.Username
-
-					local function hn()
-						dn = (tostring(inf.DisplayName) or inf.Username)..(inf.HasVerifiedBadge and ' '..utf8.char(0xE000) or '')
-						usn = inf.Username
-						ff.Text = dn
-						un.Text = inf.DisplayName and '@'..inf.Username or ''
-					end
-
-					hn()
-
-					ltagcon = {}
-
-					table.insert(ltagcon, ff:GetPropertyChangedSignal('Text'):Connect(hn))
-					table.insert(ltagcon, tag:GetPropertyChangedSignal('Parent'):Once(function()
-						for _, v in pairs(ltagcon) do
-							v:Disconnect()
-						end
-					end))
-
-					for _, v in pairs(ltagcon) do
-						table.insert(initConnections, v)
-					end
-				end
-
-				tagfunc(root:FindFirstChild('Nametag'))
-				lll = root.ChildAdded:Connect(tagfunc)
-				table.insert(initConnections, lll)
-			end
-		end)
-
-		loadedids[id] = {
-			apr = cha,
-		}
-
-		task.spawn(function()
-			local suc, z = false, 'Lid Exists'
-			if not (lid and lid.ap) then
-				suc, z = pcall(function()
-					return players:GetHumanoidDescriptionFromUserId(id)
-				end)
-			end
-
-			local ap = lid and lid.ap or suc and z
-
-			if not ap then --[[Face Error]] return end
-
-			if not ap then
-				ap = {
-					Face = 0
-				}
-			end
-
-			loadedids[id].ap = ap
-
-			local face = ap.Face
-			local faceid = "rbxthumb://type=Asset&w=768&h=432&id="..face
-
-			local head = char:WaitForChild('Head')
-			for _, v in pairs(head:GetChildren()) do
-				if v.Name == 'face' then
-					v:Destroy()
-				end
-			end
-
-			local newface = Instance.new('Decal', head)
-			newface.Name = 'face'
-			newface.Texture = face ~= 0 and faceid or 'rbxasset://textures/face.png'
-		end)
-
-		local function caa(characterModel, accessory)
-			task.spawn(function()
-				local accessoryAttachment = accessory:FindFirstChildWhichIsA("Attachment", true)
-				if not accessoryAttachment then
-					warn("No attachments found in accessory. Accessory was not attached.")
-					return
-				end
-
-				local attachmentName = accessoryAttachment.Name
-				local attachTo = nil
-
-				local st = tick()
-				repeat run.Stepped:Wait() attachTo = characterModel:FindFirstChild(attachmentName, true) until attachTo
-
-				if not attachTo or not attachTo:IsA("Attachment") then
-					warn(string.format("No attachment named %s found in character. Accessory was not attached.", attachmentName))
-					return
-				end
-
-				local Handle = accessory:FindFirstChild("Handle")
-				if not Handle then
-					warn("Attachment has no handle. Accessory was not attached.")
-					return
-				end
-
-				Handle.CFrame = attachTo.WorldCFrame * accessoryAttachment.CFrame:Inverse()
-
-				local nc = Instance.new('WeldConstraint', Handle)
-				nc.Part0 = Handle
-				nc.Part1 = attachTo.Parent
-
-				accessory.Parent = characterModel
-			end)
-		end
-
-		local names = {'Shirt', 'Pants', 'ShirtGraphic', 'Accessory'}
-
-		local function hand(v)
-			if table.find(names, v.ClassName) then
-				task.defer(function()
-					v:Destroy()
-				end)
-			elseif v.ClassName == 'BodyColors' then
-				local bc = cha:FindFirstChild('Body Colors') :: BodyColors
-				if bc then
-					v.HeadColor3 = bc.HeadColor3
-					v.TorsoColor3 = bc.TorsoColor3
-					v.LeftArmColor3 = bc.LeftArmColor3
-					v.LeftLegColor3 = bc.LeftLegColor3
-					v.RightArmColor3 = bc.RightArmColor3
-					v.RightLegColor3 = bc.RightLegColor3
-
-					local to = {
-						RightUpperArm = bc.RightArmColor3,
-						RightLowerArm = bc.RightArmColor3,
-						RightHand = bc.RightArmColor3,
-
-						LeftUpperArm = bc.LeftArmColor3,
-						LeftLowerArm = bc.LeftArmColor3,
-						LeftHand = bc.LeftArmColor3,
-
-						Head = bc.HeadColor3,
-						UpperTorso = bc.TorsoColor3,
-						LowerTorso = bc.TorsoColor3,
-
-						RightUpperLeg = bc.RightLegColor3,
-						RightLowerLeg = bc.RightLegColor3,
-						RightFoot = bc.RightLegColor3,
-
-						LeftUpperLeg = bc.LeftLegColor3,
-						LeftLowerLeg = bc.LeftLegColor3,
-						LeftFoot = bc.LeftLegColor3,
-					}
-
-					for piece, colr in pairs(to) do
-						task.spawn(function()
-							char:WaitForChild(piece).Color = colr
-						end)
-					end
-				end
-			end
-		end
-
-		for _, v : BodyColors in pairs(char:GetChildren()) do
-			hand(v)
-		end
-
-		local con2
-		local con = char.ChildAdded:Connect(function(v)
-			if not table.find(_G.ECON_VARS.CHAR_UGC, v) then
-				hand(v)
-			end
-		end)
-
-		table.insert(initConnections, con)
-		table.insert(initConnections, char:GetPropertyChangedSignal('Parent'):Once(function()
-			if con then
-				con:Disconnect()
-			end
-
-			if con2 then
-				con2:Disconnect()
-			end
-		end))
-
-		local function h2(v)
-			if table.find(names, v.ClassName) then
-				if v:IsA('Accessory') then
-					local v = v:Clone()
-					for _, v in v:GetChildren() do
-						if v:IsA('BasePart') then
-							v.CanCollide = false
-							v.CanQuery = false
-							v.CanTouch = false
-							v.CollisionGroup = 'Players'
-							v.Massless = true
-						end
-					end
-
-					table.insert(_G.ECON_VARS.CHAR_UGC, v)
-					caa(char, v)
-				else 
-					local cl = v:Clone() :: BodyColors
-					table.insert(_G.ECON_VARS.CHAR_UGC, cl)
-					cl.Parent = char
-				end
-			end
-		end
-
-		for _, v in pairs(cha:GetChildren()) do
-			h2(v)
-		end
-
-		con2 = cha.ChildAdded:Connect(h2)
-		table.insert(initConnections, con2)
-	end)
-end
-
-function createSparklesFrame(f)
-	local __ret = {}
-
-	local sparkleCooldown = .75
-	local lastSparkle = tick()
-	local sparkles = {}
-
-	function __ret:Update()
-		if tick()-lastSparkle > sparkleCooldown then
-			lastSparkle = tick()
-
-			local size = 0.375 + 0.25 * math.random() * 3
-			local clone = scripts.UserInterface.PrimeSparkle:Clone()
-			clone.Size = UDim2.new(size, 0, size, 0)
-
-			clone.Position = UDim2.new(0.5, (math.random() - 0.5) * f.AbsoluteSize.X, 0.5, (math.random() - 0.5) * f.AbsoluteSize.Y)
-			clone.Rotation = math.random() * 360
-			clone.Parent = f
-			clone:TweenSize(UDim2.new(), "In", "Back", 2, true)
-
-			table.insert(sparkles,{
-				object = clone;
-				spawnTick = tick();
-			})
-		end
-
-		for i, v in sparkles do
-			if tick()-v.spawnTick > 2 then
-				v.object:Destroy()
-				table.remove(sparkles,i)
-			else
-				v.object.Rotation += .01*180
-			end
-		end
-	end
-
-	function __ret:Destroy()
-		for _, v in sparkles do
-			v.object:Destroy()
-		end
-
-		__ret = nil
-	end
-
-	return __ret
-end
-
--- // REST
-
-local READ_FILE = false
-
-for t, weapons in UTILS.WEAPON_TYPES.typeToWeapons do
-	local gameplayTab = UI_WINDOW:CreateTab(WEAPON_TYPES[t])
-
-	if t == 1 then
-		local sec = gameplayTab:CreateSection'Character Changer'
-
-		local charchanger = gameplayTab:CreateInput({
-			Name = 'Player ID / Name',
-			CurrentValue = tostring(CURRENT_ID),
-			PlaceholderText = 'ConePartyy',
-			RemoveTextAfterFocusLost = false,
-			Flag = 'appearancechangerid',
-			Callback = function(t)
-				local suc, z = false, 'Lid Exists'
-				if not (tonumber(t) or tonumber(_G.ECON_VARS.NAME_ID[t])) then
-					suc, z = pcall(function()
-						return players:GetUserIdFromNameAsync(t)
-					end)
-				end
-
-				local id = tonumber(t) or tonumber(_G.ECON_VARS.NAME_ID[t] or suc and z)
-
-				if not id then --[[Name To ID Error]] return end
-
-				if id then
-					_G.ECON_VARS.NAME_ID[t] = id
-					CURRENT_ID = id
-					cchar(id)
-
-					if READ_FILE then
-						writeFile()
-					end
-				end
-			end,
-		})
-
-		charapb = charchanger
-
-		local visualSection = gameplayTab:CreateSection('Wrap Changer - Hold a weapon')
-
-		local selectedWrap = 'None'
-		local selectedWeapon = 'Assault Rifle'
-		local wrapsX = {}
-		local inverted = false
-
-		for wrap, v in UTILS.WRAPPER_MOD:getAll() do
-			table.insert(wrapsX, v)
-		end
-		
-		table.insert(wrapsX, 'None')
-
-		function updateSkin()
-			local name = cw.Name:split' - '[2]
-			wrapSkinInfo[name] = {
-				wrap = selectedWrap,
-				inverted = inverted,
-			}
-
-			writeFile()
-			gt()
-		end
-
-		local typeWrap
-		local wrapDropdown = gameplayTab:CreateDropdown({
-			Name = 'Wrap',
-			Options = wrapsX,
-			CurrentOption = {selectedWrap},
-			SpecialOptions = specialWraps,
-			MultipleOptions = false,
-			Ext = true,
-			Flag = 'wcwcdropdown',
-			Callback = function(Options, nosound)
-				selectedWrap = Options[1]
-
-				if not nosound and not (not vms or #vms:GetChildren() == 0) then
-					updateSkin()
-				elseif not nosound then
-					UTILS.ECON_UI:Notify({
-						Title = 'Error',
-						Content = 'Hold a weapon to change your wrap', 
-						Image = 6026568210,
-						Duration = 2,
-					})
-				end
-			end,
-		})
-		
-		for _, v in specialWraps do
-			local frame = wrapDropdown.Frames[v]
-			if frame then
-				local txt = frame.Title :: TextLabel
-				
-				txt.FontFace = Font.fromName('Montserrat',Enum.FontWeight.ExtraBold,Enum.FontStyle.Normal)
-				
-				local sparkles = createSparklesFrame(frame)
-				local c
-				c = game:GetService('RunService').RenderStepped:Connect(function()
-					if frame.Parent then
-						sparkles.Update()
-					else
-						c:Disconnect()
-					end
-				end)
-			end
-		end
-
-		local wrapz = {'none'}
-		for wrap, v in UTILS.WRAPPER_MOD:getAll() do
-			table.insert(wrapz, v:lower())
-		end
-
-		typeWrap = gameplayTab:CreateInput({
-			Name = 'Type Wrap',
-			CurrentValue = selectedWrap,
-			PlaceholderText = selectedWrap,
-			RemoveTextAfterFocusLost = true,
-			Ext = true,
-			Flag = 'wcwcinput',
-			Callback = function(txt, nosound)
-				if table.find(wrapz, txt:lower()) then
-					local realWrap = 'None'
-					for w, v in UTILS.WRAPPER_MOD:getAll() do
-						if v:lower() == txt:lower() then
-							realWrap = v
-						end
-					end
-
-					if not (not vms or #vms:GetChildren() == 0) then
-						wrapDropdown:Set({realWrap}, nosound)
-					end
-
-					selectedWrap = realWrap
-
-					if not nosound and not (not vms or #vms:GetChildren() == 0) then
-					elseif not nosound then
-						UTILS.ECON_UI:Notify({
-							Title = 'Error',
-							Content = 'Hold a weapon to change your wrap', 
-							Image = 6026568210,
-							Duration = 2,
-						})
-					end
-				end
-			end,
-		})
-
-		local invertedToggle = gameplayTab:CreateToggle({
-			Name = 'Inverted',
-			CurrentValue = false,
-			Ext = true,
-			Flag = "invtoggle",
-			Callback = function(Value, nosound)
-				inverted = Value
-
-				if not nosound and not (not vms or #vms:GetChildren() == 0) then
-					updateSkin()
-				elseif not nosound then
-					UTILS.ECON_UI:Notify({
-						Title = 'Error',
-						Content = 'Hold a weapon to change your wrap', 
-						Image = 6026568210,
-						Duration = 2,
-					})
-				end
-			end,
-		})
-
-		local function _vmAdded(v)
-			if not v:HasTag('Changed') and v.Name:find(plr.Name) then
-				for _, v in _G.toskin do
-					_G.ac(v)
-				end
-			end
-		end
-
-		table.insert(initConnections, vms.ChildAdded:Connect(function(v)
-			_vmAdded(v)
-			check(v)
-
-			local n = string.split(cw.Name, ' - ')[2]
-			local inf = wrapSkinInfo[n]
-			visualSection:Set(n and 'Wrap Changer - '..n or 'Wrap Changer - Hold a weapon')
-			task.spawn(function()
-				typeWrap:Set(inf and inf.wrap or 'None', 1)
-			end)
-
-			task.spawn(function()
-				invertedToggle:Set(inf and inf.inverted, 1)	
-			end)
-		end))
-
-		table.insert(initConnections, tempvms.ChildAdded:Connect(_vmAdded))
-
-		table.insert(initConnections, vms.ChildRemoved:Connect(function(v)
-			if not vms or #vms:GetChildren() == 0 then
-				visualSection:Set('Wrap Changer - Hold a weapon')
-				task.spawn(function()
-					typeWrap:Set('None', 1)
-				end)
-
-				task.spawn(function()
-					invertedToggle:Set(false, 1)	
-				end)
-			end
-		end))
-
-		local function frcheck()
-			local v = vms:GetChildren()[1]
-			if v then
-				check(v)
-
-				local n = string.split(cw.Name, ' - ')[2]
-				local inf = wrapSkinInfo[n]
-				visualSection:Set(n and 'Wrap Changer - '..n or 'Wrap Changer - Hold a weapon')
-				task.spawn(function()
-					typeWrap:Set(inf and inf.wrap or 'None', 1)
-				end)
-
-				task.spawn(function()
-					invertedToggle:Set(inf and inf.inverted, 1)	
-				end)
-			end
-		end
-
-		_G.frr = frcheck
-	end
-
-	local visualSection = gameplayTab:CreateSection'Weapons'
-
-	for skin, v in weapons do
-		skin = v
-		v = UTILS.SKIN_INFO.skinInfo[v]
-
-		if v then
-			local ov = table.clone(v)
-			v = {'Dont Change'}
-			for _, v2 in pairs(ov) do
-				table.insert(v, v2)
-			end
-
-			local selectedSkin = [[Dont Change]]
-			local drop = gameplayTab:CreateDropdown({
-				Name = skin,
-				Options = v,
-				CurrentOption = {[[Dont Change]]},
-				MultipleOptions = false,
-				Flag = skin,
-				Callback = function(Options, nosound, nowrite)
-					selectedSkin = Options[1]
-
-					_G.toskin[skin] = Options[1]
-
-					if _G.ac then
-						_G.ac(selectedSkin)
-					else
-						local skins = ov
-						table.insert(skins,skin)
-					end
-
-					if not nosound then
-						if READ_FILE then
-							writeFile()
-						end
-					end
-				end,
-			})
-
-			weaponToButton[skin] = drop
-		end
-	end
-end
-
-local going = true
-
-plr:SetAttribute('OriginalPositionb', nil)
-plr:SetAttribute('OriginalPositionb', true)
-
-table.insert(initConnections, plr:GetAttributeChangedSignal('OriginalPositionb'):Connect(function()
-	for _, v in initConnections do
-		v:Disconnect()
-	end
-
-	going = false
-	return
-end))
-
-local relAnim = rep.Modules.AnimationLibrary
-
-local soundGroup = ss:FindFirstChild('Zero') or Instance.new('SoundGroup', ss)
-local animStorage = uis:FindFirstChild('AnimsEcon') or Instance.new('Folder', uis)
-animStorage.Name = 'AnimsEcon'
-soundGroup.Name = 'Zero'
-
-local soundOn = true
-
--- // Global
-
-if _G.soundCon then
-	_G.soundCon:Disconnect()
-end
-
-if _G.volumeC then
-	_G.volumeC:Disconnect()
-end
-
-_G.volumeC = ss.Other:GetPropertyChangedSignal('Volume'):Connect(function()
-	if soundOn then
-		soundGroup.Volume = ss.Other.Volume
-	end
-end)
-
-_G.soundCon = weaponSounds.ChildAdded:Connect(function(s)
-	if (not table.find(module.canPlay, s.SoundId) or s.PlaybackSpeed == .5) and not s:HasTag('IsOurs') then
-		s.SoundGroup = soundGroup
-	end
-end)
-
--- // Main
-
-local toMuzzle = {
-	Minigun = 'Minigun',
-	Spray = 'Spray',
-}
-
-for _, v in skins.Weapons:GetChildren() do
-	toMuzzle[v.Name] = toMuzzle[v.Name] or 'Default'
-end
-
-task.spawn(function()
-	local prelo = {}
-	for _, v in _G.toskin do
-		table.insert(prelo, UTILS.SKIN_MOD.viewmodels[v].image)
-	end
-	game:GetService('ContentProvider'):PreloadAsync(prelo)
-end)
-
-function findSkin(name)
-	local skins = OG_VMS.fromName
-	for n, v in skins do
-		if n == name then return v.model end
-	end
-end
-
--- // Weapons ViewProfile UI Changer
-
-local prcons = {}
-local pacons = {}
-local pa2cons = {}
-local sidecons = {}
-
-local is = _G.selectChanged
-
-function getIcon()
-	local content = nil
-	local isReady = nil
-	local id = CURRENT_ID or plr.UserId
-	local s = _G.ECON_VARS.SAVED_ICONS[id]
-
-	if s then
-		content = s.content
-		isReady = s.isReady
-	else
-		local suc, c, r = pcall(function()
-			return players:GetUserThumbnailAsync(id, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
-		end)
-
-		if not suc or not r then --[[Icon Error]] return end
-
-		content = c
-		r = r
-
-		_G.ECON_VARS.SAVED_ICONS[id] = {
-			content = c, isReady = r
-		}
-	end
-
-	return content, isReady
-end
-
--- // FUNCTIONS
-
-function idtplr(id)
-	local d = _G.ECON_VARS.ID_PLR[id]
-	if d then return d end
-
-	for _, v in players:GetPlayers() do
-		if v.UserId == id then
-			_G.ECON_VARS.ID_PLR[id] = v
-			return v
-		end
-	end
-end
-
--- // Weapons List UI
-
-for _, v in fighterInterfaces:GetChildren() do
-	__handleFighterInterface(v)
-end
-
--- // Character UI
-
-task.spawn(function()
-	local MAIN_UI = plr.PlayerGui:WaitForChild('MainGui')
-	local pages = MAIN_UI.MainFrame.Pages
-
-	local function checkfor(v)
-		if v.Name == 'ViewProfile' then
-			if prcons then
-				for _, v in pairs(prcons) do
-					v:Disconnect()
-				end
-			end
-
-			local _active = v:WaitForChild('Active')
-			local __player = _active.Player
-
-			local _display = __player.DisplayName
-			local _username = __player.Username
-			local _headshot = __player.Headshot
-			local list = __player.FavoriteWeapons
-
-			local content, isReady = getIcon()
-
-			if not _G.ECON_VARS.PLR_ICONS[_headshot] then
-				_G.ECON_VARS.PLR_ICONS[_headshot] = _headshot.Image
-			end
-
-			local function hn(changedim)
-				if string.find(_G.ECON_VARS.PLR_ICONS[_headshot], tostring(plr.UserId)) then
-					_display.Text = dn
-					_username.Text = '@'..usn
-					if isReady and _headshot.Image ~= content then
-						_G.ignorenext = true
-						_headshot.Image = content
 					end
 				else
-					local str = string.sub(_G.ECON_VARS.PLR_ICONS[_headshot], 56, -1)
-					local id = tonumber(string.sub(str, 1, string.find(str, '&')-1))
-					if id and idtplr(id) then
-						_username.Text = '@'..idtplr(id).Name
+					z:Disconnect()
+				end
+			end)
+		end;Celestial = function()
+			local z
+			z = run.Heartbeat:Connect(function()
+				if #new > 0 and new[1].Parent and IS_CURRENT() then
+					for i, v in new do
+						local var9 = (tick() * 0.01 + (v.Name == 'Big' and .5 or 0)) % 1
+						local var10 = 0.05 + 1.075 * var9 ^ 2
+						v.Transparency = math.sin(math.pi * var9 - (math.pi/2)) ^ 20 * 0.75 + 0.25
+						v.StudsPerTileU = var10
+						v.StudsPerTileV = var10
 					end
-				end
-			end
-
-			prcons = {}
-
-			if not is then
-				local function handle(v)
-					task.spawn(function()
-						local b = v.Name == 'PickWeaponSlot' and v:WaitForChild('Button')
-						if b and b:FindFirstChild('Icon') and b.Icon:FindFirstChild('Picture') then
-							b = b.Icon.Picture
-							b.Name = 'OPic'
-
-							local function calc()
-								if string.find(_G.ECON_VARS.PLR_ICONS[_headshot], tostring(plr.UserId)) then
-									local ts = UTILS.SKIN_MOD.its[b.Image]
-									local tog = UTILS.SKIN_INFO.skinToOg[ts] or ts
-									local tocur = _G.toskin[tog]
-									if tocur and tocur ~= 'Dont Change' then
-										b.Image = UTILS.SKIN_MOD.viewmodels[tocur].image
-									end
-								end
-							end
-
-							table.insert(ID_CHANGED_FUNCS, calc)
-							calc()
-
-							local z = b:GetPropertyChangedSignal('Image'):Connect(calc)
-							table.insert(prcons, z)
-							table.insert(initConnections, z)
-						end
-					end)
-				end
-
-				for _, v in pairs(list:GetChildren()) do
-					handle(v)
-				end
-
-				table.insert(prcons, list.ChildAdded:Connect(handle))
-			end
-
-			hn()
-
-			table.insert(ID_CHANGED_FUNCS, hn)
-			table.insert(prcons, _headshot:GetPropertyChangedSignal('Image'):Connect(function()
-				if not _G.ignorenext then
-					_G.ECON_VARS.PLR_ICONS[_headshot] = _headshot.Image
 				else
-					_G.ignorenext = false
-				end
-
-				hn(true)
-			end))
-
-			table.insert(prcons, _username:GetPropertyChangedSignal('Text'):Connect(function()
-				hn(true)
-			end))
-
-			table.insert(prcons, _display:GetPropertyChangedSignal('Text'):Connect(function()
-				hn(true)
-			end))
-
-			for _, v in pairs(prcons) do
-				table.insert(initConnections, v)
-			end 
-		end
-	end
-
-	if pages:FindFirstChild('ViewProfile') then
-		checkfor(pages.ViewProfile)
-	end
-
-	table.insert(initConnections, pages.ChildAdded:Connect(checkfor))
-
-	-- // Lobby Icon Party #1
-
-	local lobby = MAIN_UI.MainFrame.Lobby
-
-	if pacons then
-		for _, v in pairs(pacons) do
-			v:Disconnect()
-		end
-	end
-
-	pacons = {}
-
-	local function cf(v)
-		if v.Name == 'Party' then
-			local bd = v.BottomDisplay
-			local con = bd.Container
-
-			local function h(v : Frame)
-				if v.Name == 'PartyMemberSlot' and v.LayoutOrder == 1 then
-					local ico = v.Button.Icon
-					ico.Image = getIcon()
-
-					table.insert(ID_CHANGED_FUNCS, function()
-						ico.Image = getIcon()
-					end)
-
-					local z = ico:GetPropertyChangedSignal('Image'):Connect(function()
-						ico.Image = getIcon()
-					end)
-
-					table.insert(pacons, z)
-					table.insert(initConnections, z)
-				end
-			end
-
-
-			local z = con.ChildAdded:Connect(h)
-			table.insert(pacons, z)
-			table.insert(initConnections, z)
-
-			for _, v in pairs(con:GetChildren()) do
-				h(v)
-			end
-		end
-	end
-
-	if lobby:FindFirstChild('Party') then
-		cf(lobby.Party)
-	end
-
-	table.insert(initConnections, lobby.ChildAdded:Connect(cf))
-
-	-- // Lobby Icon Party #2
-
-	if pa2cons then
-		for _, v in pairs(pa2cons) do
-			v:Disconnect()
-		end
-	end
-
-	pa2cons = {}
-
-	local function cc(v)
-		if v.Name == 'Party' then
-			local b = v.Members
-
-			local function h(v : Frame)
-				if v.Name == 'PartyMemberBigSlot' and v.LayoutOrder == 1 then
-					local ico = v.Icon
-					ico.Image = getIcon()
-
-					local _display = v.DisplayName
-					local _username = v.Username
-
-					local function hn()
-						_display.Text = dn
-						_username.Text = '@'..usn
-						ico.Image = getIcon()
-					end
-
-					local function add(con)
-						table.insert(pa2cons, con)
-						table.insert(initConnections, con)
-					end
-
-					hn()
-					add(_username:GetPropertyChangedSignal('Text'):Connect(hn))
-					add(_display:GetPropertyChangedSignal('Text'):Connect(hn))
-					add(ico:GetPropertyChangedSignal('Image'):Connect(hn))
-
-					table.insert(ID_CHANGED_FUNCS, hn)
-				end
-			end
-
-			local z = b.ChildAdded:Connect(h)
-			table.insert(pa2cons, z)
-			table.insert(initConnections, z)
-
-			for _, v in pairs(b:GetChildren()) do
-				h(v)
-			end
-		end
-	end
-
-	if pages:FindFirstChild('Party') then
-		cc(pages.Party)
-	end
-
-	table.insert(initConnections, pages.ChildAdded:Connect(cc))
-
-	-- // Side Party
-
-	local lobby = MAIN_UI.MainFrame.Lobby
-
-	if sidecons then
-		for _, v in pairs(sidecons) do
-			v:Disconnect()
-		end
-	end
-
-	sidecons = {}
-
-	local function h(v)
-		if v.Name == 'SideParty' then
-			local con = v.Container
-
-			local function h(v : Frame)
-				if v.Name == 'PartyMemberSlot' and v.LayoutOrder == -1 then
-					local ico = v.Button.Icon
-					ico.Image = getIcon()
-
-					table.insert(ID_CHANGED_FUNCS, function()
-						ico.Image = getIcon()
-					end)
-
-					local function add(con)
-						table.insert(sidecons, con)
-						table.insert(initConnections, con)
-					end
-
-					add(ico:GetPropertyChangedSignal('Image'):Connect(function()
-						ico.Image = getIcon()
-					end))
-				end
-			end
-
-			local z = con.ChildAdded:Connect(h)
-			table.insert(sidecons, z)
-			table.insert(initConnections, z)
-
-			for _, v in pairs(con:GetChildren()) do
-				h(v)
-			end
-		end
-	end
-
-	if pages:FindFirstChild('SideParty') then
-		h(pages.SideParty)
-	end
-
-	table.insert(initConnections, pages.ChildAdded:Connect(h))
-end)
-
--- // Weapons UI
-
-if not _G.selectChanged then
-	task.spawn(function()
-		local MAIN_UI = plr.PlayerGui:WaitForChild('MainGui').MainFrame.Equipment.Weapons.Container.List.Container
-
-		local function handle(v)
-			local b = v:FindFirstChild('Button')
-			b = b and b:FindFirstChild('Icon')
-
-			local xico = b and b:FindFirstChild('UICorner')
-			local n = v.Name == 'EquipmentWeaponSlot'
-			if n and b and not xico then
-				local function calc()
-					local ts = UTILS.SKIN_MOD.its[b.Image]
-					local tog = UTILS.SKIN_INFO.skinToOg[ts] or ts
-					local tocur = _G.toskin[tog]
-					if tocur and tocur ~= 'Dont Change' then
-						b.Image = UTILS.SKIN_MOD.viewmodels[tocur].image
-					end
-				end
-
-				calc()
-				b:GetPropertyChangedSignal('Image'):Connect(calc)
-			elseif n and b and xico then
-
-			end
-		end
-
-		for _, v in MAIN_UI:GetChildren() do
-			handle(v)
-		end
-
-		MAIN_UI.ChildAdded:Connect(handle)
-	end)
-end
-
--- // Weapon Selection UI
-
-if not _G.selectChanged then
-	task.spawn(function()
-		local function checkfor(v)
-			task.spawn(function()
-				local typ = v.Name == 'PickWeapons' and 1 or v.Name == 'PickWeaponsList' and 2 or 0
-				if typ>0 and not v:HasTag('Econ') then
-					local chosen = v:WaitForChild('ChosenWeapons')
-					local list = typ == 1 and v:WaitForChild('List') or v:WaitForChild('ListContainer').List
-
-					v:AddTag'Econ'
-
-					local cons = {}
-
-					if chosen and list then
-						list = list.Container
-
-						-- // LIST
-
-						local function handle(v)
-							task.spawn(function()
-								local b = v.Name:find('PickWeapon') and v:WaitForChild('Button')
-								if b and b:FindFirstChild('Icon') and b.Icon:FindFirstChild('Picture') then
-									b = b.Icon.Picture
-									b.Name = 'OPic'
-
-									local function calc()
-										local ts = UTILS.SKIN_MOD.its[b.Image]
-										local tog = UTILS.SKIN_INFO.skinToOg[ts] or ts
-										local tocur = _G.toskin[tog]
-										if tocur and tocur ~= 'Dont Change' then
-											b.Image = UTILS.SKIN_MOD.viewmodels[tocur].image
-										end
-									end
-
-									calc()
-									table.insert(cons, b:GetPropertyChangedSignal('Image'):Connect(calc))
-								end
-							end)
-						end
-
-						for _, v in pairs(list:GetChildren()) do
-							handle(v)
-						end
-
-						local con = list.ChildAdded:Connect(handle)
-						table.insert(cons, con)
-
-						-- // MAIN SELECTION
-
-						local function handle2(v)
-							task.spawn(function()
-								if v.Name:find('ChosenSlot') then
-									local b = v.Button.Picture
-									local function calc()
-										local ts = UTILS.SKIN_MOD.its[b.Image]
-										local tog = UTILS.SKIN_INFO.skinToOg[ts] or ts
-										local tocur = _G.toskin[tog]
-										if tocur and tocur ~= 'Dont Change' then
-											b.Image = UTILS.SKIN_MOD.viewmodels[tocur].image
-										end
-									end
-
-									calc()
-									table.insert(cons, b:GetPropertyChangedSignal('Image'):Connect(calc))
-								end
-							end)
-						end
-
-						for _, v in pairs(chosen:GetChildren()) do
-							handle2(v)
-						end
-
-						table.insert(cons, chosen.ChildAdded:Connect(handle2))
-
-						-- // FINISH
-
-						--for _, v in pairs(cons) do
-						--	table.insert(initConnections, v)
-						--end
-					end
+					z:Disconnect()
 				end
 			end)
-		end
-
-		local MAIN_UI = plr.PlayerGui:WaitForChild('MainGui')
-		local pages = MAIN_UI.MainFrame.Pages
-
-		if pages:FindFirstChild('PickWeapons') then
-			checkfor(pages.PickWeapons)
-		end
-
-		pages.ChildAdded:Connect(checkfor)
-		--table.insert(initConnections, pages.ChildAdded:Connect(checkfor))
-	end)
-end
-
-_G.selectChanged = true
-
--- // Rest
-
-function special(name)
-	if name then 
-		local keywords = {'sprint', 'idle', 'reload'}
-		for _, v in keywords do
-			if name:find(v) then
-				return true
-			end
-		end
-	end
-end
-
-function applySkin(skinName, cs)
-	task.spawn(function()
-		if skinName == 'Dont Change' then return end
-		if not UTILS.SKIN_INFO.skinToOg[skinName] then skinName = UTILS.SKIN_INFO.lowerToOg[skinName:lower()] end
-
-		local ogitem = UTILS.SKIN_INFO.skinToOg[skinName]
-		if not ogitem then return end
-
-		local char = plr.Character		
-		local hum = char and char:FindFirstChild('Humanoid') :: Humanoid
-
-		-- // Main Changer
-
-		local function apl(vm)
-			task.spawn(function()
-				local skin = findSkin(skinName)
-				local vm = vm or vms:GetChildren()[1]
-
-				if skin and not vm:HasTag'Changed' then
-					vm:AddTag'Changed'
-
-					-- // ANIMATIONS | CLEANI
-
-					local last = vm.Name
-					local spl = string.split(vm.Name, ' - ')
-					local ogWeapon = skins:FindFirstChild(spl[2], true)
-
-					if not vm:GetAttribute('OGItem') then
-						vm:SetAttribute('OGItem', spl[2])
+		end;Speed = function()
+			local z
+			local _shift = 0
+			local arg2 = 1
+			z = run.Heartbeat:Connect(function()
+				if #new > 0 and new[1].Parent and IS_CURRENT() then
+					_shift = (_shift + 1 * (math.sin(tick() * 1) ^ 20 * 0.75 + 0.25))-- % 0.2
+					for i, v in new do
+						v.OffsetStudsU = _shift * (v.Name == 'Left' and 1 or -1) * _G.speed
 					end
-
-					local ig = vm:GetAttribute('OGItem')
-
-					vm.Name = spl[1]..' - '..spl[2].. ' - '..skinName
-
-					local name = vm.name
-
-					local clean = _G.ECON_VARS.VMS_CONS[name] or _G.ECON_VARS.VMS_CONS[last]
-					if clean then
-						for _, v in clean do
-							v:Disconnect()
-						end
-					end
-
-					-- // ANIMATIONS TABLE
-
-					local econAnim = vm:FindFirstChild('Anims') or Instance.new('Folder', vm)
-					econAnim:ClearAllChildren()
-					econAnim.Name = 'Anims'
-
-					local animator = vm.AnimationController.Animator :: Animator
-
-					local animtbl = {}
-					local toname = {}
-					local prs = {}
-
-					local sn = _G.ECON_VARS.ECON_ANIMS[name] or _G.ECON_VARS.ECON_ANIMS[last]
-					if sn then
-						for _, v in sn do
-							if v.anim then
-								v.anim:Stop(0)
-							end
-						end
-					end
-
-					local was = {}
-					for _, v in vm.ItemVisual:GetChildren() do
-						if v:HasTag('IsChanged') then
-							table.insert(was, v)
-						end
-					end
-
-					local dontDestroy = {'_katana'}
-
-					local function destroyBlacklist(str)
-						local IN_TABLE = false
-						for _ , v in dontDestroy do
-							if str:find(v) then
-								IN_TABLE = true
-							end
-						end
-						return IN_TABLE
-					end
-
-					-- // AnimationPlayed
-
-					local apev = {}
-					local playcons = {}
-					function apev:Connect(func)
-						table.insert(playcons, func)
-					end
-
-					-- // AnimationStopped
-
-					local asev = {}
-					local stopcons = {}
-					function asev:Connect(func)
-						table.insert(stopcons, func)
-					end
-
-					-- // Equiped
-
-					local eqev = {}
-					local equipcons = {}
-					function eqev:Connect(func)
-						table.insert(equipcons, func)
-					end
-
-					-- // Table
-
-					local inz = {}
-					local tb = {
-						_destroyed = false,
-						AnimationPlayed = apev,
-						AnimationStopped = asev,
-						Equipped = eqev,
-					}
-
-					function tb:_RegisterAmmoVisual()
-
-					end
-
-					local playii = {}
-					function tb:IsAnimationPlaying(n)
-						return table.find(playii, n)
-					end
-
-					-- // ANIMATIONS
-
-					local _precontr = {
-						anims = {}
-					}
-
-					function _precontr:add(pre, b)
-						local x = {tbl = b}
-
-						function x:stop()
-							b.anim:Stop()
-						end
-
-						function x:play(args)
-							args = args or {}
-
-							local ref = args.reference :: AnimationTrack
-							if ref and not ref.IsPlaying then return end
-
-							if not special(b.name) and not args.isSpecial then
-								for _, v : AnimationTrack in pairs(animator:GetPlayingAnimationTracks()) do
-									if table.find(_G.ECON_VARS.ECON_ANIMS, v) and not special(toname[v.Animation.AnimationId]) then
-										v:Stop()
-									end
-								end
-							end
-
-							local loaded = b.anim
-							loaded.Priority = args.priority or prs[loaded] or Enum.AnimationPriority.Action2
-							loaded.TimePosition = args.pos or 0			
-							loaded:Play()
-							loaded:AdjustWeight(1)
-							loaded:AdjustSpeed(b.relinfo.Speed)
-
-							-- // Connections
-
-							task.spawn(function()
-								local basicPlayed = ANIM_TO_NAME[b.prename] or b.prename
-
-								table.insert(playii, basicPlayed)
-
-								for _, v in playcons do
-									v(basicPlayed)
-								end
-
-								table.insert(initConnections, loaded.Stopped:Once(function()
-									table.remove(playii, table.find(playii, basicPlayed))
-									for _, v in stopcons do
-										v(basicPlayed)
-									end
-								end))
-							end)
-
-							-- // Rest
-
-							local norm = loaded.Speed
-							prs[loaded] = loaded.Priority
-
-							-- // SOUNDS
-
-							if b then
-								if args.silenceReference and ref then
-									table.insert(_G.silenced, ref)
-								end
-
-								if b.soundcall then
-									task.spawn(b.soundcall,UTILS.RIVALS_UTILS, b.name, loaded.Speed, loaded, vm)
-								end
-
-								-- // REST
-
-								if ref then
-									table.insert(_G.ECON_VARS.VMS_CONS[name], ref.Stopped:Once(function()
-										if args.unsilenceAfter then
-											table.remove(_G.silenced, table.find(_G.silenced, ref))
-										end
-
-										loaded:Stop()
-									end))
-								end
-
-								local function upd()
-									local no = {'Water', 'Air'}
-									if b.name:find'sprint' then
-										loaded:AdjustSpeed(table.find(no, hum.FloorMaterial.Name) and .15 or norm)
-									end
-								end
-
-								if args.stopref and ref then
-									ref.Priority = Enum.AnimationPriority.Core
-									ref:AdjustSpeed(0)
-									ref:AdjustWeight(.001, 0)
-								end
-
-								if b.name:find'sprint' and hum then
-									local con = hum:GetPropertyChangedSignal('FloorMaterial'):Connect(upd)
-									upd()
-
-									table.insert(_G.ECON_VARS.VMS_CONS[name], con)
-
-									loaded.Stopped:Once(function()
-										con:Disconnect()
-									end)
-								end
-							end
-						end
-
-						_precontr.anims[pre] = x
-					end
-
-					-- // REST
-
-					local _ogidtoinf = {}
-					local _ogprentoid = {}
-
-					for prename, name in UTILS.SKIN_MOD.viewmodels[ig].anims do
-						local vmi = UTILS.SKIN_MOD.viewmodels[ig]
-
-						local id = _G.animLib.Info[name].AnimationID
-						local animType = vmi.animsReverse[name]
-
-						_ogprentoid[prename] = id
-
-						_ogidtoinf[id] = {
-							name = name,
-							prename = prename,
-						}
-
-						local new = UTILS.SKIN_MOD.viewmodels[skinName]
-						local typeToReal = new.anims[animType]
-
-						local nowid = _G.animLib.Info[typeToReal]
-
-						if nowid then
-							table.insert(inz, prename)
-
-							local SOUND_CODE = UTILS.SKIN_SOUND_CODE[typeToReal]
-							local SOUND_MOD = SOUND_CODE and loadstring(SOUND_CODE)
-
-							local LOADED_ANIM = Instance.new('Animation') :: AnimationTrack
-							LOADED_ANIM.AnimationId = nowid.AnimationID
-							LOADED_ANIM.Parent = econAnim
-							LOADED_ANIM = animator:LoadAnimation(LOADED_ANIM)
-
-							table.insert(_G.ECON_VARS.ECON_ANIMS, LOADED_ANIM)
-
-							toname[nowid.AnimationID] = name
-
-							animtbl[id] = {
-								anim = LOADED_ANIM,
-								name = typeToReal,
-								prename = prename,
-								type = animType,
-								relinfo = nowid,
-								soundcall = SOUND_MOD and SOUND_MOD()
-							}
-
-							_precontr:add(prename, animtbl[id])
-						end
-					end
-
-					for prename, name in UTILS.SKIN_MOD.viewmodels[skinName].anims do
-						if not table.find(inz, prename) then
-							local nowid = _G.animLib.Info[name]
-
-							if nowid.AnimationID then
-								local SOUND_CODE = UTILS.SKIN_SOUND_CODE[name]
-								local SOUND_MOD = SOUND_CODE and loadstring(SOUND_CODE)
-
-								local LOADED_ANIM = Instance.new('Animation') :: AnimationTrack
-								LOADED_ANIM.AnimationId = nowid.AnimationID
-								LOADED_ANIM.Parent = econAnim
-								LOADED_ANIM = animator:LoadAnimation(LOADED_ANIM)
-
-								table.insert(_G.ECON_VARS.ECON_ANIMS, LOADED_ANIM)
-
-								toname[nowid.AnimationID] = name
-
-								_precontr:add(prename, {
-									anim = LOADED_ANIM,
-									name = prename,
-									prename = prename,
-									type = prename,
-									relinfo = nowid,
-									soundcall = SOUND_MOD and SOUND_MOD()
-								})
-							end
-						end
-					end
-
-					-- // Knife Backstab
-
-					local h = _precontr.anims.HeavyAttackAnimationHit
-					if h then
-						table.insert(_G.ECON_VARS.HEADSHOT_FUNCS, function()
-							if vms:GetChildren()[1] == vm then
-								h:play({
-									reference = _precontr.anims.HeavyAttack1.tbl.anim,
-									isSpecial = 1,
-									silenceReference = 1,
-									unsilenceAfter = 1,
-								})
-							end
-						end)
-					end
-
-					-- // Rest
-
-					local playing = {}
-
-					local function ct(track : AnimationTrack)
-						if not table.find(_G.ECON_VARS.ECON_ANIMS, track) then
-							local pr = track.Priority
-							track:AdjustWeight(0.0001, 0)
-							track:AdjustSpeed(0)
-							track.Priority = Enum.AnimationPriority.Core
-
-							local bg = _ogidtoinf[track.Animation.AnimationId]
-							local b = animtbl[track.Animation.AnimationId]
-
-							local z
-
-							if bg and bg.prename == 'rareinspect' then
-								z = _precontr.anims.inspect
-							end
-
-							local ri = _precontr.anims.rareinspect
-							local inspects = {'inspect', 'rareinspect'}
-							local rare = false
-							if ri and math.random(1, (_G.rarechance or 6)) == 1 and table.find(inspects, bg.prename) then
-								z = _precontr.anims.inspect
-								rare = true
-
-								local s = 1 + 0.25*math.random()
-								UTILS.RIVALS_UTILS:CreateSound('rbxassetid://13159969353', .25, s, nil, true)
-							end
-
-							if b or z then
-								local z = z or _precontr.anims[b.prename]
-								if z then
-									local tbl = {
-										pos = track.TimePosition,
-										priority = prs[z.tbl.anim] or pr,
-										reference = track
-									}
-
-									if ri and rare then
-										ri:play({
-											reference = track,
-											isSpecial = 1,
-											priority = tbl.priority,
-										})
-									else
-										z:play(tbl)
-									end
-								end
-							end
-						end
-					end
-
-					table.insert(_G.ECON_VARS.APPLIED_VMS, vm)
-
-					local function pt(p)
-						local c = vms:GetChildren()[1]
-
-						if p ~= vms then
-							for _, v in weaponSounds:GetChildren() do
-								if (not v:GetAttribute('DontClearSound') and _G.soundToWeapon[v] == vm) then
-									v:Destroy()
-								end
-							end
-						end
-
-						if not c or c == vm or not table.find(_G.ECON_VARS.APPLIED_VMS, c) then
-							soundOn = p ~= vms
-							soundGroup.Volume = soundOn and ss.Other.Volume or 0
-
-							for _, v in equipcons do
-								v()
-							end
-
-							if soundOn then
-								for _, v in animtbl do
-									v.anim:Stop()
-								end
-							end
-						end
-					end
-
-					_G.ECON_VARS.VMS_CONS[name] = {}
-					_G.ECON_VARS.VMS_CONS[name][1] = animator.AnimationPlayed:Connect(ct)
-					for _, v in animator:GetPlayingAnimationTracks() do
-						ct(v)
-					end
-
-					_G.ECON_VARS.VMS_CONS[name][3] = vm:GetPropertyChangedSignal('Parent'):Connect(function()
-						if not vm.Parent then
-							tb._destroyed = true
-						end
-
-						pt(vm.Parent)
-					end)
-
-					pt(vm.Parent)
-
-					-- // REMOVING
-
-					_G.ECON_VARS.VMS_CONS[name][2] = vm:GetPropertyChangedSignal('Parent'):Once(function()
-						if not vm.Parent then
-							pt()
-							for _, v in _G.ECON_VARS.VMS_CONS[name] do
-								v:Disconnect()
-							end
-							_G.ECON_VARS.VMS_CONS[name] = nil
-						end
-					end)
-
-					-- // ADD
-
-					if vm == vms:GetChildren()[1] and _G.frr then
-						_G.frr()
-					end
-
-					-- // Unimportant [ Effects ]
-
-					task.spawn(function()
-						-- // AIMING CHECK
-
-						local itemint = plr.PlayerGui.MainGui.MainFrame.ItemInterfaces:WaitForChild(plr.Name.. ' - '..spl[2])
-
-						local function set(arg1)
-							local scope = itemint.Mouse.Scope
-							local tbl = {
-								BlurImage = scope.Blur.ImageLabel,
-								CircleImage = scope.Circle.ImageLabel,
-								ReticleDotUICorner = scope.Reticle.Container.Dot.UICorner,
-								_dont_rotate_scope_while_sliding = false
-							}
-
-							arg1 = tbl
-
-							-- // Scopes
-
-							local scopes = {
-								['Pixel Sniper'] = function()
-									arg1.BlurImage.Image = "rbxassetid://18171031143"
-									arg1.BlurImage.ResampleMode = Enum.ResamplerMode.Pixelated
-									arg1.CircleImage.Image = "rbxassetid://18171045114"
-									arg1.CircleImage.ResampleMode = Enum.ResamplerMode.Pixelated
-									arg1.ReticleDotUICorner:Destroy()
-								end, Keyper = function()
-									arg1.BlurImage.Image = "rbxassetid://129335242148588"
-									arg1.BlurImage.Size = UDim2.new(1.25, 0, 1.25, 0)
-									arg1.CircleImage.Image = "rbxassetid://81498448678518"
-									arg1.CircleImage.Size = UDim2.new(1.25, 0, 1.25, 0)
-									arg1._dont_rotate_scope_while_sliding = true
-								end, ['Pixel Crossbow'] = function()
-									arg1.CircleImage.Image = "rbxassetid://97622703342015"
-									arg1.CircleImage.ResampleMode = Enum.ResamplerMode.Pixelated
-									arg1.ReticleDotUICorner:Destroy()
-								end,
-							}
-
-							if scopes[skinName] then
-								scopes[skinName]()
-							end
-						end
-
-						set()
-
-						local vig = itemint.AimingVignette
-
-						local last = vig.ImageTransparency
-						local aiming = false
-
-						local function aimingCallback(v)
-							local funcs = {
-								['AKEY-47'] = function()
-									local var5 = v and .1 or 0
-									UTILS.RIVALS_UTILS:CreateSound("rbxassetid://96253147006478", 0.375, 2 + var5, true, var5)
-								end,
-							}
-
-							if funcs[skinName] then
-								funcs[skinName]()
-							end
-						end
-
-						-- // Aiming Connection
-
-						_G.ECON_VARS.VMS_CONS[name][4] = vig:GetPropertyChangedSignal('ImageTransparency'):Connect(function()
-							local _c = aiming
-							if vig.ImageTransparency > last and aiming then
-								aiming = false
-							elseif vig.ImageTransparency < last and not aiming then
-								aiming = true
-							end
-
-							if aiming ~= _c and math.abs(last-vig.ImageTransparency) < .8 then aimingCallback(aiming) end
-
-							last = vig.ImageTransparency
-						end)
-					end)
+				else
+					z:Disconnect()
 				end
 			end)
-		end
+		end;['Dark Matter'] = function()
+			local z
+			z = run.Heartbeat:Connect(function()
+				if #new > 0 and new[1].Parent and IS_CURRENT() then
+					for i, v in new do
+						local speed, dir = v:GetAttribute('Speed'), v:GetAttribute('Direction')
+						if speed and dir then
+							v.OffsetStudsU = tick() * speed * dir.X % v.StudsPerTileU
+							v.OffsetStudsV = tick() * speed * dir.Y % v.StudsPerTileV
+						end
+					end
+				else
+					z:Disconnect()
+				end
+			end)
+		end;['Burning, Churning'] = function()
+			local z
+			z = run.Heartbeat:Connect(function()
+				if #new > 0 and new[1].Parent and IS_CURRENT() then
+					for i, v in new do
+						local speed, dir = v:GetAttribute('Speed'), v:GetAttribute('Direction')
+						if speed and dir then
+							v.OffsetStudsU = tick() * speed * dir.X % v.StudsPerTileU
+							v.OffsetStudsV = tick() * speed * dir.Y % v.StudsPerTileU
+						end
+					end
+				else
+					z:Disconnect()
+				end
+			end)
+		end,
+	}
 
-		local first = vms:GetChildren()[1]
-		local z = first and first.Name:split' - '
-		if first and z[1] == plr.Name and z[2] == ogitem then
-			apl(first)
-		end
-
-		for _, v in rep.Assets.Temp.ViewModels:GetChildren() do
-			local z = v.Name:split' - '
-			if v and z[1] == plr.Name and z[2] == ogitem then
-				apl(v)
-			end
-		end
-	end)
+	if funcs[wrapx] then funcs[wrapx]() end
 end
 
--- // Main
+mod:add_wrap("Unique", "Community", {Enum.Material.Glass, Color3.fromRGB(124, 17, 255), 0, 0.1, nil}, {Enum.Material.Glass, Color3.fromRGB(255, 213, 0), 0, 0.1, nil}, {nil, Color3.fromRGB(112, 181, 255), nil, nil, nil}, nil, "Earned by redeeming codes")
+mod:add_wrap("Unique", "1B Visits", {Enum.Material.Glass, Color3.fromRGB(48, 38, 0), 0, 0.4, "1BVisits"}, {Enum.Material.Glass, Color3.fromRGB(127, 100, 0), 0, 0.4, "1BVisits"}, {Enum.Material.Neon, Color3.fromRGB(173, 155, 123), 0, 0, nil}, nil, "Earned by redeeming a code when the game (RIVALS) reached 1,000,000,000 visits")
+mod:add_wrap("Unique", "Cream", {nil, Color3.fromRGB(255, 209, 157), 0, 0, nil}, {nil, Color3.fromRGB(62, 55, 48), 0, 0, nil}, nil, nil, "Earned by inviting friends to the game (RIVALS)")
+mod:add_wrap("Unique", "Danger", {Enum.Material.Neon, Color3.fromRGB(168, 0, 0), 0, 0, "Danger1"}, {Enum.Material.Neon, Color3.fromRGB(17, 17, 17), 0, 0, "Danger2"}, {Enum.Material.Neon, Color3.fromRGB(161, 47, 47), 0, 0, nil}, nil, "Earned by completing a special challenge during the Roblox 2024 Winter Spotlight")
+mod:add_wrap("Unique", "Glacier", {"Glacier", Color3.fromRGB(175, 221, 255), 0, 0, nil}, {"Glacier", Color3.fromRGB(231, 231, 236), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(130, 157, 166), 0, 0, nil}, nil, "Earned from the 2024 Festive Event Advent Calendar")
+mod:add_wrap("Unique", "Pine", {Enum.Material.SmoothPlastic, Color3.fromRGB(58, 115, 55), 0, 0, "Pine"}, {"Pine", Color3.fromRGB(72, 51, 40), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(158, 162, 121), 0, 0, nil}, nil, "Earned from the 2024 Festive Event Advent Calendar")
+mod:add_wrap("Unique", "Glamour", {Enum.Material.SmoothPlastic, Color3.fromRGB(86, 36, 36), 0, 0, "Glamour"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(117, 0, 0), 0, 0.1, nil}, {Enum.Material.Neon, Color3.fromRGB(170, 128, 99), 0, 0, nil}, nil, "Earned by watching a quick video ad in the Shop")
+mod:add_wrap("Unique", "Sensite", {"Developore", Color3.fromRGB(255, 180, 30), 0, 0, nil}, {"Developore", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(255, 172, 99), nil, nil, nil})
+mod:add_wrap("Unique", "Nosnite", {"Developore", Color3.fromRGB(180, 128, 255), 0, 0, nil}, {"Developore", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(136, 114, 202), nil, nil, nil})
+mod:add_wrap("Unique", "Nekore", {"Developore", Color3.fromRGB(6, 100, 150), 0, 0, nil}, {"Developore", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(102, 144, 236), nil, nil, nil})
+mod:add_wrap("Unique", "Shadore", {"Developore", Color3.fromRGB(203, 51, 51), 0, 0, nil}, {"Developore", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(248, 108, 108), nil, nil, nil})
+mod:add_wrap("Unique", "Brianore", {"Developore", Color3.fromRGB(101, 255, 93), 0, 0, nil}, {"Developore", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(157, 248, 163), nil, nil, nil})
+mod:add_wrap("Unique", "Boomore", {"Developore", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {"Developore", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(175, 175, 175), nil, nil, nil})
+mod:add_wrap("Unique", "Beggar", {Enum.Material.Pebble, Color3.fromRGB(255, 176, 0), 0.05, 0, "dude"}, {Enum.Material.CorrodedMetal, Color3.fromRGB(255, 176, 0), 0.1, 0, "bruh"}, {Enum.Material.Neon, Color3.fromRGB(9, 137, 207), 0, 1000, "epic"}, nil, "Beggars can't be choosers")
+mod:add_wrap("Common", "Red", {nil, Color3.fromRGB(255, 50, 50), 0, 0, nil})
+mod:add_wrap("Common", "Orange", {nil, Color3.fromRGB(255, 110, 0), 0, 0, nil})
+mod:add_wrap("Common", "Yellow", {nil, Color3.fromRGB(255, 215, 0), 0, 0, nil})
+mod:add_wrap("Common", "Green", {nil, Color3.fromRGB(100, 255, 50), 0, 0, nil})
+mod:add_wrap("Common", "Blue", {nil, Color3.fromRGB(0, 150, 255), 0, 0, nil})
+mod:add_wrap("Common", "Purple", {nil, Color3.fromRGB(136, 0, 255), 0, 0, nil})
+mod:add_wrap("Common", "Pink", {nil, Color3.fromRGB(255, 60, 236), 0, 0, nil})
+mod:add_wrap("Common", "Salmon", {nil, Color3.fromRGB(255, 107, 107), 0, 0, nil})
+mod:add_wrap("Common", "Brown", {nil, Color3.fromRGB(91, 54, 35), 0, 0, nil})
+mod:add_wrap("Common", "Lemon", {nil, Color3.fromRGB(255, 230, 105), 0, 0, nil})
+mod:add_wrap("Common", "Mint", {nil, Color3.fromRGB(167, 255, 135), 0, 0, nil})
+mod:add_wrap("Common", "Sky", {nil, Color3.fromRGB(135, 207, 255), 0, 0, nil})
+mod:add_wrap("Common", "Olive", {nil, Color3.fromRGB(75, 79, 55), 0, 0, nil})
+mod:add_wrap("Common", "Blush", {nil, Color3.fromRGB(255, 164, 255), 0, 0, nil})
+mod:add_wrap("Common", "Maroon", {nil, Color3.fromRGB(117, 33, 69), 0, 0, nil})
+mod:add_wrap("Common", "Beige", {nil, Color3.fromRGB(184, 156, 110), 0, 0, nil})
+mod:add_wrap("Common", "Navy", {nil, Color3.fromRGB(0, 18, 76), 0, 0, nil})
+mod:add_wrap("Common", "Teal", {nil, Color3.fromRGB(0, 255, 225), 0, 0, nil})
+mod:add_wrap("Common", "Highlighter", {nil, Color3.fromRGB(192, 255, 57), 0, 0, nil})
+mod:add_wrap("Common", "Crimson", {nil, Color3.fromRGB(75, 14, 14), 0, 0, nil})
+mod:add_wrap("Common", "Cool", {nil, Color3.fromRGB(97, 200, 255), 0, 0, nil})
+mod:add_wrap("Common", "Gunmetal", {Enum.Material.SmoothPlastic, Color3.fromRGB(40, 40, 40), 0, 0.05, nil}, {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 255, 255), 0, 1, "Gunmetal"}, {Enum.Material.Neon, Color3.fromRGB(182, 116, 99), 0, 0, nil})
+mod:add_wrap("Common", "Venom", {Enum.Material.Neon, Color3.fromRGB(136, 0, 255), 0, 0, "Venom"}, {Enum.Material.Metal, Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(102, 0, 191), 0.15, 0, nil})
+mod:add_wrap("Common", "MaGGenta", {Enum.Material.SmoothPlastic, Color3.fromRGB(206, 206, 206), 0, 0, nil}, {Enum.Material.SmoothPlastic, Color3.fromRGB(115, 40, 255), 0, 0, nil})
+mod:add_wrap("Common", "Bluesteel", {"Bluesteel", Color3.fromRGB(38, 96, 150), 0, 0, nil}, {Enum.Material.Metal, Color3.fromRGB(159, 161, 172), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(37, 73, 173), 0, 0, nil})
+mod:add_wrap("Common", "Cheese", {"Cheese", Color3.fromRGB(255, 221, 48), 0, 0, nil}, {"Cheesecloth", Color3.fromRGB(248, 221, 194), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(172, 118, 0), 0, 0, nil})
+mod:add_wrap("Common", "Stained", {"Stained", Color3.fromRGB(82, 126, 175), 0, 0, nil}, {"Stained", Color3.fromRGB(120, 183, 255), 0, 0, nil})
+mod:add_wrap("Common", "Lumber", {"Lumber1", Color3.fromRGB(124, 92, 70), 0, 0, nil}, {"Lumber2", Color3.fromRGB(105, 64, 40), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(198, 135, 114), 0, 0, nil})
+mod:add_wrap("Common", "Ornate", {Enum.Material.SmoothPlastic, Color3.fromRGB(27, 42, 53), 0, 0, nil}, {Enum.Material.Metal, Color3.fromRGB(226, 155, 64), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(255, 53, 53), 0, 0, nil})
+mod:add_wrap("Common", "Mustard", {nil, Color3.fromRGB(136, 102, 0), 0, 0, nil})
+mod:add_wrap("Common", "Violet", {nil, Color3.fromRGB(85, 43, 255), 0, 0, nil})
+mod:add_wrap("Common", "Jean", {nil, Color3.fromRGB(0, 76, 255), 0, 0, nil})
+mod:add_wrap("Common", "Copper", {Enum.Material.Glass, Color3.fromRGB(213, 115, 61), 0, 0.3, nil}, {Enum.Material.Glass, Color3.fromRGB(170, 85, 0), 0, 0.3, nil}, {Enum.Material.Neon, Color3.fromRGB(186, 143, 135), 0, 0, nil})
+mod:add_wrap("Common", "Machine", {"BrushedMetal", Color3.fromRGB(202, 203, 209), 0, 0, nil}, {"BrushedMetal", Color3.fromRGB(202, 203, 209), 0, 0, nil}, {"BrushedMetal", Color3.fromRGB(202, 203, 209), 0, 0, nil})
+mod:add_wrap("Common", "Titanium", {Enum.Material.Glass, Color3.fromRGB(205, 205, 205), 0, 0.3, nil}, {Enum.Material.Glass, Color3.fromRGB(248, 248, 248), 0, 0.3, nil}, {Enum.Material.Neon, Color3.fromRGB(171, 171, 171), 0, 0, nil})
+mod:add_wrap("Common", "Tungsten", {Enum.Material.Glass, Color3.fromRGB(66, 67, 76), 0, 0.3, nil}, {Enum.Material.Glass, Color3.fromRGB(91, 93, 105), 0, 0.3, nil}, {Enum.Material.Neon, Color3.fromRGB(133, 141, 192), 0, 0, nil})
+mod:add_wrap("Common", "Haunted", {Enum.Material.Glass, Color3.fromRGB(0, 0, 0), 0, 0.4, nil}, {Enum.Material.SmoothPlastic, Color3.fromRGB(0, 255, 238), 0.5, 0.2, nil}, {Enum.Material.Neon, Color3.fromRGB(110, 253, 255), 0, 0, nil})
+mod:add_wrap("Common", "Vexed", {Enum.Material.Glass, Color3.fromRGB(0, 0, 0), 0, 0.4, nil}, {Enum.Material.SmoothPlastic, Color3.fromRGB(105, 46, 255), 0.5, 0.2, nil}, {Enum.Material.Neon, Color3.fromRGB(153, 133, 255), 0, 0, nil})
+mod:add_wrap("Common", "Cursed", {Enum.Material.Glass, Color3.fromRGB(0, 0, 0), 0, 0.4, nil}, {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 0, 0), 0.5, 0.2, nil}, {Enum.Material.Neon, Color3.fromRGB(255, 142, 142), 0, 0, nil})
+mod:add_wrap("Common", "Frigid", {nil, nil, nil, nil, "Frigid"}, {nil, nil, nil, nil, "Frigid"})
+mod:add_wrap("Common", "Midnight", {"PBRSimpleMetallic", Color3.fromRGB(7, 25, 67), 0, 0, nil}, {"PBRSimpleMetallic", Color3.fromRGB(77, 77, 77), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(82, 122, 255), 0, 0, nil})
+mod:add_wrap("Common", "Slush", {Enum.Material.Neon, Color3.fromRGB(136, 168, 161), 0, 0, "Slush1"}, {Enum.Material.Neon, Color3.fromRGB(128, 145, 158), 0, 0, "Slush2"}, {Enum.Material.Neon, Color3.fromRGB(100, 155, 163), 0, 0, nil})
+mod:add_wrap("Common", "Lavish Crystal", {"LavishCrystal", Color3.fromRGB(183, 149, 255), 0, 0, nil}, {"LavishCrystal", Color3.fromRGB(219, 196, 236), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(142, 128, 166), 0, 0, nil})
+mod:add_wrap("Common", "Noir", {Enum.Material.Neon, Color3.fromRGB(165, 165, 165), 0, 0, "Noir1"}, {Enum.Material.Neon, Color3.fromRGB(17, 17, 17), 0, 0, "Noir2"}, {Enum.Material.Neon, Color3.fromRGB(157, 157, 157), 0, 0, nil})
+mod:add_wrap("Common", "Normal", {Enum.Material.Neon, Color3.fromRGB(138, 0, 148), 0, 0, "Normal1"}, {Enum.Material.Neon, Color3.fromRGB(0, 32, 96), 0, 0, "Normal2"}, {Enum.Material.Neon, Color3.fromRGB(158, 58, 58), 0, 0, nil})
+mod:add_wrap("Common", "Rust", {Enum.Material.CorrodedMetal, nil, 0, 0, nil}, {Enum.Material.CorrodedMetal, nil, 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(159, 159, 159), 0, 0.1, nil})
+mod:add_wrap("Common", "Tawny", {Enum.Material.Neon, Color3.fromRGB(255, 233, 111), 0, 0, "Tawny1"}, {Enum.Material.Neon, Color3.fromRGB(68, 44, 7), 0, 0, "Tawny2"}, {Enum.Material.Neon, Color3.fromRGB(167, 118, 78), 0, 0, nil})
+mod:add_wrap("Common", "Olo", {nil, Color3.fromRGB(0, 254, 202), 0, 0, nil})
+mod:add_wrap("Rare", "Gold", {Enum.Material.Glass, Color3.fromRGB(255, 170, 24), 0, 0.4, nil}, {Enum.Material.Glass, Color3.fromRGB(255, 170, 24), 0, 0.4, nil}, {nil, Color3.fromRGB(255, 165, 120), nil, nil, nil}, nil, "Earned from weapon contracts", "Earned from a weapon contract for this weapon")
+mod:add_wrap("Rare", "Forest Camo", {"Forest Camo", Color3.fromRGB(237, 234, 234), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(17, 17, 17), 0, 0, nil}, {nil, Color3.fromRGB(140, 255, 98), nil, nil, nil})
+mod:add_wrap("Rare", "Honeycomb", {"Honeycomb", Color3.fromRGB(255, 201, 74), 0, 0, nil}, {Enum.Material.SmoothPlastic, Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(170, 121, 72), 0, 0, nil})
+mod:add_wrap("Rare", "Patriot", {"Patriot", Color3.fromRGB(248, 248, 248), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(17, 17, 17), 0, 0, nil}, {nil, Color3.fromRGB(168, 168, 168), nil, nil, nil})
+mod:add_wrap("Rare", "Clouds", {"Clouds", Color3.fromRGB(248, 248, 248), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(17, 98, 148), 0, 0, nil}, {nil, Color3.fromRGB(123, 150, 163), nil, nil, nil})
+mod:add_wrap("Rare", "Swirls", {"Swirls", Color3.fromRGB(248, 248, 248), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(17, 17, 17), 0, 0, nil}, {nil, Color3.fromRGB(167, 167, 167), nil, nil, nil})
+mod:add_wrap("Rare", "Brain", {"Brain", Color3.fromRGB(255, 152, 220), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(255, 106, 228), nil, nil, nil})
+mod:add_wrap("Rare", "Arctic Camo", {"Arctic Camo", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(17, 17, 17), 0, 0, nil}, {nil, Color3.fromRGB(154, 175, 194), nil, nil, nil})
+mod:add_wrap("Rare", "Carpet", {"Carpet", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(139, 139, 255), nil, nil, nil})
+mod:add_wrap("Rare", "Circuit", {"Circuit", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(105, 206, 105), nil, nil, nil})
+mod:add_wrap("Rare", "Desert Camo", {"Desert Camo", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(17, 17, 17), 0, 0, nil}, {nil, Color3.fromRGB(163, 141, 116), nil, nil, nil})
+mod:add_wrap("Rare", "Digital Camo", {"Digital Camo", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(17, 17, 17), 0, 0, nil}, {nil, Color3.fromRGB(161, 161, 161), nil, nil, nil})
+mod:add_wrap("Rare", "Frosted", {"Frosted", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(161, 239, 255), 0, 0.4, nil}, {nil, Color3.fromRGB(128, 163, 175), nil, nil, nil})
+mod:add_wrap("Rare", "Mainframe", {"Mainframe", Color3.fromRGB(255, 102, 204), 0, 0, nil}, {"Mainframe", Color3.fromRGB(7, 14, 29), 0, 0, nil}, {nil, Color3.fromRGB(231, 135, 255), nil, nil, nil})
+mod:add_wrap("Rare", "Ocean Camo", {"Ocean Camo", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(17, 17, 17), 0, 0, nil}, {nil, Color3.fromRGB(108, 130, 255), nil, nil, nil})
+mod:add_wrap("Rare", "PB & J", {"PB & J", Color3.fromRGB(212, 144, 189), 0, 0, nil}, {"PB & J", Color3.fromRGB(212, 144, 189), 0, 0, nil}, {nil, Color3.fromRGB(143, 120, 255), nil, nil, nil})
+mod:add_wrap("Rare", "Reptile", {"Reptile", Color3.fromRGB(103, 127, 51), 0, 0, nil}, {"Reptile", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(146, 255, 106), nil, nil, nil})
+mod:add_wrap("Rare", "Rug", {"Rug", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(157, 157, 157), 0, 0, nil}, {nil, Color3.fromRGB(163, 163, 163), nil, nil, nil})
+mod:add_wrap("Rare", "Steel", {"Steel", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(54, 54, 54), 0, 0.4, nil}, {nil, Color3.fromRGB(159, 159, 159), nil, nil, nil})
+mod:add_wrap("Rare", "Street Camo", {"Street Camo", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(17, 17, 17), 0, 0, nil}, {nil, Color3.fromRGB(180, 172, 112), nil, nil, nil})
+mod:add_wrap("Rare", "Urban Camo", {"Urban Camo", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(17, 17, 17), 0, 0, nil}, {nil, Color3.fromRGB(255, 131, 131), nil, nil, nil})
+mod:add_wrap("Rare", "Medium stone grey", {Enum.Material.SmoothPlastic, Color3.fromRGB(163, 162, 165), 0, 0, nil}, {Enum.Material.SmoothPlastic, Color3.fromRGB(163, 162, 165), 0, 0, nil}, {Enum.Material.SmoothPlastic, Color3.fromRGB(163, 162, 165), 0, 0, nil})
+mod:add_wrap("Rare", "Studs", {nil, nil, 0, 0, "Studs"}, {nil, nil, 0, 0, "Studs"})
+mod:add_wrap("Rare", "Inlets", {nil, nil, 0, 0, "Inlets"}, {nil, nil, 0, 0, "Inlets"})
+mod:add_wrap("Rare", "Universal", {nil, nil, 0, 0, "Universal"}, {nil, nil, 0, 0, "Universal"})
+mod:add_wrap("Rare", "Surge", {nil, Color3.fromRGB(109, 25, 47), 0, 0, nil}, {nil, Color3.fromRGB(23, 59, 111), 0, 0, nil})
+mod:add_wrap("Rare", "Vile", {nil, Color3.fromRGB(75, 35, 136), 0, 0, nil}, {nil, Color3.fromRGB(101, 147, 49), 0, 0, nil})
+mod:add_wrap("Rare", "OranGG", {nil, Color3.fromRGB(206, 206, 206), 0, 0, nil}, {nil, Color3.fromRGB(255, 106, 0), 0, 0, nil})
+mod:add_wrap("Rare", "Maize", {nil, Color3.fromRGB(0, 39, 76), 0, 0, nil}, {nil, Color3.fromRGB(255, 203, 5), 0, 0, nil})
+mod:add_wrap("Rare", "Spartan", {nil, Color3.fromRGB(24, 69, 59), 0, 0, nil}, {nil, Color3.fromRGB(255, 255, 255), 0, 0, nil})
+mod:add_wrap("Rare", "Crossed", {"Crossed", Color3.fromRGB(0, 153, 255), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(0, 32, 54), 0, 0, nil}, {nil, Color3.fromRGB(76, 94, 255), nil, nil, nil})
+mod:add_wrap("Rare", "Celtic", {Enum.Material.SmoothPlastic, Color3.fromRGB(27, 39, 22), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(175, 142, 86), 0, 0, "Celtic"}, {Enum.Material.Neon, Color3.fromRGB(175, 142, 86), 0, 0, nil})
+mod:add_wrap("Rare", "Dawn", {Enum.Material.Neon, Color3.fromRGB(255, 204, 0), 0, 0, "Dawn1"}, {Enum.Material.Neon, Color3.fromRGB(28, 52, 117), 0, 0, "Dawn2"}, {Enum.Material.Neon, Color3.fromRGB(161, 122, 90), 0, 0, nil})
+mod:add_wrap("Rare", "Termination", {Enum.Material.Metal, Color3.fromRGB(117, 0, 0), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(255, 255, 255), 0, 0.05, nil}, {Enum.Material.Neon, Color3.fromRGB(170, 57, 57), 0, 0, nil})
+mod:add_wrap("Rare", "Fiery", {Enum.Material.Neon, Color3.fromRGB(159, 29, 29), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(163, 145, 91), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(185, 34, 34), 0, 0, nil})
+mod:add_wrap("Rare", "Portal", {Enum.Material.Neon, Color3.fromRGB(255, 102, 204), 0, 0, "Portal"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 152, 220), 0, 0.4, nil}, {Enum.Material.Neon, Color3.fromRGB(255, 152, 220), 0, 0, nil})
+mod:add_wrap("Rare", "Voltaic", {"Voltaic", Color3.fromRGB(226, 155, 64), 0, 0, nil}, {Enum.Material.Metal, Color3.fromRGB(226, 155, 64), 0, 0, nil}, {Enum.Material.ForceField, Color3.fromRGB(226, 155, 64), 0, 0, nil})
+mod:add_wrap("Rare", "Carmine", {Enum.Material.Glass, Color3.fromRGB(117, 0, 0), 0.15, 0, nil}, {"Carmine", Color3.fromRGB(86, 36, 36), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(189, 0, 0), 0, 0, nil})
+mod:add_wrap("Rare", "Money", {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 255, 255), 0, 0, "Money"}, {Enum.Material.Plastic, Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(102, 255, 99), 0, 0, nil})
+mod:add_wrap("Rare", "Eco", {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(0, 163, 0), 0, 0, "Eco"}, {Enum.Material.Neon, Color3.fromRGB(0, 163, 0), 0, 0, nil})
+mod:add_wrap("Rare", "Igneous", {Enum.Material.SmoothPlastic, Color3.fromRGB(0, 0, 0), 0, 0.05, nil}, {Enum.Material.Neon, Color3.fromRGB(255, 176, 111), 0, 0, "Igneous"}, {Enum.Material.Neon, Color3.fromRGB(168, 145, 93), 0, 0, nil})
+mod:add_wrap("Rare", "Spellslinger", {Enum.Material.Neon, Color3.fromRGB(255, 255, 255), 0, 0, "Spellsling"}, {"Spellslinger", Color3.fromRGB(12, 156, 127), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(101, 182, 159), 0, 0, nil})
+mod:add_wrap("Rare", "White", {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 255, 255), 0, 0, nil}, {nil, Color3.fromRGB(255, 255, 255), nil, nil, nil}, nil, "Earned by reaching Level 50 on a weapon", "Earned by reaching Level 50 on this weapon")
+mod:add_wrap("Rare", "Black", {Enum.Material.SmoothPlastic, Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.SmoothPlastic, Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(0, 0, 0), nil, nil, nil}, nil, "Earned by reaching Level 99 on a weapon", "Earned by reaching Level 99 on this weapon")
+mod:add_wrap("Rare", "Nova", {"Nova", Color3.fromRGB(19, 255, 224), 0, 0, nil}, {"Nova", Color3.fromRGB(0, 120, 94), 0, 0, nil}, {nil, Color3.fromRGB(89, 255, 191), nil, nil, nil}, nil, "Rare drop from Daily Tasks")
+mod:add_wrap("Rare", "Fire", {Enum.Material.Neon, Color3.fromRGB(102, 77, 0), 0, 0, "Fire"}, {Enum.Material.Glass, Color3.fromRGB(255, 100, 0), 0, 0.1, nil}, {nil, Color3.fromRGB(255, 106, 69), nil, nil, nil}, nil, "Earned by winning 10 duels in a row")
+mod:add_wrap("Rare", "Trophy", {Enum.Material.Neon, Color3.fromRGB(168, 158, 66), 0, 0, "Trophy"}, {Enum.Material.Glass, Color3.fromRGB(252, 255, 96), 0, 0.1, nil}, {nil, Color3.fromRGB(252, 255, 96), nil, nil, nil}, nil, "Earned by winning 25 duels")
+mod:add_wrap("Rare", "Experience", {Enum.Material.Neon, Color3.fromRGB(94, 145, 157), 0, 0, "Experience"}, {Enum.Material.Glass, Color3.fromRGB(30, 150, 255), 0, 0.1, nil}, {nil, Color3.fromRGB(106, 166, 191), nil, nil, nil}, nil, "Earned every 10 career levels")
+mod:add_wrap("Rare", "Rage", {"Rage", Color3.fromRGB(255, 121, 248), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(38, 14, 27), 0, 0, nil}, {nil, Color3.fromRGB(190, 72, 72), nil, nil, nil})
+mod:add_wrap("Rare", "Scales", {"Scales", Color3.fromRGB(255, 202, 128), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(47, 28, 7), 0, 0, nil}, {nil, Color3.fromRGB(255, 143, 121), nil, nil, nil})
+mod:add_wrap("Rare", "Obsidian", {"Arabesque", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(25, 24, 36), 0, 0, nil}, {nil, Color3.fromRGB(143, 120, 255), nil, nil, nil})
+mod:add_wrap("Rare", "Toy", {Enum.Material.SmoothPlastic, Color3.fromRGB(55, 134, 37), 0, 0.1, nil}, {Enum.Material.SmoothPlastic, Color3.fromRGB(55, 134, 37), 0, 0.1, nil}, {Enum.Material.Glass, Color3.fromRGB(55, 134, 37), 0, 0.1, nil})
+mod:add_wrap("Rare", "Well Done", {"A5", Color3.fromRGB(72, 56, 40), 0, 0, nil}, {Enum.Material.Concrete, Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(255, 163, 140), nil, nil, nil})
+mod:add_wrap("Rare", "Dunes", {"Dunes", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {"Dunes", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(171, 157, 125), nil, nil, nil})
+mod:add_wrap("Rare", "Glisten", {"Glisten", Color3.fromRGB(4, 175, 236), 0, 0, nil}, {"Glisten", Color3.fromRGB(0, 88, 120), 0, 0, nil}, {nil, Color3.fromRGB(126, 154, 255), nil, nil, nil})
+mod:add_wrap("Rare", "Glossy", {"Glossy", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {"Glossy", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {nil, Color3.fromRGB(255, 169, 218), nil, nil, nil})
+mod:add_wrap("Rare", "Storm", {"Storm", Color3.fromRGB(248, 248, 248), 0, 0, nil}, {"Storm", Color3.fromRGB(44, 41, 70), 0, 0, nil}, {nil, Color3.fromRGB(150, 140, 255), nil, nil, nil})
+mod:add_wrap("Rare", "Bunsen", {"Bunsen", Color3.fromRGB(33, 84, 185), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(5, 22, 59), 0, 0, nil}, {nil, Color3.fromRGB(17, 61, 255), nil, nil, nil})
+mod:add_wrap("Rare", "Black Granite", {"Black Granite", Color3.fromRGB(223, 223, 222), 0, 0, nil}, {"Black Granite", Color3.fromRGB(91, 93, 105), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(17, 17, 17), 0.75, 0, nil})
+mod:add_wrap("Rare", "Cerulean", {"Resolute", Color3.fromRGB(0, 255, 255), 0, 0, nil}, {"Resolute", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(61, 255, 110), 0, 0, nil})
+mod:add_wrap("Rare", "Clamshell", {"Clamshell", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 226, 212), 0, 0.3, nil}, {Enum.Material.Neon, Color3.fromRGB(233, 182, 213), 0, 0, nil})
+mod:add_wrap("Rare", "Cool Crochet", {"Crochet", Color3.fromRGB(117, 127, 106), 0, 0, nil}, {"Crochet", Color3.fromRGB(116, 134, 157), 0, 0, nil}, {"Crochet", Color3.fromRGB(116, 134, 157), 0, 0, nil})
+mod:add_wrap("Rare", "Cork", {"Cork", Color3.fromRGB(248, 248, 248), 0, 0, nil}, {"Cork", Color3.fromRGB(163, 162, 165), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(203, 171, 149), 0, 0, nil})
+mod:add_wrap("Rare", "Hammered Copper", {"Hammered", Color3.fromRGB(140, 96, 64), 0, 0, nil}, {"Hammered", Color3.fromRGB(140, 96, 64), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(204, 117, 95), 0, 0, nil})
+mod:add_wrap("Rare", "Hypnotic", {"Hypnotic 1", Color3.fromRGB(248, 248, 248), 0, 0, nil}, {"Hypnotic 2", Color3.fromRGB(248, 248, 248), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(223, 143, 255), 0, 0, nil})
+mod:add_wrap("Rare", "Leafy Grass", {"Leafy Grass", Color3.fromRGB(223, 223, 222), 0, 0, nil}, {"Leafy Grass", Color3.fromRGB(163, 162, 165), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(132, 197, 104), 0, 0, nil})
+mod:add_wrap("Rare", "Liquid Chrome", {"Liquid Chrome", Color3.fromRGB(193, 193, 193), 0, 0, nil}, {"Liquid Chrome", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(155, 158, 193), 0, 0, nil})
+mod:add_wrap("Rare", "Mahogany", {"Mahogany Wood", Color3.fromRGB(194, 124, 74), 0, 0, nil}, {"Mahogany Wood", Color3.fromRGB(117, 62, 0), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(199, 141, 107), 0, 0, nil})
+mod:add_wrap("Rare", "Neo", {"Neo", Color3.fromRGB(4, 175, 236), 0, 0, nil}, {"Neo", Color3.fromRGB(61, 21, 133), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(82, 124, 174), 0, 0, nil})
+mod:add_wrap("Rare", "Pink Crochet", {"Crochet", Color3.fromRGB(255, 152, 220), 0, 0, nil}, {"Crochet", Color3.fromRGB(172, 103, 149), 0, 0, nil}, {"Crochet", Color3.fromRGB(255, 152, 220), 0, 0, nil})
+mod:add_wrap("Rare", "Pink Glitter", {"Pink Glitter", Color3.fromRGB(255, 152, 220), 0, 0, nil}, {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 152, 220), 0, 0.3, nil}, {Enum.Material.Neon, Color3.fromRGB(183, 113, 197), 0, 0, nil})
+mod:add_wrap("Rare", "Studded", {"Studded", nil, 0, 0, nil}, {"Studded", nil, 0, 0, nil})
+mod:add_wrap("Rare", "Tempest", {Enum.Material.Neon, Color3.fromRGB(248, 248, 248), 0, 0, "Tempest1"}, {Enum.Material.Neon, Color3.fromRGB(167, 167, 167), 0, 0, "Tempest2"}, {Enum.Material.Neon, Color3.fromRGB(163, 138, 149), 0, 0, nil})
+mod:add_wrap("Rare", "Yang", {"Yin Yang", Color3.fromRGB(248, 248, 248), 0, 0, nil}, {Enum.Material.SmoothPlastic, Color3.fromRGB(248, 248, 248), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(17, 17, 17), 0, 0, nil})
+mod:add_wrap("Rare", "Yin", {"Yin Yang", Color3.fromRGB(248, 248, 248), 0, 0, nil}, {Enum.Material.SmoothPlastic, Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(255, 255, 255), 0, 0, nil})
+mod:add_wrap("Rare", "Ancient", {"Ancient2", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {"Ancient1", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(164, 189, 71), 0, 0, nil})
+mod:add_wrap("Rare", "Grass", {Enum.Material.SmoothPlastic, Color3.fromRGB(205, 205, 205), 0, 0, nil}, {"Grass1", Color3.fromRGB(223, 223, 222), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(138, 171, 133), 0, 0, nil})
+mod:add_wrap("Rare", "Rustic", {"RusticWood", Color3.fromRGB(124, 92, 70), 0, 0, nil}, {"BrushedMetal", Color3.fromRGB(202, 203, 209), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(221, 177, 145), 0, 0, nil})
+mod:add_wrap("Rare", "Chrome Webs", {"Chrome Webs", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {"Chrome Webs", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 0, 0, nil})
+mod:add_wrap("Rare", "Green Goo", {Enum.Material.Neon, Color3.fromRGB(83, 161, 82), 0, 0, "GooWelds"}, {Enum.Material.Plastic, Color3.fromRGB(76, 46, 29), 0, 0, "GooStudsG"}, {Enum.Material.Neon, Color3.fromRGB(83, 161, 82), 0, 0, "GooWelds"})
+mod:add_wrap("Rare", "Purple Goo", {Enum.Material.Neon, Color3.fromRGB(88, 54, 163), 0, 0, "GooWelds"}, {Enum.Material.Plastic, Color3.fromRGB(27, 42, 53), 0, 0, "GooStudsP"}, {Enum.Material.Neon, Color3.fromRGB(88, 54, 163), 0, 0, "GooWelds"})
+mod:add_wrap("Rare", "Werewolf Fur", {"Werewolf Fur", Color3.fromRGB(111, 85, 34), 0, 0, nil}, {"Werewolf Fur", Color3.fromRGB(74, 56, 23), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(170, 75, 75), 0, 0, nil})
+mod:add_wrap("Rare", "Snowfall", {Enum.Material.Neon, Color3.fromRGB(255, 255, 255), 0, 0, "Snowfall"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(159, 159, 159), 0, 0, nil})
+mod:add_wrap("Rare", "Ugly Sweater", {"UglySweater", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {"UglySweater2", Color3.fromRGB(39, 70, 45), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(149, 167, 148), 0, 0, nil})
+mod:add_wrap("Rare", "Jolly Wrapping", {"WrappingPaper", Color3.fromRGB(20, 135, 77), 0, 0, "JollyWrapping"}, {"WrappingPearlescent", Color3.fromRGB(247, 42, 55), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(247, 71, 74), 0, 0, nil})
+mod:add_wrap("Rare", "Forest Wrapping", {"WrappingPaper", Color3.fromRGB(59, 93, 57), 0, 0, nil}, {"WrappingPearlescent2", Color3.fromRGB(252, 252, 252), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(129, 172, 122), 0, 0, nil})
+mod:add_wrap("Rare", "Peppermint Wrapping", {"WrappingPaper", Color3.fromRGB(202, 56, 59), 0, 0, nil}, {"WrappingPearlescent2", Color3.fromRGB(252, 252, 252), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(185, 95, 95), 0, 0, nil})
+mod:add_wrap("Rare", "Winter Wrapping", {"WrappingPaper", Color3.fromRGB(22, 78, 130), 0, 0, "WinterWrapping"}, {"WrappingPearlescent", Color3.fromRGB(252, 252, 252), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(135, 146, 177), 0, 0, nil})
+mod:add_wrap("Rare", "Mocha Wrapping", {"WrappingPaper", Color3.fromRGB(206, 176, 158), 0, 0, nil}, {"WrappingPearlescent", Color3.fromRGB(116, 93, 87), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(179, 157, 135), 0, 0, nil})
+mod:add_wrap("Rare", "Minty Wrapping", {"WrappingPaper", Color3.fromRGB(38, 150, 126), 0, 0, "MintyWrapping"}, {"WrappingPearlescent", Color3.fromRGB(32, 144, 116), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(103, 179, 160), 0, 0, nil})
+mod:add_wrap("Rare", "Frosty Wrapping", {"WrappingPaper", Color3.fromRGB(194, 194, 194), 0, 0, "FrostyWrapping"}, {"WrappingPearlescent", Color3.fromRGB(217, 239, 255), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(179, 179, 179), 0, 0, nil})
+mod:add_wrap("Rare", "Creme Wrapping", {"WrappingPaper", Color3.fromRGB(150, 47, 69), 0, 0, "CremeWrapping"}, {"WrappingPearlescent", Color3.fromRGB(184, 58, 85), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(184, 101, 119), 0, 0, nil})
+mod:add_wrap("Rare", "Blush Wrapping", {"WrappingPaper", Color3.fromRGB(247, 175, 218), 0, 0, "BlushWrapping"}, {"WrappingPearlescent", Color3.fromRGB(230, 140, 152), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(230, 140, 152), 0, 0, nil})
+mod:add_wrap("Rare", "Cashmere Wrapping", {"WrappingPaper", Color3.fromRGB(186, 135, 112), 0, 0, nil}, {"WrappingPearlescent", Color3.fromRGB(255, 158, 128), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(255, 149, 128), 0, 0, nil})
+mod:add_wrap("Rare", "Carbon Wrapping", {"WrappingPaper", Color3.fromRGB(56, 58, 59), 0, 0, "CarbonWrapping"}, {"WrappingPearlescent", Color3.fromRGB(83, 97, 103), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(151, 157, 179), 0, 0, nil})
+mod:add_wrap("Rare", "Caned Wrapping", {"WrappingPaper", Color3.fromRGB(181, 47, 65), 0, 0, "CanedWrapping"}, {"WrappingPearlescent", Color3.fromRGB(150, 39, 56), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(171, 84, 98), 0, 0, nil})
+mod:add_wrap("Rare", "Arbiter", {Enum.Material.SmoothPlastic, Color3.fromRGB(36, 56, 70), 0, 0, "Arbiter"}, {"Arbiter", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(120, 135, 171), 0, 0, nil})
+mod:add_wrap("Rare", "Antimatter", {Enum.Material.Neon, Color3.fromRGB(255, 0, 4), 0, 0, "Antimatter1"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(71, 0, 0), 0, 0, "Antimatter2"}, {Enum.Material.Neon, Color3.fromRGB(157, 0, 0), 0, 0, nil})
+mod:add_wrap("Rare", "Crimson Art", {"CrimsonArt", Color3.fromRGB(213, 213, 213), 0, 0, "CrimsonArt1"}, {"CrimsonArt", Color3.fromRGB(248, 248, 248), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(159, 73, 73), 0, 0, nil})
+mod:add_wrap("Rare", "Model", {"RBLXPckge", Color3.fromRGB(248, 248, 248), 0, 0, nil}, {Enum.Material.SmoothPlastic, Color3.fromRGB(163, 162, 165), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(88, 111, 166), 0, 0, nil})
+mod:add_wrap("Rare", "Plasma", {Enum.Material.Neon, Color3.fromRGB(163, 137, 176), 0, 0, "Plasma1"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(81, 0, 179), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(155, 130, 167), 0, 0, nil})
+mod:add_wrap("Rare", "Purpleize", {"Purpleize", Color3.fromRGB(224, 178, 208), 0, 0, nil}, {"Purpleize", Color3.fromRGB(167, 94, 155), 0, 0.05, nil}, {Enum.Material.Neon, Color3.fromRGB(163, 122, 172), 0, 0, nil})
+mod:add_wrap("Rare", "Regal", {"RegalFabric", Color3.fromRGB(186, 0, 0), 0, 0.3, nil}, {Enum.Material.Glass, Color3.fromRGB(243, 182, 0), 0, 0.6, "Regal"}, {Enum.Material.Neon, Color3.fromRGB(171, 125, 99), 0, 0, nil})
+mod:add_wrap("Rare", "Sentinel", {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 255, 255), 0, 0.5, "Sentinel"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 255, 255), 0, 0.5, nil}, {Enum.Material.Neon, Color3.fromRGB(168, 143, 124), 0, 0, nil})
+mod:add_wrap("Rare", "Strobe", {Enum.Material.SmoothPlastic, Color3.fromRGB(17, 17, 17), 0, 0, "Strobe1"}, {Enum.Material.Neon, Color3.fromRGB(17, 17, 17), 0, 0, "Strobe2"}, {Enum.Material.Neon, Color3.fromRGB(111, 158, 166), 0, 0, nil})
+mod:add_wrap("Rare", "TIX", {Enum.Material.SmoothPlastic, Color3.fromRGB(19, 21, 22), 0, 0, "TIXWRAP"}, {Enum.Material.Plastic, Color3.fromRGB(71, 44, 12), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(166, 146, 85), 0, 0, nil})
+mod:add_wrap("Rare", "Tealur", {Enum.Material.Neon, Color3.fromRGB(73, 166, 138), 0, 0, "Tealur"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(23, 23, 23), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(70, 159, 131), 0, 0, nil})
+mod:add_wrap("Rare", "Waste", {Enum.Material.Neon, Color3.fromRGB(0, 168, 67), 0, 0, "Waste1"}, {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 0, 0, "Waste2"}, {Enum.Material.Neon, Color3.fromRGB(58, 158, 58), 0, 0, nil})
+mod:add_wrap("Rare", "Lovely Leopard", {Enum.Material.SmoothPlastic, Color3.fromRGB(248, 248, 248), 0, 0, "LovelyLeopard1"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(17, 17, 17), 0, 0, "LovelyLeopard2"}, {Enum.Material.Neon, Color3.fromRGB(161, 119, 162), 0, 0, nil})
+mod:add_wrap("Legendary", "Diamond", {"Diamond", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(255, 170, 24), 0, 0.4, nil}, {nil, Color3.fromRGB(255, 165, 120), nil, nil, nil}, nil, "Earned from weapon contracts", "Earned from a weapon contract for this weapon")
+mod:add_wrap("Legendary", "Scorched", {"Scorched", Color3.fromRGB(171, 171, 171), 0, 0, nil}, {"Scorched", Color3.fromRGB(43, 43, 43), 0, 0, nil}, {nil, Color3.fromRGB(255, 79, 25), nil, nil, nil})
+mod:add_wrap("Legendary", "Glass", {Enum.Material.Glass, Color3.fromRGB(255, 255, 255), 0.5, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(255, 255, 255), 0.5, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(255, 255, 255), 0.5, 0, nil})
+mod:add_wrap("Legendary", "Malevolent", {"Malevolent", Color3.fromRGB(163, 162, 165), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(25, 15, 39), 0, 0, nil}, {nil, Color3.fromRGB(78, 43, 168), nil, nil, nil})
+mod:add_wrap("Legendary", "Omnisand", {"Omnisand", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {"Omnisand", Color3.fromRGB(81, 81, 81), 0, 0, nil}, {nil, Color3.fromRGB(166, 97, 48), nil, nil, nil})
+mod:add_wrap("Legendary", "Quasar", {Enum.Material.Neon, Color3.fromRGB(255, 72, 0), 0, 0, "Quasar"}, {Enum.Material.Neon, Color3.fromRGB(255, 72, 0), 0, 0, "Quasar"}, {nil, Color3.fromRGB(255, 105, 94), nil, nil, nil})
+mod:add_wrap("Legendary", "Slime", {"Slime", Color3.fromRGB(248, 248, 248), 0, 0, nil}, {"Slime", Color3.fromRGB(70, 53, 0), 0, 0, nil}, {nil, Color3.fromRGB(76, 255, 48), nil, nil, nil})
+mod:add_wrap("Legendary", "Water", {Enum.Material.Neon, Color3.fromRGB(170, 170, 170), 0, 0, "Water1"}, {Enum.Material.Neon, Color3.fromRGB(46, 89, 107), 0, 0, "Water2"}, {Enum.Material.Neon, Color3.fromRGB(77, 129, 175), 0, 0, nil})
+mod:add_wrap("Legendary", "Black Opal", {Enum.Material.Neon, Color3.fromRGB(96, 241, 96), 0, 0, "BlackOpal"}, {"Black Opal", Color3.fromRGB(17, 17, 17), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(92, 163, 125), 0, 0, nil})
+mod:add_wrap("Legendary", "Hesper", {"Hesper", Color3.fromRGB(248, 248, 248), 0, 0, nil}, {"Hesper", Color3.fromRGB(11, 33, 48), 0, 0, nil}, {nil, Color3.fromRGB(255, 118, 76), nil, nil, nil})
+mod:add_wrap("Legendary", "Sunset", {Enum.Material.SmoothPlastic, Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(213, 115, 61), 0, 0, "Sunset"}, {Enum.Material.Neon, Color3.fromRGB(213, 115, 61), 0, 0, nil})
+mod:add_wrap("Legendary", ".exe", {Enum.Material.Neon, Color3.fromRGB(138, 225, 118), 0, 0, ".exe"}, {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(138, 225, 118), 0, 0, nil})
+mod:add_wrap("Legendary", "Disco", {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 255, 255), 0, 0.5, "Disco"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 255, 255), 0, 0.5, nil}, {nil, Color3.fromRGB(255, 255, 255), nil, nil, nil}, nil, "Included in the Standard Weapons Bundle")
+mod:add_wrap("Legendary", "Classic", {Enum.Material.Plastic, Color3.fromRGB(27, 42, 53), 0, 0, nil}, {Enum.Material.Plastic, Color3.fromRGB(27, 42, 53), 0, 0, nil}, {Enum.Material.Plastic, Color3.fromRGB(27, 42, 53), 0.5, 0, nil}, nil, "Included in the Classic Bundle")
+mod:add_wrap("Legendary", "Magma", {Enum.Material.Neon, Color3.fromRGB(255, 141, 75), 0, 0, "Magma"}, {Enum.Material.Neon, Color3.fromRGB(255, 141, 75), 0, 0, "Magma"}, {nil, Color3.fromRGB(255, 141, 75), nil, nil, nil}, nil, "Included in the Heavy Duty Bundle")
+mod:add_wrap("Legendary", "Nebula", {Enum.Material.Neon, Color3.fromRGB(137, 100, 248), 0, 0, "Nebula1"}, {Enum.Material.Neon, Color3.fromRGB(199, 171, 255), 0, 0, "Nebula2"}, {nil, Color3.fromRGB(133, 103, 255), nil, nil, nil}, nil, "Included in the Exogun Bundle")
+mod:add_wrap("Legendary", "Aurum", {Enum.Material.Neon, Color3.fromRGB(176, 130, 74), 0, 0, "Aurum"}, {"Aurum", Color3.fromRGB(17, 17, 17), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(175, 128, 80), 0, 0, nil}, nil, "Included in the Medkit Bundle")
+mod:add_wrap("Legendary", "Paint", {"Paint", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(212, 212, 212), 0, 0.1, nil}, {nil, Color3.fromRGB(212, 212, 212), nil, nil, nil}, nil, "Included in the Starter Bundle")
+mod:add_wrap("Legendary", "Geometric", {"Geometric", nil, nil, nil, nil}, {"Geometric", nil, nil, nil, nil}, {"Geometric", nil, nil, nil, nil}, nil, "Included in the Pixel Bundle")
+mod:add_wrap("Legendary", ".dll", {Enum.Material.Neon, Color3.fromRGB(108, 134, 223), 0, 0, ".dll"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(0, 0, 0), 0, 0.05, nil}, {Enum.Material.Neon, Color3.fromRGB(97, 123, 184), 0, 0, nil}, nil, "Included in the Energy Bundle")
+mod:add_wrap("Legendary", "Cardboard", {Enum.Material.SmoothPlastic, Color3.fromRGB(143, 121, 89), 0, 0, "Cardboard1"}, {Enum.Material.Plaster, Color3.fromRGB(117, 98, 72), 0, 0, "Cardboard2"}, {Enum.Material.Neon, Color3.fromRGB(161, 130, 109), 0, 0, nil}, nil, "Included in the RPG Bundle")
+mod:add_wrap("Legendary", "Wealth", {"Wealth", Color3.fromRGB(0, 255, 0), 0, 0, nil}, {"Wealth", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(95, 252, 100), nil, nil, nil}, nil, "Used to be included in Key Bundles")
+mod:add_wrap("Legendary", "Lucre", {"Wealth", Color3.fromRGB(255, 213, 0), 0, 0, nil}, {"Wealth", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(255, 140, 73), nil, nil, nil}, nil, "Used to be included in Key Bundles")
+mod:add_wrap("Legendary", "Luxurious", {Enum.Material.Glass, Color3.fromRGB(255, 176, 0), 0, 0.6, "Luxurious"}, {Enum.Material.Glass, Color3.fromRGB(255, 176, 0), 0, 0.6, nil}, {Enum.Material.Neon, Color3.fromRGB(167, 156, 117), 0, 0, nil}, nil, "Included in Key Bundles")
+mod:add_wrap("Legendary", "Supernova", {Enum.Material.Neon, Color3.fromRGB(255, 255, 255), 0, 0, "Supernova"}, {Enum.Material.Neon, Color3.fromRGB(255, 255, 255), 0, 0, "Supernova"}, {nil, Color3.fromRGB(84, 246, 255), nil, nil, nil}, nil, "Legendary drop from Daily Tasks")
+mod:add_wrap("Legendary", "Groove", {"Groove", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {"Groove", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(255, 99, 99), nil, nil, nil}, nil, "Used to be purchased from the Shop")
+mod:add_wrap("Legendary", "Blaze", {Enum.Material.Neon, Color3.fromRGB(255, 0, 0), 0, 0, "Blaze1"}, {Enum.Material.Neon, Color3.fromRGB(154, 85, 32), 0, 0, "Blaze2"}, {nil, Color3.fromRGB(255, 106, 69), nil, nil, nil}, nil, "Earned by winning 100 duels in a row")
+mod:add_wrap("Legendary", "Beach", {nil, Color3.fromRGB(42, 157, 143), 0, 0, nil}, {nil, Color3.fromRGB(233, 196, 106), 0, 0, nil}, {nil, Color3.fromRGB(119, 207, 255), nil, nil, nil}, nil, "Used to be purchased from the Shop")
+mod:add_wrap("Legendary", "Malachite", {"Malachite", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(94, 255, 148), nil, nil, nil})
+mod:add_wrap("Legendary", "Arabesque", {"Arabesque", Color3.fromRGB(98, 77, 0), 0, 0.2, nil}, {Enum.Material.Glass, Color3.fromRGB(98, 77, 0), 0, 0.4, nil}, {nil, Color3.fromRGB(170, 154, 115), nil, nil, nil})
+mod:add_wrap("Legendary", "Webbed", {"Webbed", Color3.fromRGB(117, 0, 0), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(27, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(255, 69, 69), nil, nil, nil})
+mod:add_wrap("Legendary", "Lightning", {Enum.Material.Neon, Color3.fromRGB(255, 125, 92), 0, 0, "Lightning"}, {Enum.Material.Glass, Color3.fromRGB(72, 34, 14), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(166, 123, 94), 0, 0, nil})
+mod:add_wrap("Legendary", "Plastic", {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 255, 255), 0.5, 0.5, nil}, {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 255, 255), 0.5, 0.5, nil}, {nil, Color3.fromRGB(255, 255, 255), nil, nil, nil})
+mod:add_wrap("Legendary", "Chrome", {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 255, 255), 0, 1, nil}, {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 255, 255), 0, 1, nil}, {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 255, 255), 0, 1, nil})
+mod:add_wrap("Legendary", "A5", {"A5", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Concrete, Color3.fromRGB(255, 220, 192), 0, 0, nil}, {nil, Color3.fromRGB(255, 139, 139), nil, nil, nil})
+mod:add_wrap("Legendary", "Amber", {"Amber", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {"Amber", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(255, 158, 93), nil, nil, nil})
+mod:add_wrap("Legendary", "Insidious", {"Insidious", Color3.fromRGB(190, 104, 98), 0, 0, nil}, {"Insidious", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(255, 111, 111), nil, nil, nil})
+mod:add_wrap("Legendary", "Iridescent", {Enum.Material.Neon, Color3.fromRGB(166, 145, 211), 0, 0, "Iridescent1"}, {Enum.Material.Neon, Color3.fromRGB(166, 145, 211), 0, 0, "Iridescent2"}, {Enum.Material.Neon, Color3.fromRGB(156, 143, 163), 0, 0, nil})
+mod:add_wrap("Legendary", "Moonstone", {"Moonstone", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {"Moonstone", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {nil, Color3.fromRGB(146, 160, 190), nil, nil, nil})
+mod:add_wrap("Legendary", "Bright", {Enum.Material.Neon, Color3.fromRGB(160, 160, 160), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(160, 160, 160), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(160, 160, 160), 0, 0, nil})
+mod:add_wrap("Legendary", "Dark", {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 0, 0, nil})
+mod:add_wrap("Legendary", "Mischief", {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 0, 0, "Mischief"}, {Enum.Material.Glass, Color3.fromRGB(53, 39, 94), 0, 0, nil}, {nil, Color3.fromRGB(139, 131, 255), nil, nil, nil})
+mod:add_wrap("Legendary", "Carbon Fiber", {"Carbon Fiber", Color3.fromRGB(17, 17, 17), 0, 0, nil}, {"Carbon Fiber", Color3.fromRGB(248, 248, 248), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 0, 0, nil})
+mod:add_wrap("Legendary", "Hyperdrive", {"Hyperdrive", Color3.fromRGB(248, 248, 248), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(143, 156, 173), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(159, 173, 192), 0, 0, nil})
+mod:add_wrap("Legendary", "Insignia", {"Insignia", Color3.fromRGB(248, 248, 248), 0, 0, nil}, {"Insignia", Color3.fromRGB(17, 17, 17), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(199, 172, 120), 0, 0, nil})
+mod:add_wrap("Legendary", "Liquid Gold", {"Liquid Gold", Color3.fromRGB(180, 123, 0), 0, 0, nil}, {"Liquid Gold", Color3.fromRGB(255, 176, 0), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(199, 172, 120), 0, 0, nil})
+mod:add_wrap("Legendary", "Cardinal", {"Cardinal", Color3.fromRGB(255, 175, 175), 0, 0, nil}, {"Cardinal", Color3.fromRGB(17, 17, 17), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(227, 74, 76), 0, 0, nil})
+mod:add_wrap("Legendary", "Starblaze", {"Starblaze 2", Color3.fromRGB(248, 248, 248), 0, 0, nil}, {"Starblaze 1", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(177, 35, 25), 0, 0, nil})
+mod:add_wrap("Legendary", "Starfall", {"Hyperdrive", Color3.fromRGB(9, 137, 207), 0, 0, nil}, {"Starblaze 1", Color3.fromRGB(0, 255, 255), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(24, 74, 255), 0, 0, nil})
+mod:add_wrap("Legendary", "Tiger", {"Tiger", Color3.fromRGB(255, 114, 14), 0, 0, nil}, {"Tiger", Color3.fromRGB(17, 17, 17), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(255, 86, 7), 0, 0, nil})
+mod:add_wrap("Legendary", "Watermelon", {"Watermelon Red", Color3.fromRGB(255, 131, 131), 0, 0, nil}, {"Watermelon Green", Color3.fromRGB(204, 255, 204), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(163, 75, 75), 0, 0, nil}, nil, "Used to be purchased from the Shop")
+mod:add_wrap("Legendary", "Damascus", {"Damascus", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(195, 195, 195), 0, 0, nil}, nil, "Used to be purchased from the Shop")
+mod:add_wrap("Legendary", "Black Damascus", {"BlackDamascus", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 0, 0, nil}, nil, "Used to be purchased from the Shop")
+mod:add_wrap("Legendary", "Pixel Blight", {Enum.Material.Neon, nil, 0, 0, "PixelBlight", "PixelBlight"}, {Enum.Material.Neon, nil, 0, 0, "PixelBlight", "PixelBlight"}, {Enum.Material.Neon, nil, 0, 0, nil}, nil, "Used to be purchased from the Shop")
+mod:add_wrap("Legendary", "Empress", {Enum.Material.Neon, Color3.fromRGB(255, 255, 255), 0, 0, "Empress"}, {Enum.Material.Neon, Color3.fromRGB(255, 255, 255), 0, 0, "Empress"}, {Enum.Material.Neon, Color3.fromRGB(172, 150, 181), 0, 0, nil}, nil, "Used to be purchased from the Shop")
+mod:add_wrap("Legendary", "Arena", {Enum.Material.SmoothPlastic, Color3.fromRGB(151, 153, 163), 0, 0, "ArenaTex"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(132, 134, 143), 0, 0, "ArenaTex"}, {Enum.Material.Neon, Color3.fromRGB(151, 153, 163), 0, 0, nil}, nil, "Purchased from the Shop")
+mod:add_wrap("Legendary", "Simulation", {Enum.Material.Neon, Color3.fromRGB(30, 98, 153), 0, 0, "Simulation_1"}, {Enum.Material.Neon, Color3.fromRGB(16, 51, 81), 0, 0, "Simulation_2"}, {Enum.Material.Neon, Color3.fromRGB(80, 122, 170), 0, 0, nil}, nil, "Used to be purchased from the Shop")
+mod:add_wrap("Legendary", "Sunset Sparkle", {Enum.Material.Neon, Color3.fromRGB(255, 137, 137), 0, 0, "SunsetSparkle1"}, {Enum.Material.Neon, Color3.fromRGB(88, 0, 117), 0, 0, "SunsetSparkle2"}, {Enum.Material.Neon, Color3.fromRGB(161, 122, 90), 0, 0, nil}, nil, "Used to be purchased from the Shop")
+mod:add_wrap("Legendary", "Messis", {Enum.Material.SmoothPlastic, Color3.fromRGB(17, 17, 17), 0, 0, "Messis1"}, {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 0, 0, "Messis2"}, {Enum.Material.Neon, Color3.fromRGB(82, 159, 72), 0, 0, nil}, nil, "Used to be purchased from the Shop")
+mod:add_wrap("Legendary", "Birthday Wrapping", {"WrappingPaper_01c", Color3.fromRGB(68, 117, 223), 0, 0, nil}, {"Pearlescent_01c", Color3.fromRGB(255, 173, 32), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(173, 150, 110), 0, 0, nil}, nil, "Purchased from the Shop during the RIVALS Birthday Party")
+mod:add_wrap("Legendary", "RIVALS Wrapping", {"WrappingPaper_01c", Color3.fromRGB(255, 148, 26), 0, 0, "RivalsWrapping"}, {"Pearlescent_01d", Color3.fromRGB(161, 18, 166), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(145, 114, 172), 0, 0, nil}, nil, "Purchased from the Shop during the RIVALS Birthday Party")
+mod:add_wrap("Legendary", "Shadow Ink", {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 0, 0, "ShadowInk1"}, {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 0, 0, "ShadowInk2"}, {Enum.Material.Neon, Color3.fromRGB(91, 76, 171), 0, 0, nil}, nil, "Purchased from the Shop")
+mod:add_wrap("Legendary", "Triplaser", {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 255, 255), 0, 0.5, "Tripwire1"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(199, 199, 199), 0, 0.5, nil}, {Enum.Material.Neon, Color3.fromRGB(163, 73, 73), 0, 0, nil}, nil, "Purchased from the Shop")
+mod:add_wrap("Legendary", "Resolute", {"Resolute", Color3.fromRGB(0, 16, 176), 0, 0, nil}, {"Resolute", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(0, 0, 255), 0, 0, nil})
+mod:add_wrap("Legendary", "Thunderburst", {Enum.Material.Neon, Color3.fromRGB(253, 234, 141), 0, 0, "Thunderburst"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(0, 0, 0), 0, 0.05, nil}, {Enum.Material.Neon, Color3.fromRGB(163, 160, 130), 0, 0, nil})
+mod:add_wrap("Legendary", "Encrypt", {"Encrypt", Color3.fromRGB(0, 172, 57), 0, 0, nil}, {"Encrypt", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(131, 255, 129), 0, 0, nil})
+mod:add_wrap("Legendary", "Mummy", {Enum.Material.Neon, Color3.fromRGB(121, 171, 96), 0, 0, "Mummy"}, {Enum.Material.Neon, Color3.fromRGB(121, 171, 96), 0, 0, "MummyDark"}, {Enum.Material.Neon, Color3.fromRGB(121, 171, 96), 0, 0, nil})
+mod:add_wrap("Legendary", "Scourge", {"Scourge", Color3.fromRGB(170, 85, 0), 0, 0, nil}, {"Scourge", Color3.fromRGB(17, 17, 17), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(168, 90, 0), 0, 0, nil})
+mod:add_wrap("Legendary", "Frankenstein", {"Frankenstein", Color3.fromRGB(83, 135, 0), 0, 0, nil}, {"Frankenstein Metal", Color3.fromRGB(145, 161, 168), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(104, 163, 109), 0, 0, nil})
+mod:add_wrap("Legendary", "Hallow", {nil, Color3.fromRGB(0, 0, 0), 0, 0.05, nil}, {nil, Color3.fromRGB(255, 119, 0), 0, 0.1, nil}, {Enum.Material.Neon, Color3.fromRGB(255, 119, 0), 0, 0, nil}, nil, "Used to be purchased from the Shop")
+mod:add_wrap("Legendary", "Greenflame", {Enum.Material.Neon, Color3.fromRGB(0, 255, 0), 0, 0, "Greenflame1"}, {Enum.Material.Neon, Color3.fromRGB(117, 162, 48), 0, 0, "Greenflame2"}, {nil, Color3.fromRGB(122, 255, 14), nil, nil, nil}, nil, "Used to be included in Candy Bundles")
+mod:add_wrap("Legendary", "Aurora", {Enum.Material.Neon, Color3.fromRGB(129, 255, 110), 0, 0, "Aurora"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(17, 17, 17), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(129, 255, 110), 0, 0, nil})
+mod:add_wrap("Legendary", "Wintergreen", {"GlossyCandyCane2", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {"GlossyGeneric", Color3.fromRGB(0, 134, 19), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(102, 167, 104), 0, 0, nil}, nil, "Used to be purchased from the Shop")
+mod:add_wrap("Legendary", "Gingerbread", {"Gingerbread", Color3.fromRGB(225, 156, 107), 0, 0, "Gingerbread"}, {"Gingerbread", Color3.fromRGB(86, 66, 54), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(167, 153, 130), 0, 0, nil})
+mod:add_wrap("Legendary", "Peppermint", {"GlossyCandyCane", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {"GlossyGeneric", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(161, 52, 52), 0, 0, nil})
+mod:add_wrap("Legendary", "Crystallized", {Enum.Material.Glass, Color3.fromRGB(18, 238, 212), 0.85, 0, "Crystallized"}, {Enum.Material.Glass, Color3.fromRGB(18, 238, 212), 0.85, 0, "Crystallized"}, {Enum.Material.Glass, Color3.fromRGB(175, 221, 255), 0.5, 0, nil}, nil, "Used to be included in Crystal Bundles")
+mod:add_wrap("Legendary", "2025 Wrapping", {"WrappingPaper", Color3.fromRGB(59, 58, 57), 0, 0, "2025Wrapping"}, {"WrappingPearlescent", Color3.fromRGB(255, 191, 87), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(179, 173, 88), 0, 0, nil})
+mod:add_wrap("Legendary", "Bombastic", {Enum.Material.Neon, Color3.fromRGB(220, 97, 40), 0, 0, "Bombastic1"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(53, 53, 53), 0, 0, "Bombastic2"}, {Enum.Material.Neon, Color3.fromRGB(161, 93, 47), 0, 0, nil})
+mod:add_wrap("Legendary", "Candy Apple", {"CandyGlossy", Color3.fromRGB(23, 152, 0), 0, 0, "CandyGlossy"}, {"CandyGlossy", Color3.fromRGB(255, 128, 0), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(133, 161, 68), 0, 0.1, nil})
+mod:add_wrap("Legendary", "Dark Arena", {Enum.Material.SmoothPlastic, Color3.fromRGB(35, 35, 35), 0, 0, "DarkArena1"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(0, 0, 0), 0, 0, "DarkArena2"}, {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 1, 0, "DarkArena3"})
+mod:add_wrap("Legendary", "Green Sparkle", {Enum.Material.Neon, Color3.fromRGB(39, 70, 45), 0, 0, "GreenSparkle1"}, {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 0, 0, "GreenSparkle2"}, {Enum.Material.Neon, Color3.fromRGB(124, 161, 64), 0, 0, nil})
+mod:add_wrap("Legendary", "Indigo Sparkle", {Enum.Material.Neon, Color3.fromRGB(104, 35, 207), 0, 0, "IndigoSparkle1"}, {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 0, 0, "IndigoSparkle2"}, {Enum.Material.Neon, Color3.fromRGB(78, 60, 177), 0, 0, nil})
+mod:add_wrap("Legendary", "Mesh", {Enum.Material.ForceField, Color3.fromRGB(0, 0, 0), 0, 0, "DarkMesh"}, {Enum.Material.ForceField, Color3.fromRGB(0, 0, 0), 0, 0, "DarkMesh"}, {Enum.Material.ForceField, Color3.fromRGB(255, 255, 255), 0, 0, "LightMesh"})
+mod:add_wrap("Legendary", "Rift", {Enum.Material.Neon, Color3.fromRGB(17, 17, 17), 0, 0, "Rift"}, {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(172, 99, 156), 0, 0, nil})
+mod:add_wrap("Legendary", "Spectral", {Enum.Material.Neon, Color3.fromRGB(55, 255, 95), 0, 0, "Spectral"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(71, 255, 203), 0, 0.4, nil}, {Enum.Material.Neon, Color3.fromRGB(92, 158, 119), 0, 0, nil})
+mod:add_wrap("Legendary", "Hologram", {Enum.Material.Neon, Color3.fromRGB(84, 138, 255), 0.6, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(84, 138, 255), 0.6, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(84, 138, 255), 0.6, 0, nil})
+mod:add_wrap("Legendary", "Bubbles", {Enum.Material.ForceField, Color3.fromRGB(255, 255, 255), 0.9, 0, "Bubbles"}, {Enum.Material.ForceField, Color3.fromRGB(255, 255, 255), 0.9, 0, "Bubbles"}, {Enum.Material.ForceField, Color3.fromRGB(255, 255, 255), 0.9, 0, "Bubbles"}, nil, "Earned by gifting other players")
+mod:add_wrap("Mythical", "Dark Matter", {"CandyGlossy", Color3.fromRGB(129, 107, 255), 0, 0, "DarkMatter1", nil, "Dark Matter"}, {"CandyGlossy", Color3.fromRGB(129, 107, 255), 0, 0, "DarkMatter2", nil, "Dark Matter"}, {Enum.Material.Neon, Color3.fromRGB(142, 98, 238), 0, 0, "DarkMatter3", nil, "Dark Matter"}, nil, "Earned from weapon contracts", "Earned from a weapon contract for this weapon")
+mod:add_wrap("Mythical", "Neon Lights", {Enum.Material.SmoothPlastic, Color3.fromRGB(42, 46, 49), 0, 0, "NeonLights1", nil, "Neon Lights"}, {Enum.Material.Neon, Color3.fromRGB(21, 0, 65), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(125, 111, 165), 0, 0, nil})
+mod:add_wrap("Mythical", "Solar", {Enum.Material.SmoothPlastic, Color3.fromRGB(98, 15, 0), 0, 0, "Solar1", nil, "Solar"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(120, 52, 21), 0, 0, "Solar2", nil, "Solar"}, {Enum.Material.Neon, Color3.fromRGB(168, 116, 78), 0, 0, nil})
+mod:add_wrap("Mythical", "Speed", {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 255, 255), 0, 0, "Speed2", nil, "Speed"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 255, 255), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(161, 105, 73), 0, 0, nil})
+mod:add_wrap("Mythical", "Celestial", {Enum.Material.Glass, Color3.fromRGB(0, 32, 96), 0.25, 0, "Celestial", nil, "Celestial"}, {Enum.Material.Metal, Color3.fromRGB(110, 116, 141), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(77, 114, 173), 0, 0, nil}, nil, "Earned by completing your Daily Tasks with a 7 day Task Streak")
+mod:add_wrap("Unobtainable", "Rivalry", {Enum.Material.SmoothPlastic, Color3.fromRGB(0, 0, 0), 0, 0, "Rivalry"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Glass, Color3.fromRGB(255, 255, 255), 0.95, 0, nil}, true, "Given to team members of the group (Nosniy Games)")
+mod:add_wrap("Unobtainable", "Scribble", {"Scribble", Color3.fromRGB(255, 255, 255), 0, 0, nil}, {"Scribble", Color3.fromRGB(0, 0, 0), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(159, 161, 172), 0, 0, nil}, true, "Obtained by submitting a concept that makes it into the game (RIVALS)")
+mod:add_wrap("Unobtainable", "Net", {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 255, 255), 0.75, 0, "Net1"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(165, 114, 55), 0, 0, "Net2"}, {Enum.Material.SmoothPlastic, Color3.fromRGB(255, 255, 255), 1, 0, "Net3"}, true, "Given to bug hunters, thank you for helping us improve the game (RIVALS)")
+mod:add_wrap("Unobtainable", "Accretion", {Enum.Material.SmoothPlastic, Color3.fromRGB(149, 167, 248), 0, 0.4, nil}, {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 0, 0, "Accretion2"}, {Enum.Material.Neon, Color3.fromRGB(0, 0, 0), 0, 0, "Accretion3"}, true, "im like hey whats up hello")
+mod:add_wrap("Unobtainable", "Eruption", {Enum.Material.Neon, Color3.fromRGB(255, 112, 69), 0, 0, "Eruption1"}, {Enum.Material.Neon, Color3.fromRGB(218, 96, 9), 0, 0, "Eruption2"}, {Enum.Material.Neon, Color3.fromRGB(168, 92, 69), 0, 0, nil}, true, "RAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
-_G.ac = applySkin
-
--- // Skinchanger Save
-
-readFile()
-READ_FILE = true
-
--- // Rest
-
-cchar()
-table.insert(initConnections, plr.CharacterAdded:Connect(cchar))
-
-queue_on_teleport(game:HttpGet(URL_ROOT..'MainSkin'))
-
-return module
+return mod
