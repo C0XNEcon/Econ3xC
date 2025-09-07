@@ -2881,7 +2881,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 			for _, droption in ipairs(Dropdown.List:GetChildren()) do
 				if droption.ClassName == "Frame" and droption.Name ~= "Placeholder" then
-					local s = DropdownSettings.SpecialOptions table.find(DropdownSettings.SpecialOptions,droption.Name)
+					local s = DropdownSettings.SpecialOptions and table.find(DropdownSettings.SpecialOptions,droption.Name)
 					local specialUnselected = Color3.fromRGB(203, 185, 96);
 					local specialSelected = Color3.fromRGB(255, 229, 28)
 					if not table.find(DropdownSettings.CurrentOption, droption.Name) then
