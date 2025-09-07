@@ -332,7 +332,7 @@ local RayfieldLibrary = {
 			ElementBackground = Color3.fromRGB(60, 45, 35),
 			ElementBackgroundHover = Color3.fromRGB(70, 50, 40),
 			SecondaryElementBackground = Color3.fromRGB(55, 40, 30),
-			ElementStroke = Color3.fromRGB(85, 60, 45),
+			ElementStroke = Color3.fromRGB(108, 76, 57),
 			SecondaryElementStroke = Color3.fromRGB(75, 50, 35),
 
 			SliderBackground = Color3.fromRGB(220, 130, 60),
@@ -2765,6 +2765,12 @@ function RayfieldLibrary:CreateWindow(Settings)
 				local frs = {}
 				for _, Option in reverseTable(DropdownSettings.Options) do
 					local DropdownOption = Elements.Template.Dropdown.List.Template:Clone()
+					local IsSpecial = DropdownSettings.SpecialOptions and table.find(DropdownSettings.SpecialOptions,Option)
+					
+					if IsSpecial then
+						DropdownOption:AddTag'Special'
+					end
+					
 					DropdownOption.Name = Option
 					DropdownOption.Title.Text = Option
 					DropdownOption.Parent = Dropdown.List
@@ -2864,7 +2870,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 					end)
 
 					Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
-						DropdownOption.UIStroke.Color = SelectedTheme.ElementStroke
+						DropdownOption.UIStroke.Color = IsSpecial and Color3.fromRGB(255, 238, 49) or SelectedTheme.ElementStroke
 					end)
 				end
 				DropdownSettings.Frames = frs
@@ -2873,17 +2879,20 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 			for _, droption in ipairs(Dropdown.List:GetChildren()) do
 				if droption.ClassName == "Frame" and droption.Name ~= "Placeholder" then
+					local s = droption:HasTag'Special'
+					local specialUnselected = Color3.fromRGB(203, 185, 96);
+					local specialSelected = Color3.fromRGB(255, 229, 28)
 					if not table.find(DropdownSettings.CurrentOption, droption.Name) then
-						droption.BackgroundColor3 = SelectedTheme.DropdownUnselected
+						droption.BackgroundColor3 = s and specialUnselected or Color3.fromRGB() SelectedTheme.DropdownUnselected
 					else
-						droption.BackgroundColor3 = SelectedTheme.DropdownSelected
+						droption.BackgroundColor3 =s and specialSelected or  SelectedTheme.DropdownSelected
 					end
 
 					Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
 						if not table.find(DropdownSettings.CurrentOption, droption.Name) then
-							droption.BackgroundColor3 = SelectedTheme.DropdownUnselected
+							droption.BackgroundColor3 = s and specialUnselected or SelectedTheme.DropdownUnselected
 						else
-							droption.BackgroundColor3 = SelectedTheme.DropdownSelected
+							droption.BackgroundColor3 = s and specialSelected or SelectedTheme.DropdownSelected
 						end
 					end)
 				end
