@@ -2883,9 +2883,9 @@ function RayfieldLibrary:CreateWindow(Settings)
 					local specialUnselected = Color3.fromRGB(203, 185, 96);
 					local specialSelected = Color3.fromRGB(255, 229, 28)
 					if not table.find(DropdownSettings.CurrentOption, droption.Name) then
-						droption.BackgroundColor3 = s and specialUnselected or Color3.fromRGB() SelectedTheme.DropdownUnselected
+						droption.BackgroundColor3 = s and specialUnselected or SelectedTheme.DropdownUnselected
 					else
-						droption.BackgroundColor3 =s and specialSelected or  SelectedTheme.DropdownSelected
+						droption.BackgroundColor3 = s and specialSelected or  SelectedTheme.DropdownSelected
 					end
 
 					Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
