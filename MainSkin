@@ -107,7 +107,7 @@ local __REQUIRE = function(name:string, URL:string)
 	TOTAL_UTILS += 1
 
 	task.spawn(function()
-		local REQUIRED_URL = not RELOAD[name] and _G[name] or loadstring(game:HttpGet(`{URL_ROOT}{URL}`))()
+		local REQUIRED_URL = not RELOAD[name] and _G[name] or loadstring(game:HttpGet(URL_ROOT..URL))()
 		UTILS[name] = REQUIRED_URL;
 		_G[name] = REQUIRED_URL;
 		
