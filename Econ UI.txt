@@ -2761,8 +2761,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 				return _NEW
 			end
 			
-			local specialUnselected = Color3.fromRGB(203, 185, 96);
-			local specialSelected = Color3.fromRGB(255, 229, 28)
+			local specialUnselected = Color3.fromRGB(157, 142, 74);
+			local specialSelected = Color3.fromRGB(239, 233, 71)
 			
 			local function SetDropdownOptions()
 				local frs = {}
@@ -2833,7 +2833,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 								Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
 							end
 							TweenService:Create(DropdownOption.UIStroke, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
-							TweenService:Create(DropdownOption, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundColor3 = IsSpecial and (_G.ECON_VARS and _G.ECON_VARS.SPECIAL_COLOR or Color3.fromRGB(255, 245, 111)) or SelectedTheme.DropdownSelected}):Play()
+							TweenService:Create(DropdownOption, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundColor3 = IsSpecial and (_G.SPECIAL_COLOR or specialSelected) or SelectedTheme.DropdownSelected}):Play()
 							Debounce = true
 						end
 
@@ -2848,7 +2848,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 						for _, droption in ipairs(Dropdown.List:GetChildren()) do
 							if droption.ClassName == "Frame" and droption.Name ~= "Placeholder" and not table.find(DropdownSettings.CurrentOption, droption.Name) then
 								local s = DropdownSettings.SpecialOptions and table.find(DropdownSettings.SpecialOptions,droption.Name)
-								TweenService:Create(droption, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundColor3 = s and specialUnselected or SelectedTheme.DropdownUnselected}):Play()
+								TweenService:Create(droption, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundColor3 = s and (_G.SPECIAL_UNSELECTED_COLOR or specialUnselected) or SelectedTheme.DropdownUnselected}):Play()
 							end
 						end
 						
@@ -2886,8 +2886,6 @@ function RayfieldLibrary:CreateWindow(Settings)
 			for _, droption in ipairs(Dropdown.List:GetChildren()) do
 				if droption.ClassName == "Frame" and droption.Name ~= "Placeholder" then
 					local s = DropdownSettings.SpecialOptions and table.find(DropdownSettings.SpecialOptions,droption.Name)
-					local specialUnselected = Color3.fromRGB(203, 185, 96);
-					local specialSelected = Color3.fromRGB(255, 229, 28)
 					if not table.find(DropdownSettings.CurrentOption, droption.Name) then
 						droption.BackgroundColor3 = s and specialUnselected or SelectedTheme.DropdownUnselected
 					else
@@ -2937,13 +2935,15 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 				for _, droption in ipairs(Dropdown.List:GetChildren()) do
 					if droption.ClassName == "Frame" and droption.Name ~= "Placeholder" then
+						local s = DropdownSettings.SpecialOptions and table.find(DropdownSettings.SpecialOptions,droption.Name)
 						if not table.find(DropdownSettings.CurrentOption, droption.Name) then
-							droption.BackgroundColor3 = SelectedTheme.DropdownUnselected
+							droption.BackgroundColor3 = s and specialUnselected or SelectedTheme.DropdownUnselected
 						else
-							droption.BackgroundColor3 = SelectedTheme.DropdownSelected
+							droption.BackgroundColor3 = s and specialSelected or  SelectedTheme.DropdownSelected
 						end
 					end
 				end
+
 				--SaveConfiguration()
 			end
 
