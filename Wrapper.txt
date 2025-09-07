@@ -1,9 +1,11 @@
 local mod = {}
 local wraps = {}
+local nameWraps = {}
 
 local run = game:GetService('RunService')
 
 function mod:add_wrap(rarity, name, group1, group2, group3, desc)
+	table.insert(nameWraps,name)
 	wraps[name] = {
 		rarity = rarity,
 		desc = desc,
@@ -14,7 +16,7 @@ function mod:add_wrap(rarity, name, group1, group2, group3, desc)
 end
 
 function mod:getAll()
-	return wraps
+	return nameWraps
 end
 
 _G.speed = .008
