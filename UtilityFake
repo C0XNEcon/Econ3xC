@@ -32,9 +32,9 @@ _G.ffunc = function(name, anim, dur)
 			stopped = true
 		end)
 
-		task.wait(dur*_G.durr)
+		local waitResult = wait(dur)
 		if z then z:Disconnect() end
-		return anim and anim.IsPlaying and not stopped and not table.find(_G.silenced, anim)
+		return anim and anim.IsPlaying and not stopped and not table.find(_G.silenced, anim) and waitResult
 	end
 end
 
