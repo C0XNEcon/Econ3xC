@@ -2762,7 +2762,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 			end
 			
 			local specialUnselected = Color3.fromRGB(157, 142, 74);
-			local specialSelected = Color3.fromRGB(239, 233, 71)
+			local specialSelected = Color3.fromRGB(197, 173, 76);
 			
 			local function SetDropdownOptions()
 				local frs = {}
@@ -2772,6 +2772,11 @@ function RayfieldLibrary:CreateWindow(Settings)
 					
 					if IsSpecial then
 						DropdownOption:AddTag'Special'
+						
+						local stroke = Instance.new('UIStroke',DropdownOption.Title);
+						stroke.Thickness = 2;
+						stroke.Color = Color3.new(0,0,0);
+						stroke.Transparency = .5
 					end
 					
 					DropdownOption.Name = Option
