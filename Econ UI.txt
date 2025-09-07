@@ -332,7 +332,7 @@ local RayfieldLibrary = {
 			ElementBackground = Color3.fromRGB(60, 45, 35),
 			ElementBackgroundHover = Color3.fromRGB(70, 50, 40),
 			SecondaryElementBackground = Color3.fromRGB(55, 40, 30),
-			ElementStroke = Color3.fromRGB(108, 76, 57),
+			ElementStroke = Color3.fromRGB(81, 57, 43),
 			SecondaryElementStroke = Color3.fromRGB(75, 50, 35),
 
 			SliderBackground = Color3.fromRGB(220, 130, 60),
@@ -2868,6 +2868,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 							SaveConfiguration()
 						end
 					end)
+					
+					DropdownOption.UIStroke.Color = IsSpecial and Color3.fromRGB(255, 238, 49) or SelectedTheme.ElementStroke
 
 					Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
 						DropdownOption.UIStroke.Color = IsSpecial and Color3.fromRGB(255, 238, 49) or SelectedTheme.ElementStroke
@@ -2879,7 +2881,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 			for _, droption in ipairs(Dropdown.List:GetChildren()) do
 				if droption.ClassName == "Frame" and droption.Name ~= "Placeholder" then
-					local s = droption:HasTag'Special'
+					local s = DropdownSettings.SpecialOptions table.find(DropdownSettings.SpecialOptions,droption.Name)
 					local specialUnselected = Color3.fromRGB(203, 185, 96);
 					local specialSelected = Color3.fromRGB(255, 229, 28)
 					if not table.find(DropdownSettings.CurrentOption, droption.Name) then
