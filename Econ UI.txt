@@ -2774,9 +2774,9 @@ function RayfieldLibrary:CreateWindow(Settings)
 						DropdownOption:AddTag'Special'
 						
 						local stroke = Instance.new('UIStroke',DropdownOption.Title);
-						stroke.Thickness = 2.5;
+						stroke.Thickness = 3;
 						stroke.Color = Color3.new(0,0,0);
-						stroke.Transparency = .85
+						stroke.Transparency = .95
 					end
 					
 					DropdownOption.Name = Option
