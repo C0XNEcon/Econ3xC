@@ -19,7 +19,7 @@ return {
 		
 		-- // Main
 		
-		local function __handleFighterInterface(ui)
+		__RET.__handleFighterInterface = function(ui)
 			if ui.Name == plr.Name then
 				local funcs = {}
 
@@ -163,7 +163,7 @@ return {
 		end
 		
 		for _, v in fighterInterfaces:GetChildren() do
-			__handleFighterInterface(v)
+			__RET.__handleFighterInterface(v)
 		end
 
 		-- //
