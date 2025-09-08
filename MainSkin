@@ -216,7 +216,7 @@ end
 
 __REQUIRE('SKIN_MOD','Skin'); __REQUIRE('RIVALS_UTILS','UtilityFake'); __REQUIRE('SKIN_INFO','SkinInfo');
 __REQUIRE('SKIN_SOUND_CODE','AnimSound'); __REQUIRE('WEAPON_TYPES','WeaponTypes'); __REQUIRE('ID_CHANGER','IDChanger');
-__REQUIRE('WRAPPER_MOD','Wrapper.txt'); __REQUIRE('ECON_UI','Econ%20UI.txt'); __REQUIRE('VISUALS_UI','VisualsUI')
+__REQUIRE('WRAPPER_MOD','Wrapper'); __REQUIRE('ECON_UI','Econ%20UI.txt'); __REQUIRE('VISUALS_UI','VisualsUI')
 
 -- // Extra Vars
 
