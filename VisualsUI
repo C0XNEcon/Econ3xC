@@ -1,0 +1,173 @@
+return {
+	init = function(UTILS:{})
+		local __RET = {}
+		
+		-- // Services
+
+		local players = game:GetService('Players')
+		local run = game:GetService('RunService')
+
+		-- // Vars
+		
+		local plr = players.LocalPlayer
+		local mainUI = plr.PlayerGui.MainGui.MainFrame
+		local fighterInterfaces = mainUI.FighterInterfaces
+		
+		local ECON_VARS = _G.ECON_VARS
+
+		local is = ECON_VARS.TIMES_EXECUTED > 1
+		
+		-- // Main
+		
+		local function __handleFighterInterface(ui)
+			if ui.Name == plr.Name then
+				local funcs = {}
+
+				local items = ui.Items.Container
+
+				funcs.handleSlot = function(v)
+					local _selected = _G.toskin[v.Name]
+					if _selected then
+						local icon = v.Icon :: ImageLabel
+						icon.ResampleMode = Enum.ResamplerMode[_selected:find('Pixel') and 'Pixelated' or 'Default'] 
+						icon.Image = UTILS.SKIN_MOD.viewmodels[_selected].image
+					end
+				end
+
+				-- //
+
+				items.ChildAdded:Connect(funcs.handleSlot)
+				for _, v in items:GetChildren() do
+					funcs.handleSlot(v)
+				end
+			end
+		end
+		
+		if not is then
+			local MAIN_UI = mainUI.Equipment.Weapons.Container.List.Container
+
+			local function handle(v)
+				local b = v:FindFirstChild('Button')
+				b = b and b:FindFirstChild('Icon')
+
+				local xico = b and b:FindFirstChild('UICorner')
+				local n = v.Name == 'EquipmentWeaponSlot'
+				if n and b and not xico then
+					local function calc()
+						local ts = UTILS.SKIN_MOD.its[b.Image]
+						local tog = UTILS.SKIN_INFO.skinToOg[ts] or ts
+						local tocur = _G.toskin[tog]
+						if tocur and tocur ~= 'Dont Change' then
+							b.Image = UTILS.SKIN_MOD.viewmodels[tocur].image
+						end
+					end
+
+					calc()
+					b:GetPropertyChangedSignal('Image'):Connect(calc)
+				elseif n and b and xico then
+
+				end
+			end
+
+			for _, v in MAIN_UI:GetChildren() do
+				handle(v)
+			end
+
+			MAIN_UI.ChildAdded:Connect(handle)
+			
+			-- // UI 2
+			
+			local function checkfor(v)
+				task.spawn(function()
+					local typ = v.Name == 'PickWeapons' and 1 or v.Name == 'PickWeaponsList' and 2 or 0
+					if typ>0 and not v:HasTag('Econ') then
+						local chosen = v:WaitForChild('ChosenWeapons')
+						local list = typ == 1 and v:WaitForChild('List') or v:WaitForChild('ListContainer').List
+
+						v:AddTag'Econ'
+
+						local cons = {}
+
+						if chosen and list then
+							list = list.Container
+
+							-- // LIST
+
+							local function handle(v)
+								task.spawn(function()
+									local b = v.Name:find('PickWeapon') and v:WaitForChild('Button')
+									if b and b:FindFirstChild('Icon') and b.Icon:FindFirstChild('Picture') then
+										b = b.Icon.Picture
+										b.Name = 'OPic'
+
+										local function calc()
+											local ts = UTILS.SKIN_MOD.its[b.Image]
+											local tog = UTILS.SKIN_INFO.skinToOg[ts] or ts
+											local tocur = _G.toskin[tog]
+											if tocur and tocur ~= 'Dont Change' then
+												b.Image = UTILS.SKIN_MOD.viewmodels[tocur].image
+											end
+										end
+
+										calc()
+										table.insert(cons, b:GetPropertyChangedSignal('Image'):Connect(calc))
+									end
+								end)
+							end
+
+							for _, v in list:GetChildren() do
+								handle(v)
+							end
+
+							local con = list.ChildAdded:Connect(handle)
+							table.insert(cons, con)
+
+							-- // MAIN SELECTION
+
+							local function handle2(v)
+								task.spawn(function()
+									if v.Name:find('ChosenSlot') then
+										local b = v.Button.Picture
+										local function calc()
+											local ts = UTILS.SKIN_MOD.its[b.Image]
+											local tog = UTILS.SKIN_INFO.skinToOg[ts] or ts
+											local tocur = _G.toskin[tog]
+											if tocur and tocur ~= 'Dont Change' then
+												b.Image = UTILS.SKIN_MOD.viewmodels[tocur].image
+											end
+										end
+
+										calc()
+										table.insert(cons, b:GetPropertyChangedSignal('Image'):Connect(calc))
+									end
+								end)
+							end
+
+							for _, v in chosen:GetChildren() do
+								handle2(v)
+							end
+
+							table.insert(cons, chosen.ChildAdded:Connect(handle2))
+						end
+					end
+				end)
+			end
+
+			local pages = mainUI.Pages
+
+			if pages:FindFirstChild('PickWeapons') then
+				checkfor(pages.PickWeapons)
+			end
+
+			pages.ChildAdded:Connect(checkfor)
+		end
+		
+		for _, v in fighterInterfaces:GetChildren() do
+			__handleFighterInterface(v)
+		end
+
+		-- //
+		
+		return __RET
+	end,
+}
