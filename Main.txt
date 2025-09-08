@@ -136,26 +136,28 @@ local function _reloadcar(itemSlot)
 
 		local con = _connis[i]
 		if con then con:Disconnect() end
+		
+		pcall(function()
+			local conni = nil
+			conni = itemSlot.Cooldowns.ChildAdded:Connect(function(v)
+				if v:IsA('Frame') and v.Icon.Image == ACCEPTEDCOOLDOWN and reload then
+					conni:Disconnect()
+					task.delay(.1, function()
+						for i = 1, 4 do
+							mousescroll(2345)
+							RunService.RenderStepped:Wait()
+						end
+					end)
+				elseif v:IsA('Frame') then
+					table.insert(NOCARRELOAD, v.Name)
+					conni:Disconnect()
+				end
+			end)
+			
+			table.insert(initConnections, conni)
 
-		local conni = nil
-		conni = itemSlot.Cooldowns.ChildAdded:Connect(function(v)
-			if v:IsA('Frame') and v.Icon.Image == ACCEPTEDCOOLDOWN and reload then
-				conni:Disconnect()
-				task.delay(.1, function()
-					for i = 1, 4 do
-						mousescroll(2345)
-						RunService.RenderStepped:Wait()
-					end
-				end)
-			elseif v:IsA('Frame') then
-				table.insert(NOCARRELOAD, v.Name)
-				conni:Disconnect()
-			end
+			_connis[i] = conni
 		end)
-
-		table.insert(initConnections, conni)
-
-		_connis[i] = conni
 	end
 end
 
@@ -358,28 +360,28 @@ local lerp = 1
 local sens = 1
 local ads = 1
 
-local function moveMouseToWorldPosition(targetPos)
-	local camera = workspace.CurrentCamera
-	local camPos = camera.CFrame.Position
-	local camLook = camera.CFrame.LookVector
+local Camera = workspace.CurrentCamera
 
-	local currentDir = camLook.Unit
-	local currentPitch = math.asin(currentDir.Y)
-	local currentYaw = math.atan2(-currentDir.X, -currentDir.Z)
+local function moveMouseToWorldPosition(targetVector3)
+	local screenSize = Camera.ViewportSize
+	local screenCenter = Vector2.new(screenSize.X / 2, screenSize.Y / 2)
 
-	local targetDir = (targetPos - camPos).Unit
-	local targetPitch = math.asin(targetDir.Y)
-	local targetYaw = math.atan2(-targetDir.X, -targetDir.Z)
+	local pos2, isOnScreen = Camera:WorldToViewportPoint(targetVector3)
+	if pos2.Z <= 0 then
+		pos2 *= -1
+	end
 
-	local deltaYaw = targetYaw - currentYaw
-	local deltaPitch = targetPitch - currentPitch
+	local viewportSize = workspace.CurrentCamera.ViewportSize
+	pos2 = Vector3.new(math.clamp(pos2.X, 0, viewportSize.X),math.clamp(pos2.Y, 0, viewportSize.Y),0)
+	
+	if isOnScreen then
+		local targetScreenPos = Vector2.new(pos2.X, pos2.Y)
+		local delta = targetScreenPos - screenCenter
+		local moveX = delta.X
+		local moveY = delta.Y
 
-	local sensitivity = 170*mousesens()*sens*ads
-
-	local moveX = deltaYaw * sensitivity
-	local moveY = -deltaPitch * sensitivity
-
-	mousemoverel(-moveX*lerp, moveY*lerp)
+		mousemoverel(moveX, moveY)
+	end
 end
 
 local last = false
@@ -421,7 +423,7 @@ local function car(right, needs)
 			end
 
 			-- a/i/m/p/o/s
-			local apos = pos+Vector3.new(Random.new(.3, -.3), Random.new(-.2, -2), Random.new(.3, -.3))
+			local apos = pos--+Vector3.new(Random.new(.3, -.3), Random.new(-.2, -2), Random.new(.3, -.3))
 			local l = Camera.CFrame
 
 			--if right and weapon == 'Knife' then
@@ -430,7 +432,7 @@ local function car(right, needs)
 			--end
 
 			if weapon == 'Daggers' or weapon == 'Bow' then
-				apos += Vector3.new(0, 2, 0)
+				apos += Vector3.new(0, 1, 0)
 			end
 
 			local x, y, z = targetHead.CFrame:ToOrientation()
@@ -530,7 +532,7 @@ local Keybind = homeTab:CreateKeybind({
 					car(true, true)
 				end
 			end)
-			
+
 			keytrack = a
 		elseif keytrack then
 			keytrack:Disconnect()
