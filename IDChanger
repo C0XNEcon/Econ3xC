@@ -11,7 +11,6 @@ return {
 
 		local plr = players.LocalPlayer
 
-		local CURRENT_ID = plr.UserId
 		local ID_CHANGED_FUNCS = {}
 		local ECON_VARS = _G.ECON_VARS
 
@@ -37,7 +36,7 @@ return {
 		local function getIcon()
 			local content = nil
 			local isReady = nil
-			local id = CURRENT_ID or plr.UserId
+			local id = ECON_VARS.CURRENT_ID or plr.UserId
 			local s = ECON_VARS.SAVED_ICONS[id]
 
 			if s then
@@ -65,7 +64,7 @@ return {
 
 		__RET.cchar = function(id:number)
 			task.spawn(function()
-				local id = typeof(id) == 'number' and id or CURRENT_ID
+				local id = typeof(id) == 'number' and id or ECON_VARS.CURRENT_ID
 				if not id then return end
 
 				local lid = loadedids[id]
