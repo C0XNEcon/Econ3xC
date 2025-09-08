@@ -10,6 +10,8 @@ return {
 		-- // Vars
 		
 		local plr = players.LocalPlayer
+		local scripts = plr.PlayerScripts
+
 		local mainUI = plr.PlayerGui.MainGui.MainFrame
 		local fighterInterfaces = mainUI.FighterInterfaces
 		
@@ -41,6 +43,53 @@ return {
 					funcs.handleSlot(v)
 				end
 			end
+		end
+		
+		__RET.createSparklesFrame = function(f)
+			local __ret = {}
+
+			local sparkleCooldown = .75
+			local lastSparkle = tick()
+			local sparkles = {}
+
+			function __ret:Update()
+				if tick()-lastSparkle > sparkleCooldown then
+					lastSparkle = tick()
+
+					local size = 0.375 + 0.25 * math.random() * 3
+					local clone = scripts.UserInterface.PrimeSparkle:Clone()
+					clone.Size = UDim2.new(size, 0, size, 0)
+
+					clone.Position = UDim2.new(0.5, (math.random() - 0.5) * f.AbsoluteSize.X, 0.5, (math.random() - 0.5) * f.AbsoluteSize.Y)
+					clone.Rotation = math.random() * 360
+					clone.Parent = f
+					clone:TweenSize(UDim2.new(), "In", "Back", 2, true)
+
+					table.insert(sparkles,{
+						object = clone;
+						spawnTick = tick();
+					})
+				end
+
+				for i, v in sparkles do
+					if tick()-v.spawnTick > 2 then
+						v.object:Destroy()
+						table.remove(sparkles,i)
+					else
+						v.object.Rotation += .01*180
+					end
+				end
+			end
+
+			function __ret:Destroy()
+				for _, v in sparkles do
+					v.object:Destroy()
+				end
+
+				__ret = nil
+			end
+
+			return __ret
 		end
 		
 		if not is then
