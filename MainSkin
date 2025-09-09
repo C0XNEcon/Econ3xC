@@ -69,6 +69,17 @@ local module = {
 
 ]]
 
+----------- [ Executor Functions ] -----------
+
+local request = (syn and syn.request) or (fluxus and fluxus.request) or (http and http.request) or http_request or request
+
+local __GETURL = function(URL)
+	local ECON_TOKEN = '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'
+	return request({Url = URL_ROOT..URL; Method = 'GET'; Headers = {
+		Authorization = `token {ECON_TOKEN}`;
+	}})
+end
+
 ----------- [ Services ] -----------
 
 local httpserv = game:GetService'HttpService'
@@ -79,10 +90,6 @@ local uis = game:GetService'CoreGui'
 local cs = game:GetService'TextChatService'
 local rep = game:GetService'ReplicatedStorage'
 local workspace = game:GetService'Workspace'
-
------------ [ Executor Functions ] -----------
-
-local request = (syn and syn.request) or (fluxus and fluxus.request) or (http and http.request) or http_request or request
 
 ----------- [ Player Assets ] -----------
 
@@ -161,13 +168,12 @@ end
 local RELOAD = {'ECON_UI'}
 local UTILS = {}
 local TOTAL_UTILS = 0
+
 local __REQUIRE = function(name, URL)
 	TOTAL_UTILS += 1
 
 	task.spawn(function()
-		local response = request({Url = URL_ROOT..URL; Method = 'GET'; Headers = {
-			Authorization = 'token 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';
-		}})
+		local response = __GETURL(URL)
 		
 		-- // Main
 		
@@ -424,10 +430,7 @@ end
 
 local UI_WINDOW = UTILS.ECON_UI:CreateWindow({
 	Name = 'Econ',
-	Icon = nil,
-	LoadingTitle = '',
-	LoadingSubtitle = "by ConePartyy",
-	Theme = "AmberGlow", 
+	Theme = 'AmberGlow', 
 
 	DisableEconFieldPrompts = true,
 	DisableBuildWarnings = true,
@@ -442,7 +445,6 @@ local UI_WINDOW = UTILS.ECON_UI:CreateWindow({
 -- // Wrap File Work
 
 local ERR_NSC = 'Econ was not saved correctly last session'
-
 local ECON_FILE = 'EconContainer'
 local READ_FILE = false
 
@@ -1350,4 +1352,4 @@ table.insert(evars.INIT_CONS, plr.CharacterAdded:Connect(UTILS.ID_CHANGER.cchar)
 
 -- //
 
-queue_on_teleport(game:HttpGet(URL_ROOT..'MainSkin'))
+queue_on_teleport(__GETURL'MainSkin')
