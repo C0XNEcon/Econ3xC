@@ -14,7 +14,7 @@ local ECON_TOKEN = 'github_pat_11BSUTHEQ0eYpjHPBVtXvk_FqpYY0warC8RimZu90aJBjEzql
 local __GETURL = function(URL)
 	return request({Url = URL_ROOT..URL; Method = 'GET'; Headers = {
 		Authorization = `token {ECON_TOKEN}`;
-	}})
+	}}).Body
 end
 
 ----------- [ Services ] -----------
@@ -386,12 +386,8 @@ local function moveMouseToWorldPosition(targetVector3)
 	pos2 = Vector3.new(math.clamp(pos2.X, 0, viewportSize.X),math.clamp(pos2.Y, 0, viewportSize.Y),0)
 
 	if isOnScreen then
-		local targetScreenPos = Vector2.new(pos2.X, pos2.Y)
-		local delta = targetScreenPos - screenCenter
-		local moveX = delta.X
-		local moveY = delta.Y
-
-		mousemoverel(moveX, moveY)
+		local delta = Vector2.new(pos2.X, pos2.Y) - screenCenter
+		mousemoverel(delta.X, delta.Y)
 	end
 end
 
@@ -419,10 +415,10 @@ task.spawn(function()
 	end
 end)
 
-local function car(right, needs)
+local function car(right, needs, head)
 	local weapon = getWeapon()
 	if (spactivate or silactive or needs) and weapon and (not table.find(carRight, weapon) or needs) then
-		local targetHead = f or getNearestHead()
+		local targetHead = head or f or getNearestHead()
 		if targetHead then
 			f = nil
 
@@ -436,12 +432,7 @@ local function car(right, needs)
 			-- a/i/m/p/o/s
 			local apos = pos--+Vector3.new(Random.new(.3, -.3), Random.new(-.2, -2), Random.new(.3, -.3))
 			local l = Camera.CFrame
-
-			--if right and weapon == 'Knife' then
-			--	f = targetHead
-			--	playSound(nil, knifeSound)
-			--end
-
+			
 			if weapon == 'Daggers' or weapon == 'Bow' then
 				apos += Vector3.new(0, 1, 0)
 			end
@@ -492,7 +483,18 @@ table.insert(initConnections, m.Button2Down:Connect(function()
 	down2 = true
 	if spactivate then
 		curr = true
-		local a = RunService.RenderStepped:Connect(car)
+		
+		local lhead = nil
+		local a = RunService.RenderStepped:Connect(function()
+			if not lhead then
+				lhead = getNearestHead()
+			end
+			
+			if lhead then
+				car(true,false,lhead)
+			end
+		end)
+		
 		table.insert(cons, a)
 	end
 end))
