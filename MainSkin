@@ -151,6 +151,9 @@ if not table.find(module.SCRIPT_WHITELIST,plr.UserId) then
 	plr:Kick("You don't have permission to use this script")
 	plr.Parent = nil
 	return
+elseif not request then
+	plr:Kick('Your executor is not supported for this script')
+	return
 end
 
 -- // Loading
@@ -174,6 +177,7 @@ local __REQUIRE = function(name, URL)
 		
 		if not suc then
 			warn(`[{name}]: {res}`)
+			return
 		end
 		
 		local REQUIRED_URL = not RELOAD[name] and _G[name] or res
