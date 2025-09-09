@@ -386,7 +386,7 @@ local function moveMouseToWorldPosition(targetVector3)
 	pos2 = Vector3.new(math.clamp(pos2.X, 0, viewportSize.X),math.clamp(pos2.Y, 0, viewportSize.Y),0)
 
 	if isOnScreen then
-		local delta = Vector2.new(pos2.X, pos2.Y) - screenCenter
+		local delta = (Vector2.new(pos2.X, pos2.Y) - screenCenter)*lerp
 		mousemoverel(delta.X, delta.Y)
 	end
 end
