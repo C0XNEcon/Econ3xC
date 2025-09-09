@@ -1,10 +1,33 @@
+--[[
+
+-- This script was made by @ConePartyy on Roblox. TODO: This script has been discontinued, it will
+   no longer receive further updates, but will update when a new key gets added.
+
+]]
+
+----------- [ Executor Functions ] -----------
+
+local request = (syn and syn.request) or (fluxus and fluxus.request) or (http and http.request) or http_request or request
+
+local __GETURL = function(URL)
+	local ECON_TOKEN = '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'
+	return request({Url = URL_ROOT..URL; Method = 'GET'; Headers = {
+		Authorization = `token {ECON_TOKEN}`;
+	}})
+end
+
+----------- [ Services ] -----------
+
 local last = game
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ts = game:GetService('TweenService')
+
+----------- [ Main ] -----------
 
 local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
@@ -136,7 +159,7 @@ local function _reloadcar(itemSlot)
 
 		local con = _connis[i]
 		if con then con:Disconnect() end
-		
+
 		pcall(function()
 			local conni = nil
 			conni = itemSlot.Cooldowns.ChildAdded:Connect(function(v)
@@ -153,7 +176,7 @@ local function _reloadcar(itemSlot)
 					conni:Disconnect()
 				end
 			end)
-			
+
 			table.insert(initConnections, conni)
 
 			_connis[i] = conni
@@ -169,8 +192,8 @@ table.insert(initConnections, _items.ChildAdded:Connect(_reloadcar))
 
 -- // EconField Setup
 
-local EconField = loadstring(game:HttpGet(z..'Econ%20UI.txt'))()
-local wrapper = loadstring(game:HttpGet(z..'Wrapper.txt'))()
+local EconField = loadstring(__GETURL'Econ UI.txt')()
+local wrapper = loadstring(__GETURL'Wrapper')()
 
 local Window = EconField:CreateWindow({
 	Name = "Econ",
@@ -373,7 +396,7 @@ local function moveMouseToWorldPosition(targetVector3)
 
 	local viewportSize = workspace.CurrentCamera.ViewportSize
 	pos2 = Vector3.new(math.clamp(pos2.X, 0, viewportSize.X),math.clamp(pos2.Y, 0, viewportSize.Y),0)
-	
+
 	if isOnScreen then
 		local targetScreenPos = Vector2.new(pos2.X, pos2.Y)
 		local delta = targetScreenPos - screenCenter
@@ -1286,4 +1309,4 @@ end))
 
 EconField.LoadConfiguration()
 
-queue_on_teleport(game:HttpGet(z..'Main.txt'))
+queue_on_teleport(__GETURL'Main.txt')
