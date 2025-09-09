@@ -73,8 +73,9 @@ local module = {
 
 local request = (syn and syn.request) or (fluxus and fluxus.request) or (http and http.request) or http_request or request
 
+local URL_ROOT = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/'
+local ECON_TOKEN = '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'
 local __GETURL = function(URL)
-	local ECON_TOKEN = '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'
 	return request({Url = URL_ROOT..URL; Method = 'GET'; Headers = {
 		Authorization = `token {ECON_TOKEN}`;
 	}})
@@ -117,8 +118,6 @@ local weaponSounds = scripts.Modules.ClientReplicatedClasses.ClientFighter.Clien
 local hitmarkerSounds = weaponSounds.ClientViewModel
 
 ----------- [ Main ] -----------
-
-local URL_ROOT = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/'
 
 local VARS = _G.ECON_VARS
 
