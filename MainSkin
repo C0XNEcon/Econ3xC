@@ -78,7 +78,7 @@ local ECON_TOKEN = 'github_pat_11BSUTHEQ0eYpjHPBVtXvk_FqpYY0warC8RimZu90aJBjEzql
 local __GETURL = function(URL)
 	return request({Url = URL_ROOT..URL; Method = 'GET'; Headers = {
 		Authorization = `token {ECON_TOKEN}`;
-	}})
+	}}).Body
 end
 
 ----------- [ Services ] -----------
@@ -177,7 +177,7 @@ local __REQUIRE = function(name, URL)
 		-- // Main
 		
 		local suc, res = pcall(function()
-			return loadstring(response.Body)()
+			return loadstring(response)()
 		end)
 		
 		if not suc then
