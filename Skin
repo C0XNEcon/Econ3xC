@@ -1,13 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local animlib = loadstring(game:HttpGet('https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/Anim'))()
 
 local mod = {
 	viewmodels = {},
 	viewmodelorder = {},
 	its = {},
 }
-
-_G.animLib = animlib
 
 local qtbl = {}
 local at = 0
@@ -56,14 +53,6 @@ local function add_viewmodel(name, icon, iconhigh, imagecenter, elimImg, elimImg
 			itbl.animsReverse[anim] = name
 			itbl.anims[name] = anim
 		end
-	end
-
-	-- // Checking Animation Availability
-
-	local p1, p2, p3 = pairs(itbl.anims)
-	for _, anim in pairs(itbl.anims) do
-		local var81 = animlib.Info[anim]
-		assert(var81, 'bro your animation doesnt exist: '..anim)
 	end
 
 	-- // Adding Extra Item Info
