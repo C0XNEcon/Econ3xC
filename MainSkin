@@ -1,6 +1,6 @@
 -- This script was made by @ConePartyy on Roblox, TODO: do not use this without my permission.
 
-local module = {
+local module = {	
 	canPlay = {
 		'rbxassetid://13158735106', 
 		'rbxassetid://13158734943', 
@@ -71,7 +71,7 @@ local module = {
 
 ----------- [ Services ] -----------
 
-local http = game:GetService'HttpService'
+local httpserv = game:GetService'HttpService'
 local players = game:GetService'Players'
 local run = game:GetService'RunService'
 local ss = game:GetService'SoundService'
@@ -79,6 +79,10 @@ local uis = game:GetService'CoreGui'
 local cs = game:GetService'TextChatService'
 local rep = game:GetService'ReplicatedStorage'
 local workspace = game:GetService'Workspace'
+
+----------- [ Executor Functions ] -----------
+
+local request = (syn and syn.request) or (fluxus and fluxus.request) or (http and http.request) or http_request or request
 
 ----------- [ Player Assets ] -----------
 
@@ -158,13 +162,21 @@ local __REQUIRE = function(name, URL)
 	TOTAL_UTILS += 1
 
 	task.spawn(function()
-		local success, response = pcall(function()
-			return game:HttpGet(`{URL_ROOT}{URL}`, true, {Headers = {Authorization = `token {module.token}`}})
-		end)
+		local response = request({Url = URL_ROOT..URL; Method = 'GET'; Headers = {
+			Authorization = 'token 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';
+		}})
 		
 		-- // Main
 		
-		local REQUIRED_URL = not RELOAD[name] and _G[name] or loadstring(response)()
+		local suc, res = pcall(function()
+			return loadstring(response.Body)()
+		end)
+		
+		if not suc then
+			warn(`[{name}]: {res}`)
+		end
+		
+		local REQUIRED_URL = not RELOAD[name] and _G[name] or res
 		UTILS[name] = REQUIRED_URL;
 		_G[name] = REQUIRED_URL;
 
@@ -216,7 +228,7 @@ end
 
 __REQUIRE('SKIN_MOD','Skin'); __REQUIRE('RIVALS_UTILS','UtilityFake'); __REQUIRE('SKIN_INFO','SkinInfo');
 __REQUIRE('SKIN_SOUND_CODE','AnimSound'); __REQUIRE('WEAPON_TYPES','WeaponTypes'); __REQUIRE('ID_CHANGER','IDChanger');
-__REQUIRE('WRAPPER_MOD','Wrapper'); __REQUIRE('ECON_UI','Econ%20UI.txt'); __REQUIRE('VISUALS_UI','VisualsUI')
+__REQUIRE('WRAPPER_MOD','Wrapper'); __REQUIRE('ECON_UI','Econ%20UI.txt'); __REQUIRE('VISUALS_UI','VisualsUI'); __REQUIRE('ANIM_LIB','Anim')
 
 -- // Extra Vars
 
@@ -1043,7 +1055,7 @@ function applySkin(skinName, cs)
 					for prename, name in UTILS.SKIN_MOD.viewmodels[ig].anims do
 						local vmi = UTILS.SKIN_MOD.viewmodels[ig]
 
-						local id = _G.animLib.Info[name].AnimationID
+						local id = UTILS.ANIM_LIB.Info[name].AnimationID
 						local animType = vmi.animsReverse[name]
 
 						_ogprentoid[prename] = id
@@ -1055,7 +1067,7 @@ function applySkin(skinName, cs)
 						local new = UTILS.SKIN_MOD.viewmodels[skinName]
 						local typeToReal = new.anims[animType]
 
-						local nowid = _G.animLib.Info[typeToReal]
+						local nowid = UTILS.ANIM_LIB.Info[typeToReal]
 
 						if nowid then
 							table.insert(inz, prename)
@@ -1087,7 +1099,7 @@ function applySkin(skinName, cs)
 
 					for prename, name in UTILS.SKIN_MOD.viewmodels[skinName].anims do
 						if not table.find(inz, prename) then
-							local nowid = _G.animLib.Info[name]
+							local nowid = UTILS.ANIM_LIB.Info[name]
 
 							if nowid.AnimationID then
 								local SOUND_CODE = UTILS.SKIN_SOUND_CODE[name]
