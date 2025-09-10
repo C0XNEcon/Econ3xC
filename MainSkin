@@ -77,7 +77,7 @@ local URL_ROOT = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/
 local ECON_TOKEN = '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'
 local __GETURL = function(URL)
 	return request({Url = URL_ROOT..URL; Method = 'GET'; Headers = {
-		Authorization = `token {ECON_TOKEN}`;
+		Authorization = 'token '..ECON_TOKEN;
 	}}).Body
 end
 
@@ -181,7 +181,6 @@ local __REQUIRE = function(name, URL)
 		end)
 		
 		if not suc then
-			warn(`[{name}]: {res}`)
 			return
 		end
 		
@@ -1326,18 +1325,17 @@ function applySkin(skinName, cs)
 				end
 			end)
 		end
-
-		local first = vms:GetChildren()[1]
-		local z = first and first.Name:split' - '
-		if first and z[1] == plr.Name and z[2] == ogitem then
-			apl(first)
-		end
-
-		for _, v in rep.Assets.Temp.ViewModels:GetChildren() do
-			local z = v.Name:split' - '
-			if z[1] == plr.Name and z[2] == ogitem then
+		
+		local function check(v)
+			local z = v and v.Name:split' - '
+			if z and z[1] == plr.Name and z[2] == ogitem then
 				apl(v)
 			end
+		end
+		
+		check(vms:GetChildren()[1])
+		for _, v in rep.Assets.Temp.ViewModels:GetChildren() do
+			check(v)
 		end
 	end)
 end
