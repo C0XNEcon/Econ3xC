@@ -2314,7 +2314,7 @@ local function check(str)
 		local b2, afa2 = getparts(str, ci+string.find(afa, 'ItemName = ')+10)
 
 		local skin = string.split(string.split(afa, ', ')[2], '"')[2]
-		local ogItem = afa:split'"'[2]
+		local ogItem = afa2:split'"'[2]
 
 		local ps = afa2:find('})')
 		b, afa2 = getparts(afa2, ps+2)
