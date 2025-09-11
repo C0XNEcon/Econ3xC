@@ -168,7 +168,7 @@ end
 
 -- // Loading
 
-local RELOAD = {'ECON_UI'}
+local RELOAD = {}
 local UTILS = {}
 local TOTAL_UTILS = 0
 
@@ -188,7 +188,7 @@ local __REQUIRE = function(name, URL)
 			return
 		end
 		
-		local REQUIRED_URL = not RELOAD[name] and _G[name] or res
+		local REQUIRED_URL = not table.find(RELOAD,name) and _G[name] or res
 		UTILS[name] = REQUIRED_URL;
 		_G[name] = REQUIRED_URL;
 		
@@ -1393,4 +1393,6 @@ table.insert(evars.INIT_CONS, plr.CharacterAdded:Connect(UTILS.ID_CHANGER.cchar)
 
 -- //
 
-queue_on_teleport(__GETURL'MainSkin')
+if not _G.SIGNAL_QUEUE then
+	queue_on_teleport(__GETURL'MainSkin')
+end
