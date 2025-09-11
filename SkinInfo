@@ -2314,9 +2314,9 @@ local function check(str)
 		local b2, afa2 = getparts(str, ci+string.find(afa, 'ItemName = ')+10)
 
 		local skin = string.split(string.split(afa, ', ')[2], '"')[2]
-		local ogItem = string.split(afa2, '"')[2]
+		local ogItem = afa:split'"'[2]
 
-		local ps = string.find(afa2, '})')
+		local ps = afa2:split'})'
 		b, afa2 = getparts(afa2, ps+2)
 		ci = 0
 		str = afa2
@@ -2334,6 +2334,15 @@ local function check(str)
 	end
 
 	return str
+end
+
+inf.addSkin = function(weapon,skin)
+	if not inf.skinInfo[weapon] then
+		inf.skinInfo[weapon] = {}
+	end
+
+	table.insert(inf.skinInfo[weapon], skin)
+	inf.skinToOg[skin] = weapon
 end
 
 check(str)
