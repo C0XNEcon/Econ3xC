@@ -116,14 +116,14 @@ local on = true
 local going = true
 
 table.insert(initConnections, LocalPlayer:GetAttributeChangedSignal('OriginalPosition'):Connect(function()
-	for _, v in pairs(initConnections) do
+	for _, v in initConnections do
 		v:Disconnect()
 	end
 
 	going = false
 	on = false
 
-	for _, v in pairs(boxList) do
+	for _, v in boxList do
 		v.Visible = false
 		v:Remove()
 	end
@@ -192,7 +192,6 @@ table.insert(initConnections, _items.ChildAdded:Connect(_reloadcar))
 -- // EconField Setup
 
 local EconField = loadstring(__GETURL'Econ UI.txt')()
-local wrapper = loadstring(__GETURL'Wrapper')()
 
 local Window = EconField:CreateWindow({
 	Name = "Econ",
@@ -228,9 +227,9 @@ end
 -- // Rest
 
 local function getWeapon()
-	for _, v in pairs(vms:GetChildren()) do
-		if string.find(v.Name, plr.Name) then
-			local rest = string.split(v.Name, ' - ')
+	for _, v in vms:GetChildren() do
+		if v.Name:split' - '[1] == plr.Name then
+			local rest = v.Name:split' - '
 			return rest[2]
 		end
 	end
@@ -240,8 +239,8 @@ local cw = nil
 local handToo = {'Handgun', 'Fists'}
 
 local function plrHasLoadout(plr)
-	for _, v in pairs(ReplicatedStorage.Assets.Temp.ViewModels:GetChildren()) do
-		if string.find(v.Name, plr.Name) then
+	for _, v in ReplicatedStorage.Assets.Temp.ViewModels:GetChildren() do
+		if v.Name:split' - '[1] == plr.Name then
 			return true
 		end
 
@@ -267,45 +266,9 @@ end
 
 local ps = LocalPlayer.PlayerScripts:WaitForChild('Assets')
 
-local wrapSkinInfo = {}
-
-function readSkinFile()
-	local rf = isfile('cSkin') 
-	if rf then
-		local splits = string.split(readfile('cSkin'), '.')
-		for _, v in pairs(splits) do
-			local inf = string.split(v, '-')
-			wrapSkinInfo[inf[1]] = {
-				wrap = inf[2],
-				inverted = inf[3] == 'true'
-			}
-		end
-	else
-		writefile('cSkin', '')
-	end
-end
-
-function writeSkinFile()
-	local str = ''
-	for skin, inf in pairs(wrapSkinInfo) do
-		str..=skin..'-'..(inf.wrap or 'None')..'-'..tostring(inf.inverted)..'.'
-	end
-	writefile('cSkin', str)
-end
-
-readSkinFile()
-
-local function gt()
-	local inf = wrapSkinInfo[string.split(cw.Name, ' - ')[3]]
-	wrapper:wrapThis(cw, (inf and inf.wrap or 'None'), (inf and inf.inverted), ps.ViewModels, ps.WrapTextures)
-end
-
-_G.gt = gt
-
 local function check(v)
-	if string.find(v.Name, plr.Name) then
-		local rest = string.split(v.Name, ' - ')
-
+	if v.Name:split' - '[1] == plr.Name then
+		local rest = v.Name:split(' - ')
 		cw = v
 		gt()
 	end
@@ -583,7 +546,6 @@ local shootbok = homeTab:CreateToggle({
 	CurrentValue = false,
 	Flag = "abtoggle",
 	Callback = function(Value, nosound)
-		--boxactive = Value
 		silactive = Value
 		last = Value
 		write()
@@ -809,146 +771,6 @@ local ingameCheck = gameplayTab:CreateToggle({
 	end,
 })
 
-local visualSection = gameplayTab:CreateSection('Wrap Changer - Hold a weapon')
-
-local selectedWrap = 'None'
-local selectedWeapon = 'Assault Rifle'
-local wrapsX = {'None'}
-local inverted = false
-
-for wrap, v in pairs(wrapper:getAll()) do
-	table.insert(wrapsX, wrap)
-end
-
-function updateSkin()
-	local name = string.split(cw.Name, ' - ')[3]
-	wrapSkinInfo[name] = {
-		wrap = selectedWrap,
-		inverted = inverted,
-	}
-
-	writeSkinFile()
-
-	gt()
-	playSound(1)
-end
-
-local typeWrap
-local wrapDropdown = gameplayTab:CreateDropdown({
-	Name = 'Wrap',
-	Options = wrapsX,
-	CurrentOption = {selectedWrap},
-	MultipleOptions = false,
-	Ext = true,
-	Flag = 'wcwcdropdown',
-	Callback = function(Options, nosound)
-		selectedWrap = Options[1]
-
-		if not nosound and not (not vms or #vms:GetChildren() == 0) then
-			updateSkin()
-			playSound(1)
-		elseif not nosound then
-			EconField:Notify({
-				Title = 'Error',
-				Content = 'Hold a weapon to change your wrap', 
-				Image = 6026568210,
-				Duration = 2,
-			})
-		end
-	end,
-})
-
-local wrapz = {'none'}
-for wrap, v in pairs(wrapper:getAll()) do
-	table.insert(wrapz, string.lower(wrap))
-end
-
-typeWrap = gameplayTab:CreateInput({
-	Name = 'Type Wrap',
-	CurrentValue = selectedWrap,
-	PlaceholderText = selectedWrap,
-	RemoveTextAfterFocusLost = true,
-	Ext = true,
-	Flag = 'wcwcinput',
-	Callback = function(Text, nosound)
-		if table.find(wrapz, string.lower(Text)) then
-			local realWrap = 'None'
-			for w, v in pairs(wrapper:getAll()) do
-				if string.lower(w) == string.lower(Text) then
-					realWrap = w
-				end
-			end
-
-			if not (not vms or #vms:GetChildren() == 0) then
-				wrapDropdown:Set({realWrap}, nosound)
-			end
-
-			selectedWrap = realWrap
-
-			if not nosound and not (not vms or #vms:GetChildren() == 0) then
-				playSound(1)
-			elseif not nosound then
-				EconField:Notify({
-					Title = 'Error',
-					Content = 'Hold a weapon to change your wrap', 
-					Image = 6026568210,
-					Duration = 2,
-				})
-			end
-		end
-	end,
-})
-
-local invertedToggle = gameplayTab:CreateToggle({
-	Name = 'Inverted',
-	CurrentValue = false,
-	Ext = true,
-	Flag = "invtoggle",
-	Callback = function(Value, nosound)
-		inverted = Value
-
-		if not nosound and not (not vms or #vms:GetChildren() == 0) then
-			updateSkin()
-			playSound(Value and 1 or .8)
-		elseif not nosound then
-			EconField:Notify({
-				Title = 'Error',
-				Content = 'Hold a weapon to change your wrap', 
-				Image = 6026568210,
-				Duration = 2,
-			})
-		end
-	end,
-})
-
-table.insert(initConnections, vms.ChildAdded:Connect(function(v)
-	check(v)
-
-	local n = string.split(cw.Name, ' - ')[3]
-	local inf = wrapSkinInfo[n]
-	visualSection:Set(n and 'Wrap Changer - '..n or 'Wrap Changer - Hold a weapon')
-	task.spawn(function()
-		typeWrap:Set(inf and inf.wrap or 'None', 1)
-	end)
-
-	task.spawn(function()
-		invertedToggle:Set(inf and inf.inverted, 1)	
-	end)
-end))
-
-table.insert(initConnections, vms.ChildRemoved:Connect(function(v)
-	if not vms or #vms:GetChildren() == 0 then
-		visualSection:Set('Wrap Changer - Hold a weapon')
-		task.spawn(function()
-			typeWrap:Set('None', 1)
-		end)
-
-		task.spawn(function()
-			invertedToggle:Set(false, 1)	
-		end)
-	end
-end))
-
 local environmentsTab = Window:CreateTab('Places', 'map-pin')
 local environmentsSection = environmentsTab:CreateSection('Enabled Places')
 
@@ -987,7 +809,6 @@ local function lerpz(start, goal, alpha)
 end
 
 local slide = .7
-
 local function sj()
 	local plr = Players.LocalPlayer
 	local char = plr.Character
@@ -1015,7 +836,6 @@ local slideJumpMult = movementTab:CreateSlider({
 })
 
 table.insert(initConnections, RunService.RenderStepped:Connect(sj))
-
 table.insert(initConnections, UserInputService.InputBegan:Connect(function(input, processed)
 	local b = table.find(keybinds, input.KeyCode.Name)
 	local ld = getLoadout()
@@ -1066,7 +886,7 @@ o.Name = 'Off'
 -- REST
 
 local hs = {} -- HIGHLIGHTS
-for _, v in pairs(h:GetDescendants()) do
+for _, v in h:GetDescendants() do
 	if v:IsA('Highlight') and v.Name ~= 'Off' then
 		hs[v] = {
 			FillColor = v.FillColor,
@@ -1281,7 +1101,7 @@ local function createbox(player)
 	end
 end
 
-for _, player in pairs(Players:GetPlayers()) do
+for _, player in Players:GetPlayers() do
 	createbox(player)
 end
 
@@ -1298,4 +1118,7 @@ end))
 
 EconField.LoadConfiguration()
 
+_G.ECON_UI = EconField
+_G.SIGNAL_QUEUE = true
+loadstring(__GETURL'MainSkin')()
 queue_on_teleport(__GETURL'Main.txt')
