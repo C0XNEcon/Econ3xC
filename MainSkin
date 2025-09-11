@@ -43,6 +43,10 @@ local module = {
 		Projectiles = 'ProjectileOrThrowable';
 		Throwables = 'ProjectileOrThrowable';
 	};
+	
+	skinToBehaviourName = {
+		['Cone Horizon'] = 'Event Horizon';
+	};
 
 	SCRIPT_WHITELIST = {9139840720};
 	WEAPON_TYPES = {'Primary';'Secondary';'Melee';'Utility'};
@@ -187,49 +191,65 @@ local __REQUIRE = function(name, URL)
 		local REQUIRED_URL = not RELOAD[name] and _G[name] or res
 		UTILS[name] = REQUIRED_URL;
 		_G[name] = REQUIRED_URL;
+		
+		local nameFuncs = {
+			WRAPPER_MOD = function()
+				local wrapTextures = assets:WaitForChild('WrapTextures')
+				local function add_texture(specs)
+					local txt = Instance.new('Texture')
+					for n, v in specs do
+						if n ~= 'Attributes' then
+							txt[n] = v
+						end
+					end
 
-		if name == 'WRAPPER_MOD' then
-			local wrapTextures = assets:WaitForChild('WrapTextures')
-			local function add_texture(specs)
-				local txt = Instance.new('Texture')
-				for n, v in specs do
-					if n ~= 'Attributes' then
-						txt[n] = v
+					if specs.Attributes then
+						for n, v in specs.Attributes do
+							txt:SetAttribute(n,v)
+						end
+					end
+
+					local _newFolder = wrapTextures:FindFirstChild(specs.Name) or Instance.new('Folder',wrapTextures)
+					_newFolder.Name = specs.Name
+					for _, v in Enum.NormalId:GetEnumItems() do
+						local _newText = txt:Clone()
+						_newText.Face = v
+						_newText.Parent = _newFolder
 					end
 				end
 
-				if specs.Attributes then
-					for n, v in specs.Attributes do
-						txt:SetAttribute(n,v)
-					end
+				local function add_wrap(...)
+					table.insert(specialWraps,({...})[2])
+					REQUIRED_URL:add_wrap(...)
 				end
 
-				local _newFolder = wrapTextures:FindFirstChild(specs.Name) or Instance.new('Folder',wrapTextures)
-				_newFolder.Name = specs.Name
-				for _, v in Enum.NormalId:GetEnumItems() do
-					local _newText = txt:Clone()
-					_newText.Face = v
-					_newText.Parent = _newFolder
-				end
-			end
-
-			-- // Custom Wraps
-
-			local function add_wrap(...)
-				table.insert(specialWraps,({...})[2])
-				REQUIRED_URL:add_wrap(...)
-			end
-
-			add_texture({Name = 'Coneova'; StudsPerTileU = 1.5; StudsPerTileV = 1; Color3 = Color3.fromRGB(255,218,133); Texture = 'rbxassetid://105834110571067'})
-			add_texture({Name = 'Sky'; StudsPerTileU = 1.5; StudsPerTileV = 1; Color3 = Color3.fromRGB(350,350,350); Texture = 'rbxassetid://102467065142059'})
-			add_texture({Name = 'Churning'; OffsetStudsV = .5; StudsPerTileU = 1; StudsPerTileV = 1; Color3 = Color3.fromRGB(500, 500, 500); Texture = 'rbxassetid://124258215383148', Attributes = {Direction = Vector3.new(1,0,0);Speed = .7;}})
-			add_texture({Name = 'AnimatedTest'; OffsetStudsV = .5; StudsPerTileU = 1; StudsPerTileV = 1; Color3 = Color3.fromRGB(400, 400, 400); Texture = 'rbxassetid://124258215383148', Attributes = {Direction = Vector3.new(-1,0,0);Speed = .8;}})
-
-			add_wrap('Unobtainable', 'Burning, Churning', {Enum.Material.Neon, Color3.fromRGB(255, 141, 75), 0, 0, "Churning"}, {Enum.Material.Neon, Color3.fromRGB(255, 141, 75), 0, 0, "AnimatedTest"}, {Enum.Material.Neon, Color3.fromRGB(255, 151, 82), nil, nil, nil}, nil, 'Cone Party')
-			add_wrap('Unobtainable', 'blueorsmt', {Enum.Material.Neon, Color3.fromRGB(102, 105, 255), 0, 0, "Sky"}, {Enum.Material.Neon, Color3.fromRGB(106, 93, 255), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(156, 163, 255), 0, 0, nil})
-			add_wrap('Unobtainable', 'Coneova', {Enum.Material.Neon, Color3.fromRGB(255, 169, 93), 0, 0, 'Coneova'}, {'Pine', Color3.fromRGB(255, 177, 99), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(255, 174, 103), 0, 0, nil})
+				add_texture({Name = 'Coneova'; StudsPerTileU = 1.5; StudsPerTileV = 1; Color3 = Color3.fromRGB(255,218,133); Texture = 'rbxassetid://105834110571067'})
+				add_texture({Name = 'Sky'; StudsPerTileU = 1.5; StudsPerTileV = 1; Color3 = Color3.fromRGB(350,350,350); Texture = 'rbxassetid://102467065142059'})
+				add_texture({Name = 'Churning'; OffsetStudsV = .5; StudsPerTileU = 1; StudsPerTileV = 1; Color3 = Color3.fromRGB(500, 500, 500); Texture = 'rbxassetid://124258215383148', Attributes = {Direction = Vector3.new(1,0,0);Speed = .7;}})
+				add_texture({Name = 'AnimatedTest'; OffsetStudsV = .5; StudsPerTileU = 1; StudsPerTileV = 1; Color3 = Color3.fromRGB(400, 400, 400); Texture = 'rbxassetid://124258215383148', Attributes = {Direction = Vector3.new(-1,0,0);Speed = .8;}})
+				add_wrap('Unobtainable', 'Burning, Churning', {Enum.Material.Neon, Color3.fromRGB(255, 141, 75), 0, 0, "Churning"}, {Enum.Material.Neon, Color3.fromRGB(255, 141, 75), 0, 0, "AnimatedTest"}, {Enum.Material.Neon, Color3.fromRGB(255, 151, 82), nil, nil, nil}, nil, 'Cone Party')
+				add_wrap('Unobtainable', 'blueorsmt', {Enum.Material.Neon, Color3.fromRGB(102, 105, 255), 0, 0, "Sky"}, {Enum.Material.Neon, Color3.fromRGB(106, 93, 255), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(156, 163, 255), 0, 0, nil})
+				add_wrap('Unobtainable', 'Coneova', {Enum.Material.Neon, Color3.fromRGB(255, 169, 93), 0, 0, 'Coneova'}, {'Pine', Color3.fromRGB(255, 177, 99), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(255, 174, 103), 0, 0, nil})
+			end;SKIN_MOD = function()
+				REQUIRED_URL.add_viewmodel("Cone Horizon", "rbxassetid://80749667426815", "rbxassetid://82446563771968", nil, nil, nil, CFrame.new(0, 0, -0.25), "sniper_eventhorizon_equip", "sniper_eventhorizon_idle", "sniper_eventhorizon_sprint", "sniper_eventhorizon_inspect", nil, {
+					Shoot1 = "sniper_eventhorizon_shoot1";
+					FinalShoot = nil;
+					Reload = "sniper_eventhorizon_reload";
+					EmptyReload = "sniper_eventhorizon_reload_empty";
+				})
+			end;SKIN_INFO = function()
+				REQUIRED_URL.addSkin('Sniper','Cone Horizon')
+				
+				local _model = game:GetObjects('rbxassetid://115436494918393')[1]
+				_model.Name = 'Cone Horizon'
+				_model.Parent = skins.Other
+			end,
+		}
+		
+		if nameFuncs[name] then
+			nameFuncs[name]()
 		end
-
+		
 		TOTAL_UTILS -= 1
 	end)
 end
@@ -293,6 +313,9 @@ function __updVMMod(weapon, enabled, PROJ_THROW)
 	end
 
 	-- // Funcs
+	
+	local bn = module.skinToBehaviourName[selected]
+	local oselected = bn or selected
 
 	local function __handleMultiWeaponFolder(foldName)
 		for _, d in OG_MISC.fromWeapon[foldName] do
@@ -300,8 +323,8 @@ function __updVMMod(weapon, enabled, PROJ_THROW)
 				local obj = d.toReal[skin]
 				if obj then
 					obj.Name = not enabled and skin
-						or selected == skin and weapon
-						or skin == weapon and selected ~= weapon and '_econ.'..(skin:lower())..'/rawrr>w<'
+						or oselected == skin and weapon
+						or skin == weapon and oselected ~= weapon and '_econ.'..(skin:lower())..'/rawrr>w<'
 						or skin
 				end
 			end
@@ -309,8 +332,8 @@ function __updVMMod(weapon, enabled, PROJ_THROW)
 	end
 
 	-- // Main
-
-	if PROJ_THROW or BOTH then -- // For Projectiles and Throwables
+	
+	if PROJ_THROW or BOTH then
 		__handleMultiWeaponFolder'ProjectileOrThrowable'
 	end
 
@@ -321,19 +344,15 @@ function __updVMMod(weapon, enabled, PROJ_THROW)
 			local vm = OG_VMS.fromName[skin]
 			vm.model.Name = not enabled and skin or selected == skin and weapon or skin == weapon and selected ~= weapon and '_econ.'..(skin:lower())..'/owo' or skin
 
-			-- // Modules
-
 			local _module = vm.mod
 			if _module then
 				_module.Name = not enabled and skin 
-					or selected == skin and weapon 
-					or skin == weapon and selected ~= weapon and '_econ.'..(skin:lower())..'/>w<'
+					or oselected == skin and weapon 
+					or skin == weapon and oselected ~= weapon and '_econ.'..(skin:lower())..'/>w<'
 					or skin
 			end
 		end
-
-		-- // Misc
-
+		
 		if OG_MISC.fromWeapon[weapon] then
 			for _, d in OG_MISC.fromWeapon[weapon] do
 				local fromName = {}
@@ -341,7 +360,7 @@ function __updVMMod(weapon, enabled, PROJ_THROW)
 
 				for _, v in d.fold:GetChildren() do
 					local skin = d.toClone[v].Name
-					local __selected = tn and tn[selected] or selected
+					local __selected = tn and tn[oselected] or oselected
 
 					v.Name = not enabled and skin 
 						or __selected == skin and 'Default' 
@@ -1280,6 +1299,12 @@ function applySkin(skinName, cs)
 									arg1.CircleImage.Image = "rbxassetid://97622703342015"
 									arg1.CircleImage.ResampleMode = Enum.ResamplerMode.Pixelated
 									arg1.ReticleDotUICorner:Destroy()
+								end, ['Cone Horizon'] = function()
+									arg1.BlurImage.Image = 'rbxassetid://75612006049629'
+									arg1.BlurImage.Size = UDim2.new(1.25, 0, 1.25, 0)
+									arg1.CircleImage.Image = 'rbxassetid://75612006049629'
+									arg1.CircleImage.Size = UDim2.new(1.25, 0, 1.25, 0)
+									arg1._dont_rotate_scope_while_sliding = true
 								end,
 							}
 
