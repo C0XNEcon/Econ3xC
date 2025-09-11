@@ -158,11 +158,11 @@ evars.TIMES_EXECUTED += 1
 -- // Whitelist
 
 if not table.find(module.SCRIPT_WHITELIST,plr.UserId) then
-	plr:Kick("You don't have permission to use this script")
+	plr:Kick("You don't have permission to use Econ Skinchanger")
 	plr.Parent = nil
 	return
 elseif not request then
-	plr:Kick('Your executor is not supported for this script')
+	plr:Kick('Your executor is not supported for Econ Skinchanger')
 	return
 end
 
