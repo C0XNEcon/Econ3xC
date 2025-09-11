@@ -231,7 +231,7 @@ local __REQUIRE = function(name, URL)
 				add_wrap('Unobtainable', 'blueorsmt', {Enum.Material.Neon, Color3.fromRGB(102, 105, 255), 0, 0, "Sky"}, {Enum.Material.Neon, Color3.fromRGB(106, 93, 255), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(156, 163, 255), 0, 0, nil})
 				add_wrap('Unobtainable', 'Coneova', {Enum.Material.Neon, Color3.fromRGB(255, 169, 93), 0, 0, 'Coneova'}, {'Pine', Color3.fromRGB(255, 177, 99), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(255, 174, 103), 0, 0, nil})
 			end;SKIN_MOD = function()
-				REQUIRED_URL.add_viewmodel("Cone Horizon", "rbxassetid://80749667426815", "rbxassetid://82446563771968", nil, nil, nil, CFrame.new(0, 0, -0.25), "sniper_eventhorizon_equip", "sniper_eventhorizon_idle", "sniper_eventhorizon_sprint", "sniper_eventhorizon_inspect", nil, {
+				REQUIRED_URL.add_viewmodel("Cone Horizon", "rbxassetid://76724077959833", "rbxassetid://76724077959833", nil, nil, nil, CFrame.new(0, 0, -0.25), "sniper_eventhorizon_equip", "sniper_eventhorizon_idle", "sniper_eventhorizon_sprint", "sniper_eventhorizon_inspect", nil, {
 					Shoot1 = "sniper_eventhorizon_shoot1";
 					FinalShoot = nil;
 					Reload = "sniper_eventhorizon_reload";
@@ -851,10 +851,12 @@ for t, weapons in UTILS.WEAPON_TYPES.typeToWeapons do
 			end
 
 			local selectedSkin = [[Dont Change]]
+			local specials = {'Cone Horizon'}
 			local drop = gameplayTab:CreateDropdown({
 				Name = skin,
 				Options = v,
 				CurrentOption = {[[Dont Change]]},
+				SpecialOptions = specials,
 				MultipleOptions = false,
 				Flag = skin,
 				Callback = function(Options, nosound, nowrite)
@@ -874,6 +876,23 @@ for t, weapons in UTILS.WEAPON_TYPES.typeToWeapons do
 					end
 				end,
 			})
+			
+			for _, v in specials do
+				local frame = drop.Frames[v]
+				if frame then
+					frame.Title.FontFace = Font.fromName('Montserrat',Enum.FontWeight.ExtraBold,Enum.FontStyle.Normal)
+
+					local sparkles = UTILS.VISUALS_UI.createSparklesFrame(frame)
+					local c
+					c = run.RenderStepped:Connect(function()
+						if frame.Parent then
+							sparkles.Update()
+						else
+							c:Disconnect()
+						end
+					end)
+				end
+			end
 
 			weaponToButton[skin] = drop
 		end
