@@ -9,7 +9,7 @@ local mod = {
 local qtbl = {}
 local at = 0
 local max = 0
-local function add_viewmodel(name, icon, iconhigh, imagecenter, elimImg, elimImgScale, rootOffset, _equip, _idle, _sprint, _inspect, _rareinspect, itemSpecAnims, infoTbl)
+function add_viewmodel(name, icon, iconhigh, imagecenter, elimImg, elimImgScale, rootOffset, _equip, _idle, _sprint, _inspect, _rareinspect, itemSpecAnims, infoTbl)
 	local itbl = {
 		image = icon,
 		imagehighres = iconhigh,
@@ -46,8 +46,6 @@ local function add_viewmodel(name, icon, iconhigh, imagecenter, elimImg, elimImg
 		itbl.animsReverse[_rareinspect] = 'rareinspect'
 	end
 
-	-- // Adding Item-Specific Animations (Shooting, Reload, etc)
-
 	if itemSpecAnims then
 		for name, anim in pairs(itemSpecAnims) do
 			itbl.animsReverse[anim] = name
@@ -55,32 +53,14 @@ local function add_viewmodel(name, icon, iconhigh, imagecenter, elimImg, elimImg
 		end
 	end
 
-	-- // Adding Extra Item Info
-
 	if infoTbl then
 		for set, val in pairs(infoTbl) do
 			itbl[set] = val
 		end
 	end
 
-	-- // Finish
-
 	mod.viewmodels[name] = itbl
 	table.insert(mod.viewmodelorder, name)
-
-	-- // Test Existing
-
-	if qtbl[icon] and not string.find(icon, '_') then
-		warn("Image already exists:", name)
-	end
-
-	if qtbl[iconhigh] and not string.find(iconhigh, '_') then
-		warn("ImageHighResolution already exists:", name)
-	end
-
-	if elimImg and qtbl[elimImg] and not string.find(elimImg, '_') then
-		warn("EliminationFeedImage already exists:", name)
-	end
 
 	qtbl[icon] = true
 	qtbl[iconhigh] = true
