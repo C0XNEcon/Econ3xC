@@ -432,7 +432,7 @@ local function car(right, needs, head)
 			-- a/i/m/p/o/s
 			local apos = pos--+Vector3.new(Random.new(.3, -.3), Random.new(-.2, -2), Random.new(.3, -.3))
 			local l = Camera.CFrame
-			
+
 			if weapon == 'Daggers' or weapon == 'Bow' then
 				apos += Vector3.new(0, 1, 0)
 			end
@@ -483,18 +483,18 @@ table.insert(initConnections, m.Button2Down:Connect(function()
 	down2 = true
 	if spactivate then
 		curr = true
-		
+
 		local lhead = nil
 		local a = RunService.RenderStepped:Connect(function()
 			if not lhead then
 				lhead = getNearestHead()
 			end
-			
+
 			if lhead then
 				car(true,false,lhead)
 			end
 		end)
-		
+
 		table.insert(cons, a)
 	end
 end))
@@ -989,18 +989,17 @@ end
 local slide = .7
 
 local function sj()
-	task.spawn(function()
-		local plr = Players.LocalPlayer
-		local char = plr.Character
-		if char then
-			local fmz = char:FindFirstChild('FakeMass') or char:WaitForChild('FakeMass') :: Part
-			local fm2 = fmz :: Part
-
+	local plr = Players.LocalPlayer
+	local char = plr.Character
+	if char then
+		local fm2 = char:FindFirstChild('FakeMass')
+		local root = char.PrimaryPart
+		if fm2 then
 			local c = fm2.CurrentPhysicalProperties
 			local z = PhysicalProperties.new(slide, c.Friction, c.Elasticity, c.FrictionWeight, c.ElasticityWeight)
 			fm2.CustomPhysicalProperties = z
 		end
-	end)
+	end
 end
 
 local slideJumpMult = movementTab:CreateSlider({
@@ -1011,7 +1010,7 @@ local slideJumpMult = movementTab:CreateSlider({
 	CurrentValue = 0,
 	Flag = 'slideSlider',
 	Callback = function(Value)
-		slide = lerpz(.7, .05, Value/100)
+		slide = lerpz(.7, 0, Value/100)
 	end,
 })
 
