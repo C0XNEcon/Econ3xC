@@ -1802,5 +1802,8 @@ add_viewmodel("Glast Shard", "rbxassetid://102980815872652", "rbxassetid://13618
 })
 add_viewmodel("RNG Dice", "rbxassetid://98372867049331", "rbxassetid://75601061529918", nil, "rbxassetid://86815994192766", 1.5, nil, "medkit_equip", "medkit_idle", "medkit_sprint", "medkit_inspect", nil)
 
-mod.add_viewmodel = add_viewmodel
+mod.add_viewmodel = function(...)
+	add_viewmodel(...)
+end
+
 return mod
