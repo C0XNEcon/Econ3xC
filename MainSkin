@@ -176,19 +176,18 @@ local __REQUIRE = function(name, URL)
 	TOTAL_UTILS += 1
 
 	task.spawn(function()
-		local response = __GETURL(URL)
-		
-		-- // Main
-		
-		local suc, res = pcall(function()
-			return loadstring(response)()
-		end)
-		
-		if not suc then
-			return
+		local REQUIRED_URL = not table.find(RELOAD,name) and _G[name]
+		if not REQUIRED_URL then
+			local response = __GETURL(URL)
+			local suc, res = pcall(function()
+				return loadstring(response)()
+			end)
+			
+			REQUIRED_URL = res
 		end
-
-		local REQUIRED_URL = not table.find(RELOAD,name) and _G[name] or res
+		
+		if not REQUIRED_URL then return end
+		
 		UTILS[name] = REQUIRED_URL;
 		_G[name] = REQUIRED_URL;
 		
