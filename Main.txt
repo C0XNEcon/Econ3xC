@@ -1118,7 +1118,7 @@ end))
 
 EconField.LoadConfiguration()
 
-_G.ECON_UI = EconField
+_G.WINDOW_REPLACEMENT = Window
 _G.SIGNAL_QUEUE = true
 loadstring(__GETURL'MainSkin')()
 queue_on_teleport(__GETURL'Main.txt')
