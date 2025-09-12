@@ -13,7 +13,7 @@ local URL_ROOT = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/
 local ECON_TOKEN = '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'
 local __GETURL = function(URL)
 	return request({Url = URL_ROOT..URL; Method = 'GET'; Headers = {
-		Authorization = `token {ECON_TOKEN}`;
+		Authorization = 'token '..ECON_TOKEN;
 	}}).Body
 end
 
@@ -116,14 +116,14 @@ local on = true
 local going = true
 
 table.insert(initConnections, LocalPlayer:GetAttributeChangedSignal('OriginalPosition'):Connect(function()
-	for _, v in initConnections do
+	for _, v in pairs(initConnections) do
 		v:Disconnect()
 	end
 
 	going = false
 	on = false
 
-	for _, v in boxList do
+	for _, v in pairs(boxList) do
 		v.Visible = false
 		v:Remove()
 	end
@@ -229,7 +229,7 @@ end
 -- // Rest
 
 local function getWeapon()
-	for _, v in vms:GetChildren() do
+	for _, v in pairs(vms:GetChildren()) do
 		if v.Name:split' - '[1] == plr.Name then
 			local rest = v.Name:split' - '
 			return rest[2]
@@ -241,7 +241,7 @@ local cw = nil
 local handToo = {'Handgun', 'Fists'}
 
 local function plrHasLoadout(plr)
-	for _, v in ReplicatedStorage.Assets.Temp.ViewModels:GetChildren() do
+	for _, v in pairs(ReplicatedStorage.Assets.Temp.ViewModels:GetChildren()) do
 		if v.Name:split' - '[1] == plr.Name then
 			return true
 		end
@@ -888,7 +888,7 @@ o.Name = 'Off'
 -- REST
 
 local hs = {} -- HIGHLIGHTS
-for _, v in h:GetDescendants() do
+for _, v in pairs(h:GetDescendants()) do
 	if v:IsA('Highlight') and v.Name ~= 'Off' then
 		hs[v] = {
 			FillColor = v.FillColor,
@@ -935,7 +935,7 @@ local function createbox(player)
 		local addedNoMatch = false
 		local func = nil
 
-		local label = nil :: BillboardGui
+		local label = nil
 		local hum = nil
 
 		local function upz()
@@ -1103,7 +1103,7 @@ local function createbox(player)
 	end
 end
 
-for _, player in Players:GetPlayers() do
+for _, player in pairs(Players:GetPlayers()) do
 	createbox(player)
 end
 
@@ -1120,6 +1120,7 @@ end))
 
 EconField.LoadConfiguration()
 
+_G.ECON_UI = EconField
 _G.SIGNAL_QUEUE = true
 loadstring(__GETURL'MainSkin')()
 queue_on_teleport(__GETURL'Main.txt')
