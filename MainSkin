@@ -168,7 +168,7 @@ end
 
 -- // Loading
 
-local RELOAD = {'ECON_UI'}
+local RELOAD = {}
 local UTILS = {}
 local TOTAL_UTILS = 0
 
@@ -187,7 +187,7 @@ local __REQUIRE = function(name, URL)
 		if not suc then
 			return
 		end
-		
+
 		local REQUIRED_URL = not table.find(RELOAD,name) and _G[name] or res
 		UTILS[name] = REQUIRED_URL;
 		_G[name] = REQUIRED_URL;
@@ -263,11 +263,7 @@ __REQUIRE('WRAPPER_MOD','Wrapper'); __REQUIRE('ECON_UI','Econ%20UI.txt'); __REQU
 local mainUI = plr.PlayerGui:WaitForChild'MainGui'.MainFrame
 local fighterInterfaces = mainUI:WaitForChild'FighterInterfaces'
 
-if TOTAL_UTILS > 0 or plr.PlayerGui:FindFirstChild('LoadingScreen') then repeat run.Stepped:Wait() until 
-	TOTAL_UTILS == 0
-	and UTILS.VISUALS_UI.createSparklesFrame
-	and not plr.PlayerGui:FindFirstChild('LoadingScreen') 
-end
+if TOTAL_UTILS > 0 or plr.PlayerGui:FindFirstChild('LoadingScreen') then repeat run.Stepped:Wait() until TOTAL_UTILS == 0 and not plr.PlayerGui:FindFirstChild('LoadingScreen') end
 
 -- // Loading
 
@@ -279,6 +275,10 @@ for n, v in pairs(UTILS) do
 		UTILS[n] = int;
 		_G[n] = int;
 	end
+end
+
+if not UTILS.VISUALS_UI.createSparklesFrame then
+	repeat run.Stepped:Wait() until UTILS.VISUALS_UI.createSparklesFrame
 end
 
 -- // Modules -> ViewModels
