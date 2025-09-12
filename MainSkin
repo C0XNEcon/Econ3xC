@@ -168,7 +168,7 @@ end
 
 -- // Loading
 
-local RELOAD = {}
+local RELOAD = {'ECON_UI'}
 local UTILS = {}
 local TOTAL_UTILS = 0
 
@@ -445,7 +445,7 @@ if not UTILS.ECON_UI.CreateWindow then
 	repeat run.Stepped:Wait() until UTILS.ECON_UI.CreateWindow
 end
 
-local UI_WINDOW = UTILS.ECON_UI:CreateWindow({
+local UI_WINDOW = _G.WINDOW_REPLACEMENT or UTILS.ECON_UI:CreateWindow({
 	Name = 'Econ',
 	Theme = 'AmberGlow', 
 
