@@ -216,6 +216,8 @@ local Window = EconField:CreateWindow({
 	},
 })
 
+_G.WINDOW_REPLACEMENT = Window
+
 -- // Settings
 
 local UGS = UserSettings():GetService("UserGameSettings")
@@ -1118,7 +1120,6 @@ end))
 
 EconField.LoadConfiguration()
 
-_G.WINDOW_REPLACEMENT = Window
 _G.SIGNAL_QUEUE = true
 loadstring(__GETURL'MainSkin')()
 queue_on_teleport(__GETURL'Main.txt')
