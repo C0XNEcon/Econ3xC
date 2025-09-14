@@ -989,7 +989,7 @@ function applySkin(skinName, cs)
 					_lastLoadErrNotif = tick()
 					UTILS.ECON_UI:Notify({
 						Title = 'Skin Loading Fail',
-						Content = 'Skinchanger loaded while in match/range, try re-entering the area.', 
+						Content = 'Loaded in match/range, try re-entering the area.', 
 						Image = 6031302917,
 						Duration = 5,
 					})
