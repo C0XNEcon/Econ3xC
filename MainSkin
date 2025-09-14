@@ -43,7 +43,7 @@ local module = {
 		Projectiles = 'ProjectileOrThrowable';
 		Throwables = 'ProjectileOrThrowable';
 	};
-	
+
 	skinToBehaviourName = {
 		['Cone Horizon'] = 'Event Horizon';
 	};
@@ -142,25 +142,8 @@ _G.ECON_VARS = _G.ECON_VARS or {
 }
 
 local evars = _G.ECON_VARS
-local specialWraps =  {}
-local toskin = {}
-_G.toskin = toskin
 
--- // Disconnecting Previous Connections
-
-for _, con in pairs(_G.ECON_VARS.INIT_CONS) do
-	con:Disconnect()
-end
-
-table.clear(_G.ECON_VARS.INIT_CONS)
-evars.TIMES_EXECUTED += 1
-
--- // Remote Vars
-
-local HANDLED_WEAPONS = evars.HANDLED_WEAPONS
-local PROJ_THROW_ACTIVE = evars.PROJ_THROW_ACTIVE
-
-local _weaponReceiverRemote = rep.Remotes.Replication.Fighter.Replicate.OnClientEvent:Connect(function(...)
+evars.BYTEID_REMOTE = rep.Remotes.Replication.Fighter.Replicate.OnClientEvent:Connect(function(...)
 	local args = {...}
 	if typeof(args[4]) == 'table' then -- Player Data
 		local _plr = args[4]["¸"]
@@ -179,15 +162,6 @@ local _weaponReceiverRemote = rep.Remotes.Replication.Fighter.Replicate.OnClient
 		elseif args[4]['·'] then -- Player Weapon Equipped
 			local userId = evars.RIVALS_BYTEPLR[_byteID]
 			local weaponData = args[4]['¶']
-
-			if userId == plr.UserId then
-				if __updVMMod then
-					__updVMMod(weaponData.e,true)
-				end
-			elseif __removeSkins then
-				__removeSkins()
-			end
-
 			if userId then 
 				if not evars.BYTE_WEAPONS[userId] then
 					evars.BYTE_WEAPONS[userId] = {}
@@ -198,40 +172,21 @@ local _weaponReceiverRemote = rep.Remotes.Replication.Fighter.Replicate.OnClient
 				evars.BYTE_WEAPONS[userId][weaponData['¾']] = weaponData.e
 			end
 		end
-	elseif args[3] == '' then -- Throwable / Projectile
-		local _byteID = args[2]
-
-		local userId = evars.RIVALS_BYTEPLR[_byteID]
-		local isOurs = plr.UserId == userId
-
-		if not evars.BYTE_WEAPONS[userId] then return end
-
-		local _weapon = evars.BYTE_WEAPONS[userId][args[4]]
-		local _isValidProjectile = module.modelList[_weapon == 'Slingshot' and args[6] or args[5]] and (typeof(args[6]) == 'Instance' or _weapon and table.find({'Slingshot'},_weapon))
-
-		if not _weapon or not isOurs and _isValidProjectile then
-			if __updVMMod then
-				if _weapon and PROJ_THROW_ACTIVE[_weapon] then
-					__updVMMod(_weapon,false,true)
-				elseif not _weapon then
-					for weapon, val in pairs(PROJ_THROW_ACTIVE) do
-						if val then
-							__updVMMod(weapon,false,true)
-						end
-					end
-				end
-			end
-
-			return
-		end
-
-		if __updVMMod and _isValidProjectile and isOurs and not PROJ_THROW_ACTIVE[_weapon] then
-			__updVMMod(_weapon,true,true)
-		end
-	elseif args[5] == 'GameOver' and __removeSkins then
-		__removeSkins()
 	end
-end);
+end)
+
+local specialWraps =  {}
+local toskin = {}
+_G.toskin = toskin
+
+-- // Disconnecting Previous Connections
+
+for _, con in pairs(_G.ECON_VARS.INIT_CONS) do
+	con:Disconnect()
+end
+
+table.clear(_G.ECON_VARS.INIT_CONS)
+evars.TIMES_EXECUTED += 1
 
 -- // Whitelist
 
@@ -260,15 +215,15 @@ local __REQUIRE = function(name, URL)
 			local suc, res = pcall(function()
 				return loadstring(response)()
 			end)
-			
+
 			REQUIRED_URL = res
 		end
-		
+
 		if not REQUIRED_URL then return end
-		
+
 		UTILS[name] = REQUIRED_URL;
 		_G[name] = REQUIRED_URL;
-		
+
 		local nameFuncs = {
 			WRAPPER_MOD = function()
 				local wrapTextures = assets:WaitForChild('WrapTextures')
@@ -316,17 +271,17 @@ local __REQUIRE = function(name, URL)
 				})
 			end;SKIN_INFO = function()
 				REQUIRED_URL.addSkin('Sniper','Cone Horizon')
-				
+
 				local _model = game:GetObjects('rbxassetid://115436494918393')[1]
 				_model.Name = 'Cone Horizon'
 				_model.Parent = skins.Other
 			end,
 		}
-		
+
 		if nameFuncs[name] then
 			nameFuncs[name]()
 		end
-		
+
 		TOTAL_UTILS -= 1
 	end)
 end
@@ -360,6 +315,9 @@ end
 
 -- // Modules -> ViewModels
 
+local HANDLED_WEAPONS = evars.HANDLED_WEAPONS
+local PROJ_THROW_ACTIVE = evars.PROJ_THROW_ACTIVE
+
 function __updVMMod(weapon, enabled, PROJ_THROW)
 	local BOTH = typeof(PROJ_THROW)  ~= 'boolean'
 
@@ -391,7 +349,7 @@ function __updVMMod(weapon, enabled, PROJ_THROW)
 	end
 
 	-- // Funcs
-	
+
 	local bn = module.skinToBehaviourName[selected]
 	local oselected = bn or selected
 
@@ -410,7 +368,7 @@ function __updVMMod(weapon, enabled, PROJ_THROW)
 	end
 
 	-- // Main
-	
+
 	if PROJ_THROW or BOTH then
 		__handleMultiWeaponFolder'ProjectileOrThrowable'
 	end
@@ -421,6 +379,12 @@ function __updVMMod(weapon, enabled, PROJ_THROW)
 		for _, skin in pairs(all) do
 			local vm = OG_VMS.fromName[skin]
 			local n = not enabled and skin or selected == skin and weapon or skin == weapon and selected ~= weapon and '_econ.'..(skin:lower())..'/owo' or skin
+			if n == weapon then
+				vm.model:AddTag'EconTag'
+			else
+				vm.model:RemoveTag'EconTag'
+			end
+
 			vm.model.Name = n
 
 			local _module = vm.mod
@@ -431,7 +395,7 @@ function __updVMMod(weapon, enabled, PROJ_THROW)
 					or skin
 			end
 		end
-		
+
 		if OG_MISC.fromWeapon[weapon] then
 			for _, d in pairs(OG_MISC.fromWeapon[weapon]) do
 				local fromName = {}
@@ -550,7 +514,7 @@ local charapb = {}
 
 function readFile()
 	READ_FILE = true
-	
+
 	local rf = isfile(ECON_FILE)
 	if rf then
 		local splits = readfile(ECON_FILE):split''
@@ -598,7 +562,7 @@ if _G.hd then
 	end
 end
 
-function __removeSkins()
+local function __removeSkins()
 	for weapon, val in pairs(HANDLED_WEAPONS) do
 		if val then
 			__updVMMod(weapon,false,1)
@@ -617,8 +581,52 @@ _G.hd = {
 		end
 	end);
 
-	weaponReceiver = _weaponReceiverRemote;
-	UI_Imgs = fighterInterfaces.ChildAdded:Connect(UTILS.VISUALS_UI.__handleFighterInterface)
+	weaponReceiver = rep.Remotes.Replication.Fighter.Replicate.OnClientEvent:Connect(function(...)
+		local args = {...}
+		if typeof(args[4]) == 'table' then -- Player Data
+			local _plr = args[4]["¸"]
+			local _byteID = args[2]
+			if args[4]['·'] then -- Player Weapon Equipped
+				local userId = evars.RIVALS_BYTEPLR[_byteID]
+				local weaponData = args[4]['¶']
+				if userId == plr.UserId then
+					__updVMMod(weaponData.e,true)
+				else
+					__removeSkins()
+				end
+			end
+		elseif args[3] == '' then -- Throwable / Projectile
+			local _byteID = args[2]
+
+			local userId = evars.RIVALS_BYTEPLR[_byteID]
+			local isOurs = plr.UserId == userId
+
+			if not evars.BYTE_WEAPONS[userId] then return end
+
+			local _weapon = evars.BYTE_WEAPONS[userId][args[4]]
+			local _isValidProjectile = module.modelList[_weapon == 'Slingshot' and args[6] or args[5]] and (typeof(args[6]) == 'Instance' or _weapon and table.find({'Slingshot'},_weapon))
+
+			if not _weapon or not isOurs and _isValidProjectile then
+				if _weapon and PROJ_THROW_ACTIVE[_weapon] then
+					__updVMMod(_weapon,false,true)
+				elseif not _weapon then
+					for weapon, val in pairs(PROJ_THROW_ACTIVE) do
+						if val then
+							__updVMMod(weapon,false,true)
+						end
+					end
+				end
+
+				return
+			end
+
+			if _isValidProjectile and isOurs and not PROJ_THROW_ACTIVE[_weapon] then
+				__updVMMod(_weapon,true,true)
+			end
+		elseif args[5] == 'GameOver' then
+			__removeSkins()
+		end
+	end); UI_Imgs = fighterInterfaces.ChildAdded:Connect(UTILS.VISUALS_UI.__handleFighterInterface)
 }
 
 -- // Wrapper
@@ -889,7 +897,7 @@ for t, weapons in pairs(UTILS.WEAPON_TYPES.typeToWeapons) do
 					end
 				end,
 			})
-			
+
 			for _, v in pairs(specials) do
 				local frame = drop.Frames[v]
 				if frame then
@@ -958,8 +966,6 @@ function special(name)
 	end
 end
 
--- // Perm Vars
-
 local _lastLoadErrNotif = tick()
 
 function applySkin(skinName, cs)
@@ -979,10 +985,8 @@ function applySkin(skinName, cs)
 			task.spawn(function()
 				local skin =  OG_VMS.fromName[skinName].model
 				local vm = vm or vms:GetChildren()[1]
-				
-				local skinApplied = evars.OUR_BYTEID
-				
-				if not skinApplied and not vm:HasTag'EconLoadNotif' and tick()-_lastLoadErrNotif > 2 then
+
+				if not vm.ItemVisual:HasTag'EconTag' and not vm:HasTag'EconLoadNotif' and tick()-_lastLoadErrNotif > 2 then
 					_lastLoadErrNotif = tick()
 					UTILS.ECON_UI:Notify({
 						Title = 'Skin Loading Fail',
@@ -990,11 +994,11 @@ function applySkin(skinName, cs)
 						Image = 6031302917,
 						Duration = 5,
 					})
-					
+
 					vm:AddTag'EconLoadNotif'
 				end
 
-				if skinApplied and skin and not vm:HasTag'Changed' then
+				if skin and not vm:HasTag'Changed' and vm.ItemVisual:HasTag'EconTag' then
 					vm:AddTag'Changed'
 
 					local last = vm.Name
@@ -1400,14 +1404,14 @@ function applySkin(skinName, cs)
 				end
 			end)
 		end
-		
+
 		local function check(v)
 			local z = v and v.Name:split' - '
 			if z and z[1] == plr.Name and z[2] == ogitem then
 				apl(v)
 			end
 		end
-		
+
 		check(vms:GetChildren()[1])
 		for _, v in pairs(rep.Assets.Temp.ViewModels:GetChildren()) do
 			check(v)
