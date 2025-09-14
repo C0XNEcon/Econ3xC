@@ -982,7 +982,7 @@ function applySkin(skinName, cs)
 				
 				local skinApplied = evars.OUR_BYTEID
 				
-				if skinApplied and not vm:HasTag'EconLoadNotif' and tick()-_lastLoadErrNotif > 2 then
+				if not skinApplied and not vm:HasTag'EconLoadNotif' and tick()-_lastLoadErrNotif > 2 then
 					_lastLoadErrNotif = tick()
 					UTILS.ECON_UI:Notify({
 						Title = 'Skin Loading Fail',
