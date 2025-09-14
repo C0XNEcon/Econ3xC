@@ -155,6 +155,83 @@ end
 table.clear(_G.ECON_VARS.INIT_CONS)
 evars.TIMES_EXECUTED += 1
 
+-- // Remote Vars
+
+local HANDLED_WEAPONS = evars.HANDLED_WEAPONS
+local PROJ_THROW_ACTIVE = evars.PROJ_THROW_ACTIVE
+local _weaponReceiverRemote = rep.Remotes.Replication.Fighter.Replicate.OnClientEvent:Connect(function(...)
+	local args = {...}
+	if typeof(args[4]) == 'table' then -- Player Data
+		local _plr = args[4]["¸"]
+		local _byteID = args[2]
+		if _plr then -- Player Byte ID
+			if _plr.Name == plr.Name then
+				local _lastByteID = evars.OUR_BYTEID
+				evars.OUR_BYTEID = _byteID
+
+				if _byteID ~= _lastByteID and evars.BYTE_WEAPONS[plr.UserId] then
+					table.clear(evars.BYTE_WEAPONS[plr.UserId])
+				end
+			end
+
+			evars.RIVALS_BYTEPLR[_byteID] = players:FindFirstChild(_plr.Name).UserId
+		elseif args[4]['·'] then -- Player Weapon Equipped
+			local userId = evars.RIVALS_BYTEPLR[_byteID]
+			local weaponData = args[4]['¶']
+
+			if userId == plr.UserId then
+				if __updVMMod then
+					__updVMMod(weaponData.e,true)
+				end
+			elseif __removeSkins then
+				__removeSkins()
+			end
+
+			if userId then 
+				if not evars.BYTE_WEAPONS[userId] then
+					evars.BYTE_WEAPONS[userId] = {}
+				elseif args[5] == 1 then
+					table.clear(evars.BYTE_WEAPONS[userId])
+				end
+
+				evars.BYTE_WEAPONS[userId][weaponData['¾']] = weaponData.e
+			end
+		end
+	elseif args[3] == '' then -- Throwable / Projectile
+		local _byteID = args[2]
+
+		local userId = evars.RIVALS_BYTEPLR[_byteID]
+		local isOurs = plr.UserId == userId
+
+		if not evars.BYTE_WEAPONS[userId] then return end
+
+		local _weapon = evars.BYTE_WEAPONS[userId][args[4]]
+		local _isValidProjectile = module.modelList[_weapon == 'Slingshot' and args[6] or args[5]] and (typeof(args[6]) == 'Instance' or _weapon and table.find({'Slingshot'},_weapon))
+
+		if not _weapon or not isOurs and _isValidProjectile then
+			if __updVMMod then
+				if _weapon and PROJ_THROW_ACTIVE[_weapon] then
+					__updVMMod(_weapon,false,true)
+				elseif not _weapon then
+					for weapon, val in pairs(PROJ_THROW_ACTIVE) do
+						if val then
+							__updVMMod(weapon,false,true)
+						end
+					end
+				end
+			end
+
+			return
+		end
+
+		if __updVMMod and _isValidProjectile and isOurs and not PROJ_THROW_ACTIVE[_weapon] then
+			__updVMMod(_weapon,true,true)
+		end
+	elseif args[5] == 'GameOver' and __removeSkins then
+		__removeSkins()
+	end
+end);
+
 -- // Whitelist
 
 if not table.find(module.SCRIPT_WHITELIST,plr.UserId) then
@@ -281,9 +358,6 @@ if not UTILS.VISUALS_UI.createSparklesFrame then
 end
 
 -- // Modules -> ViewModels
-
-local HANDLED_WEAPONS = evars.HANDLED_WEAPONS
-local PROJ_THROW_ACTIVE = evars.PROJ_THROW_ACTIVE
 
 function __updVMMod(weapon, enabled, PROJ_THROW)
 	local BOTH = typeof(PROJ_THROW)  ~= 'boolean'
@@ -522,7 +596,7 @@ if _G.hd then
 	end
 end
 
-local function __removeSkins()
+function __removeSkins()
 	for weapon, val in pairs(HANDLED_WEAPONS) do
 		if val then
 			__updVMMod(weapon,false,1)
@@ -541,74 +615,8 @@ _G.hd = {
 		end
 	end);
 
-	weaponReceiver = rep.Remotes.Replication.Fighter.Replicate.OnClientEvent:Connect(function(...)
-		local args = {...}
-		if typeof(args[4]) == 'table' then -- Player Data
-			local _plr = args[4]["¸"]
-			local _byteID = args[2]
-			if _plr then -- Player Byte ID
-				if _plr.Name == plr.Name then
-					local _lastByteID = evars.OUR_BYTEID
-					evars.OUR_BYTEID = _byteID
-
-					if _byteID ~= _lastByteID and evars.BYTE_WEAPONS[plr.UserId] then
-						table.clear(evars.BYTE_WEAPONS[plr.UserId])
-					end
-				end
-
-				evars.RIVALS_BYTEPLR[_byteID] = players:FindFirstChild(_plr.Name).UserId
-			elseif args[4]['·'] then -- Player Weapon Equipped
-				local userId = evars.RIVALS_BYTEPLR[_byteID]
-				local weaponData = args[4]['¶']
-
-				if userId == plr.UserId then
-					__updVMMod(weaponData.e,true)
-				else
-					__removeSkins()
-				end
-
-				if userId then 
-					if not evars.BYTE_WEAPONS[userId] then
-						evars.BYTE_WEAPONS[userId] = {}
-					elseif args[5] == 1 then
-						table.clear(evars.BYTE_WEAPONS[userId])
-					end
-
-					evars.BYTE_WEAPONS[userId][weaponData['¾']] = weaponData.e
-				end
-			end
-		elseif args[3] == '' then -- Throwable / Projectile
-			local _byteID = args[2]
-
-			local userId = evars.RIVALS_BYTEPLR[_byteID]
-			local isOurs = plr.UserId == userId
-
-			if not evars.BYTE_WEAPONS[userId] then return end
-
-			local _weapon = evars.BYTE_WEAPONS[userId][args[4]]
-			local _isValidProjectile = module.modelList[_weapon == 'Slingshot' and args[6] or args[5]] and (typeof(args[6]) == 'Instance' or _weapon and table.find({'Slingshot'},_weapon))
-
-			if not _weapon or not isOurs and _isValidProjectile then
-				if _weapon and PROJ_THROW_ACTIVE[_weapon] then
-					__updVMMod(_weapon,false,true)
-				elseif not _weapon then
-					for weapon, val in pairs(PROJ_THROW_ACTIVE) do
-						if val then
-							__updVMMod(weapon,false,true)
-						end
-					end
-				end
-
-				return
-			end
-
-			if _isValidProjectile and isOurs and not PROJ_THROW_ACTIVE[_weapon] then
-				__updVMMod(_weapon,true,true)
-			end
-		elseif args[5] == 'GameOver' then
-			__removeSkins()
-		end
-	end); UI_Imgs = fighterInterfaces.ChildAdded:Connect(UTILS.VISUALS_UI.__handleFighterInterface)
+	weaponReceiver = _weaponReceiverRemote;
+	UI_Imgs = fighterInterfaces.ChildAdded:Connect(UTILS.VISUALS_UI.__handleFighterInterface)
 }
 
 -- // Wrapper
