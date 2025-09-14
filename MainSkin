@@ -420,12 +420,7 @@ function __updVMMod(weapon, enabled, PROJ_THROW)
 		for _, skin in pairs(all) do
 			local vm = OG_VMS.fromName[skin]
 			local n = not enabled and skin or selected == skin and weapon or skin == weapon and selected ~= weapon and '_econ.'..(skin:lower())..'/owo' or skin
-			if n == weapon then
-				vm.model:AddTag'EconTag'
-			else
-				vm.model:RemoveTag'EconTag'
-			end
-			
+			vm.model:SetAttribute('OGSkin',skin)
 			vm.model.Name = n
 			
 			local _module = vm.mod
@@ -985,7 +980,7 @@ function applySkin(skinName, cs)
 				local skin =  OG_VMS.fromName[skinName].model
 				local vm = vm or vms:GetChildren()[1]
 				
-				if not vm.ItemVisual:HasTag'EconTag' and not vm:HasTag'EconLoadNotif' and tick()-_lastLoadErrNotif > 2 then
+				if vm.ItemVisual:GetAttribute'OGSkin' ~= vm.ItemVisual.Name and not vm:HasTag'EconLoadNotif' and tick()-_lastLoadErrNotif > 2 then
 					_lastLoadErrNotif = tick()
 					UTILS.ECON_UI:Notify({
 						Title = 'Skin Loading Fail',
@@ -997,7 +992,7 @@ function applySkin(skinName, cs)
 					vm:AddTag'EconLoadNotif'
 				end
 
-				if skin and not vm:HasTag'Changed' and vm.ItemVisual:HasTag'EconTag' then
+				if skin and not vm:HasTag'Changed' and vm.ItemVisual:GetAttribute'OGSkin' == vm.ItemVisual.Name then
 					vm:AddTag'Changed'
 
 					local last = vm.Name
