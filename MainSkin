@@ -159,7 +159,6 @@ evars.TIMES_EXECUTED += 1
 
 local HANDLED_WEAPONS = evars.HANDLED_WEAPONS
 local PROJ_THROW_ACTIVE = evars.PROJ_THROW_ACTIVE
-local VM_TOSKIN = {}
 
 local _weaponReceiverRemote = rep.Remotes.Replication.Fighter.Replicate.OnClientEvent:Connect(function(...)
 	local args = {...}
@@ -423,8 +422,7 @@ function __updVMMod(weapon, enabled, PROJ_THROW)
 			local vm = OG_VMS.fromName[skin]
 			local n = not enabled and skin or selected == skin and weapon or skin == weapon and selected ~= weapon and '_econ.'..(skin:lower())..'/owo' or skin
 			vm.model.Name = n
-			VM_TOSKIN[vm.model] = skin
-			
+
 			local _module = vm.mod
 			if _module then
 				_module.Name = not enabled and skin 
@@ -982,9 +980,9 @@ function applySkin(skinName, cs)
 				local skin =  OG_VMS.fromName[skinName].model
 				local vm = vm or vms:GetChildren()[1]
 				
-				local isChosen = VM_TOSKIN[skin] == skinName
+				local skinApplied = evars.OUR_BYTEID
 				
-				if not isChosen and not vm:HasTag'EconLoadNotif' and tick()-_lastLoadErrNotif > 2 then
+				if skinApplied and not vm:HasTag'EconLoadNotif' and tick()-_lastLoadErrNotif > 2 then
 					_lastLoadErrNotif = tick()
 					UTILS.ECON_UI:Notify({
 						Title = 'Skin Loading Fail',
@@ -996,7 +994,7 @@ function applySkin(skinName, cs)
 					vm:AddTag'EconLoadNotif'
 				end
 
-				if skin and not vm:HasTag'Changed' and isChosen then
+				if skinApplied and skin and not vm:HasTag'Changed' then
 					vm:AddTag'Changed'
 
 					local last = vm.Name
