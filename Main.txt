@@ -1095,9 +1095,10 @@ local function createbox(player)
 				end
 			else
 				invis()
-				if char then
+				if char and char.Parent then
 					char.Parent = workspace
 				end
+				
 				boxBox.Transparency = 1
 				boxBox.Visible = false
 			end
