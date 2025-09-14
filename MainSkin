@@ -982,7 +982,7 @@ function applySkin(skinName, cs)
 				local skin =  OG_VMS.fromName[skinName].model
 				local vm = vm or vms:GetChildren()[1]
 				
-				local isChosen = VM_TOSKIN[vm.ItemVisual] == skinName
+				local isChosen = VM_TOSKIN[skin] == skinName
 				
 				if not isChosen and not vm:HasTag'EconLoadNotif' and tick()-_lastLoadErrNotif > 2 then
 					_lastLoadErrNotif = tick()
