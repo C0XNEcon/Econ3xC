@@ -837,6 +837,16 @@ local slideJumpMult = movementTab:CreateSlider({
 	end,
 })
 
+-- // Skin
+
+_G.ECON_UI = EconField
+_G.SIGNAL_QUEUE = true
+task.spawn(function()
+	loadstring(__GETURL'MainSkin')()
+end)
+
+-- // Rest
+
 table.insert(initConnections, RunService.RenderStepped:Connect(sj))
 table.insert(initConnections, UserInputService.InputBegan:Connect(function(input, processed)
 	local b = table.find(keybinds, input.KeyCode.Name)
@@ -1120,7 +1130,4 @@ end))
 
 EconField.LoadConfiguration()
 
-_G.ECON_UI = EconField
-_G.SIGNAL_QUEUE = true
-loadstring(__GETURL'MainSkin')()
 queue_on_teleport(__GETURL'Main.txt')
