@@ -428,7 +428,13 @@ modulesCopy.Parent = modules
 
 vmModsOG = vmModsOG or vmModules
 
+local NAME_FINISHER = {}
+
 if not evars.OG_VMS then
+	for _, v in pairs(rep.Modules.Finishers:GetChildren()) do
+		NAME_FINISHER[v.Name] = v
+	end
+	
 	for _, v in pairs(skins:GetDescendants()) do
 		if v:IsA('Model') then
 			local FINAL_TB = {
@@ -635,6 +641,31 @@ _G.hd = {
 		elseif args[5] == 'GameOver' then
 			__removeSkins()
 		end
+		
+		--if args[5] == '!' then
+		--	local _byteID = args[2]
+
+		--	local userId = evars.RIVALS_BYTEPLR[_byteID]
+		--	local isOurs = plr.UserId == userId
+
+		--	if not evars.BYTE_WEAPONS[userId] then return end
+
+		--	local _weapon = evars.BYTE_WEAPONS[userId][args[4]]
+
+		--	if not _weapon or not isOurs then
+		--		for n, v in NAME_FINISHER do
+		--			v.Name = n
+		--		end
+				
+		--		return
+		--	end
+
+		--	if isOurs then
+		--		for n, v in NAME_FINISHER do
+		--			v.Name = n == finisherSkinInfo[_weapon] and 'Ragdoll' or `_econ.{n:lower()}/conparty:)`
+		--		end
+		--	end
+		--end
 	end); UI_Imgs = fighterInterfaces.ChildAdded:Connect(UTILS.VISUALS_UI.__handleFighterInterface)
 }
 
@@ -833,79 +864,79 @@ for t, weapons in pairs(UTILS.WEAPON_TYPES.typeToWeapons) do
 		
 		-- // Finishers
 		
-		local finisherSection = gameplayTab:CreateSection('Finishers - Hold a weapon')
-		local finishers = {}
-		local typeFinisher = nil
+		--local finisherSection = gameplayTab:CreateSection('Finishers - Hold a weapon')
+		--local finishers = {}
+		--local typeFinisher = nil
 		
-		local tfinishers = {}
+		--local tfinishers = {}
 		
-		for _, v in pairs(rep.Modules.Finishers:GetChildren()) do
-			table.insert(finishers,v.Name)
-		end
+		--for _, v in pairs(rep.Modules.Finishers:GetChildren()) do
+		--	table.insert(finishers,v.Name)
+		--end
 		
-		for _, v in pairs(finishers) do
-			table.insert(tfinishers,v:lower())
-		end
+		--for _, v in pairs(finishers) do
+		--	table.insert(tfinishers,v:lower())
+		--end
 		
-		local finishersDropdown = gameplayTab:CreateDropdown({
-			Name = 'Finisher',
-			Options = finishers,
-			CurrentOption = {selectedFinisher},
-			SpecialOptions = {},
-			MultipleOptions = false,
-			Ext = true,
-			Flag = 'fcdropdown',
-			Callback = function(Options, nosound)
-				selectedFinisher = Options[1]
+		--local finishersDropdown = gameplayTab:CreateDropdown({
+		--	Name = 'Finisher',
+		--	Options = finishers,
+		--	CurrentOption = {selectedFinisher},
+		--	SpecialOptions = {},
+		--	MultipleOptions = false,
+		--	Ext = true,
+		--	Flag = 'fcdropdown',
+		--	Callback = function(Options, nosound)
+		--		selectedFinisher = Options[1]
 
-				if not nosound and not (not vms or #vms:GetChildren() == 0) then
-					updateSkin()
-				elseif not nosound then
-					UTILS.ECON_UI:Notify({
-						Title = 'Error',
-						Content = 'Hold a weapon to change their finisher', 
-						Image = 6026568210,
-						Duration = 2,
-					})
-				end
-			end,
-		})
+		--		if not nosound and not (not vms or #vms:GetChildren() == 0) then
+		--			updateSkin()
+		--		elseif not nosound then
+		--			UTILS.ECON_UI:Notify({
+		--				Title = 'Error',
+		--				Content = 'Hold a weapon to change their finisher', 
+		--				Image = 6026568210,
+		--				Duration = 2,
+		--			})
+		--		end
+		--	end,
+		--})
 		
-		typeFinisher = gameplayTab:CreateInput({
-			Name = 'Type Finisher',
-			CurrentValue = selectedFinisher,
-			PlaceholderText = selectedFinisher,
-			RemoveTextAfterFocusLost = true,
-			Ext = true,
-			Flag = 'wcwcinput',
-			Callback = function(txt, nosound)
-				if table.find(tfinishers, txt:lower()) then
-					local realFinisher = 'Ragdoll'
-					for w, v in pairs(finishers) do
-						if v:lower() == txt:lower() then
-							realFinisher = v
-							break
-						end
-					end
+		--typeFinisher = gameplayTab:CreateInput({
+		--	Name = 'Type Finisher',
+		--	CurrentValue = selectedFinisher,
+		--	PlaceholderText = selectedFinisher,
+		--	RemoveTextAfterFocusLost = true,
+		--	Ext = true,
+		--	Flag = 'wcwcinput',
+		--	Callback = function(txt, nosound)
+		--		if table.find(tfinishers, txt:lower()) then
+		--			local realFinisher = 'Ragdoll'
+		--			for w, v in pairs(finishers) do
+		--				if v:lower() == txt:lower() then
+		--					realFinisher = v
+		--					break
+		--				end
+		--			end
 
-					if not (not vms or #vms:GetChildren() == 0) then
-						finishersDropdown:Set({realFinisher}, nosound)
-					end
+		--			if not (not vms or #vms:GetChildren() == 0) then
+		--				finishersDropdown:Set({realFinisher}, nosound)
+		--			end
 
-					selectedFinisher = realFinisher
+		--			selectedFinisher = realFinisher
 
-					if not nosound and not (not vms or #vms:GetChildren() == 0) then
-					elseif not nosound then
-						UTILS.ECON_UI:Notify({
-							Title = 'Error',
-							Content = 'Hold a weapon to change their finisher', 
-							Image = 6026568210,
-							Duration = 2,
-						})
-					end
-				end
-			end,
-		})
+		--			if not nosound and not (not vms or #vms:GetChildren() == 0) then
+		--			elseif not nosound then
+		--				UTILS.ECON_UI:Notify({
+		--					Title = 'Error',
+		--					Content = 'Hold a weapon to change their finisher', 
+		--					Image = 6026568210,
+		--					Duration = 2,
+		--				})
+		--			end
+		--		end
+		--	end,
+		--})
 		
 		-- // Rest
 
