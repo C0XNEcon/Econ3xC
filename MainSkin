@@ -78,7 +78,7 @@ local module = {
 local request = (syn and syn.request) or (fluxus and fluxus.request) or (http and http.request) or http_request or request
 
 local URL_ROOT = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/'
-local ECON_TOKEN = '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'
+local ECON_TOKEN = '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'
 local __GETURL = function(URL)
 	return request({Url = URL_ROOT..URL; Method = 'GET'; Headers = {
 		Authorization = 'token '..ECON_TOKEN;
@@ -508,6 +508,7 @@ local ERR_NSC = 'Econ was not saved correctly last session'
 local ECON_FILE = 'EconContainer'
 local READ_FILE = false
 
+local finisherSkinInfo = {}
 local wrapSkinInfo = {}
 local weaponToButton = {}
 local charapb = {}
@@ -527,8 +528,14 @@ function readFile()
 				if b then
 					_G.toskin[inf[1]] = inf[2]
 					b:Set({inf[2]}, true)
-
-					local inf = v:split''
+					
+					local finisherSplits = v:split(string.char(3))
+					local inf = finisherSplits[1]:split''
+					
+					if finisherSplits[2] then
+						finisherSkinInfo[inf[1]] = finisherSplits[2]
+					end
+					
 					wrapSkinInfo[inf[1]] = {
 						wrap = inf[3] or 'None',
 						inverted = inf[4]
@@ -545,9 +552,11 @@ function writeFile()
 	local str = evars.CURRENT_ID..''
 	for weapon, skin in pairs(_G.toskin) do
 		local wrap = wrapSkinInfo[weapon]
+		local finisher = finisherSkinInfo[weapon]
 		str ..= weapon..''
 			..skin
 			..(wrap and wrap.wrap ~= 'None' and (''..wrap.wrap..(wrap.inverted and '' or '')) or '')
+			..(finisher and finisher ~= 'Ragdoll' and (''..finisher) or '')
 			..''
 	end
 
@@ -691,9 +700,10 @@ for t, weapons in pairs(UTILS.WEAPON_TYPES.typeToWeapons) do
 
 		charapb = charchanger
 
-		local visualSection = gameplayTab:CreateSection('Wrap Changer - Hold a weapon')
+		local visualSection = gameplayTab:CreateSection('Wraps - Hold a weapon')
 
 		local selectedWrap = 'None'
+		local selectedFinisher = 'Ragdoll'
 		local selectedWeapon = 'Assault Rifle'
 		local wrapsX = {}
 		local inverted = false
@@ -709,7 +719,9 @@ for t, weapons in pairs(UTILS.WEAPON_TYPES.typeToWeapons) do
 			wrapSkinInfo[name] = {
 				wrap = selectedWrap,
 				inverted = inverted,
-			}
+			};
+			
+			finisherSkinInfo[name] = selectedFinisher
 
 			writeFile()
 			gt()
@@ -775,6 +787,7 @@ for t, weapons in pairs(UTILS.WEAPON_TYPES.typeToWeapons) do
 					for w, v in pairs(getAll_result) do
 						if v:lower() == txt:lower() then
 							realWrap = v
+							break
 						end
 					end
 
@@ -810,13 +823,91 @@ for t, weapons in pairs(UTILS.WEAPON_TYPES.typeToWeapons) do
 				elseif not nosound then
 					UTILS.ECON_UI:Notify({
 						Title = 'Error',
-						Content = 'Hold a weapon to change your wrap', 
+						Content = 'Hold a weapon to change their wrap', 
 						Image = 6026568210,
 						Duration = 2,
 					})
 				end
 			end,
 		})
+		
+		-- // Finishers
+		
+		local finisherSection = gameplayTab:CreateSection('Finishers - Hold a weapon')
+		local finishers = {}
+		local typeFinisher = nil
+		
+		local tfinishers = {}
+		
+		for _, v in pairs(rep.Modules.Finishers:GetChildren()) do
+			table.insert(finishers,v.Name)
+		end
+		
+		for _, v in pairs(finishers) do
+			table.insert(tfinishers,v:lower())
+		end
+		
+		local finishersDropdown = gameplayTab:CreateDropdown({
+			Name = 'Finisher',
+			Options = finishers,
+			CurrentOption = {selectedFinisher},
+			SpecialOptions = {},
+			MultipleOptions = false,
+			Ext = true,
+			Flag = 'fcdropdown',
+			Callback = function(Options, nosound)
+				selectedFinisher = Options[1]
+
+				if not nosound and not (not vms or #vms:GetChildren() == 0) then
+					updateSkin()
+				elseif not nosound then
+					UTILS.ECON_UI:Notify({
+						Title = 'Error',
+						Content = 'Hold a weapon to change their finisher', 
+						Image = 6026568210,
+						Duration = 2,
+					})
+				end
+			end,
+		})
+		
+		typeFinisher = gameplayTab:CreateInput({
+			Name = 'Type Finisher',
+			CurrentValue = selectedFinisher,
+			PlaceholderText = selectedFinisher,
+			RemoveTextAfterFocusLost = true,
+			Ext = true,
+			Flag = 'wcwcinput',
+			Callback = function(txt, nosound)
+				if table.find(tfinishers, txt:lower()) then
+					local realFinisher = 'Ragdoll'
+					for w, v in pairs(finishers) do
+						if v:lower() == txt:lower() then
+							realFinisher = v
+							break
+						end
+					end
+
+					if not (not vms or #vms:GetChildren() == 0) then
+						finishersDropdown:Set({realFinisher}, nosound)
+					end
+
+					selectedFinisher = realFinisher
+
+					if not nosound and not (not vms or #vms:GetChildren() == 0) then
+					elseif not nosound then
+						UTILS.ECON_UI:Notify({
+							Title = 'Error',
+							Content = 'Hold a weapon to change their finisher', 
+							Image = 6026568210,
+							Duration = 2,
+						})
+					end
+				end
+			end,
+		})
+		
+		-- // Rest
 
 		local function _vmAdded(v)
 			if not v:HasTag('Changed') and v.Name:find(plr.Name) then
@@ -832,9 +923,17 @@ for t, weapons in pairs(UTILS.WEAPON_TYPES.typeToWeapons) do
 
 			local n = cw.Name:split' - '[2]
 			local inf = wrapSkinInfo[n]
-			visualSection:Set(n and 'Wrap Changer - '..n or 'Wrap Changer - Hold a weapon')
+			local finisher = finisherSkinInfo[n]
+			
+			visualSection:Set(n and 'Wraps - '..n or 'Wraps - Hold a weapon')
+			finisherSection:Set(n and 'Finishers - '..n or 'Finishers - Hold a weapon')
+			
 			task.spawn(function()
 				typeWrap:Set(inf and inf.wrap or 'None', 1)
+			end)
+			
+			task.spawn(function()
+				typeFinisher:Set(finisher or 'Ragdoll', 1)
 			end)
 
 			task.spawn(function()
