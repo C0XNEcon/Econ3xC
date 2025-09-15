@@ -701,6 +701,19 @@ local nl = plrs.LocalPlayer.PlayerScripts.UserInterface:WaitForChild('TeammateLa
 -- // REST
 
 local gameplayTab = Window:CreateTab('Gameplay', 'swords') -- Title, Image
+local deviceSection = gameplayTab:CreateSection('Device')
+
+local deviceDropdown = gameplayTab:CreateDropdown({
+	Name = 'Change Device',
+	Options = {'VR', 'Touch', 'Gamepad', 'MouseKeyboard'},
+	CurrentOption = {'MouseKeyboard'},
+	MultipleOptions = false,
+	Flag = 'devicedrop',
+	Callback = function(Options)
+		ReplicatedStorage.Remotes.Replication.Fighter.SetControls:FireServer(Options[1])
+	end,
+})
+
 local gameplaySection = gameplayTab:CreateSection('Gameplay')
 
 local CARRELOAD = gameplayTab:CreateToggle({
