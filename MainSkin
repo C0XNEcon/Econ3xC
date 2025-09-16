@@ -957,15 +957,15 @@ for t, weapons in pairs(UTILS.WEAPON_TYPES.typeToWeapons) do
 			local finisher = finisherSkinInfo[n]
 			
 			visualSection:Set(n and 'Wraps - '..n or 'Wraps - Hold a weapon')
-			finisherSection:Set(n and 'Finishers - '..n or 'Finishers - Hold a weapon')
+			--finisherSection:Set(n and 'Finishers - '..n or 'Finishers - Hold a weapon')
 			
 			task.spawn(function()
 				typeWrap:Set(inf and inf.wrap or 'None', 1)
 			end)
 			
-			task.spawn(function()
-				typeFinisher:Set(finisher or 'Ragdoll', 1)
-			end)
+			--task.spawn(function()
+			--	typeFinisher:Set(finisher or 'Ragdoll', 1)
+			--end)
 
 			task.spawn(function()
 				invertedToggle:Set(inf and inf.inverted, 1)	
