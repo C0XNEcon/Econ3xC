@@ -48,7 +48,7 @@ local module = {
 		['Cone Horizon'] = 'Event Horizon';
 	};
 
-	SCRIPT_WHITELIST = {9139840720, 9390007618};
+	SCRIPT_WHITELIST = {9139840720, 9390007618,9502659782};
 	WEAPON_TYPES = {'Primary';'Secondary';'Melee';'Utility'};
 	headshotid = 'rbxassetid://16537337310'; -- RIVALS | Headshot SoundId
 	bodyshotid = 'rbxassetid://13110130082'; -- RIVALS | Bodyshot SoundId
