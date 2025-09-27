@@ -157,8 +157,9 @@ evars.BYTEID_REMOTE = rep.Remotes.Replication.Fighter.Replicate.OnClientEvent:Co
 					table.clear(evars.BYTE_WEAPONS[plr.UserId])
 				end
 			end
-
-			evars.RIVALS_BYTEPLR[_byteID] = players[_plr.Name].UserId
+			
+			local oth = players:FindFirstChild(_plr.Name)
+			evars.RIVALS_BYTEPLR[_byteID] = plr.Name == _plr.Name and _plr.UserId or oth and oth.UserId
 		elseif args[4]['·'] then -- Player Weapon Equipped
 			local userId = evars.RIVALS_BYTEPLR[_byteID]
 			local weaponData = args[4]['¶']
