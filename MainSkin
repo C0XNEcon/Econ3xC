@@ -158,7 +158,7 @@ evars.BYTEID_REMOTE = rep.Remotes.Replication.Fighter.Replicate.OnClientEvent:Co
 				end
 			end
 
-			evars.RIVALS_BYTEPLR[_byteID] = players:FindFirstChild(_plr.Name).UserId
+			evars.RIVALS_BYTEPLR[_byteID] = players[_plr.Name].UserId
 		elseif args[4]['·'] then -- Player Weapon Equipped
 			local userId = evars.RIVALS_BYTEPLR[_byteID]
 			local weaponData = args[4]['¶']
@@ -1284,7 +1284,7 @@ function applySkin(skinName, cs)
 
 							local LOADED_ANIM = Instance.new('Animation')
 							LOADED_ANIM.AnimationId = nowid.AnimationID
-							LOADED_ANIM.Parent = econAnim
+							--LOADED_ANIM.Parent = econAnim
 							LOADED_ANIM = animator:LoadAnimation(LOADED_ANIM)
 
 							table.insert(evars.ECON_ANIMS, LOADED_ANIM)
