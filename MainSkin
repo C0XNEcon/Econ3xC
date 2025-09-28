@@ -146,7 +146,7 @@ local evars = _G.ECON_VARS
 evars.BYTEID_REMOTE = rep.Remotes.Replication.Fighter.Replicate.OnClientEvent:Connect(function(...)
 	local args = {...}
 	if typeof(args[4]) == 'table' then -- Player Data
-		local _plr = args[4]["¸"]
+		local _plr = args[4]["º"]
 		local _byteID = args[2]
 		if _plr then -- Player Byte ID
 			if _plr.Name == plr.Name then
@@ -157,20 +157,19 @@ evars.BYTEID_REMOTE = rep.Remotes.Replication.Fighter.Replicate.OnClientEvent:Co
 					table.clear(evars.BYTE_WEAPONS[plr.UserId])
 				end
 			end
-			
-			local oth = players:FindFirstChild(_plr.Name)
-			evars.RIVALS_BYTEPLR[_byteID] = plr.Name == _plr.Name and _plr.UserId or oth and oth.UserId
+
+			evars.RIVALS_BYTEPLR[_byteID] = players[_plr.Name].UserId
 		elseif args[4]['·'] then -- Player Weapon Equipped
 			local userId = evars.RIVALS_BYTEPLR[_byteID]
-			local weaponData = args[4]['¶']
+			local weaponData = args[4]['·']
 			if userId then 
 				if not evars.BYTE_WEAPONS[userId] then
 					evars.BYTE_WEAPONS[userId] = {}
 				elseif args[5] == 1 then
 					table.clear(evars.BYTE_WEAPONS[userId])
 				end
-
-				evars.BYTE_WEAPONS[userId][weaponData['¾']] = weaponData.e
+				
+				evars.BYTE_WEAPONS[userId][weaponData['¿']] = weaponData.e
 			end
 		end
 	end
@@ -604,11 +603,15 @@ _G.hd = {
 			local _byteID = args[2]
 			if args[4]['·'] then -- Player Weapon Equipped
 				local userId = evars.RIVALS_BYTEPLR[_byteID]
-				local weaponData = args[4]['¶']
-				if userId == plr.UserId then
-					__updVMMod(weaponData.e,true)
-				else
-					__removeSkins()
+				if _plr then
+					local weaponData = _plr['·']
+					if weaponData then
+						if userId == plr.UserId then
+							__updVMMod(weaponData.e,true)
+						else
+							__removeSkins()
+						end
+					end
 				end
 			end
 		elseif args[3] == '' then -- Throwable / Projectile
@@ -616,11 +619,11 @@ _G.hd = {
 
 			local userId = evars.RIVALS_BYTEPLR[_byteID]
 			local isOurs = plr.UserId == userId
-
+			
 			if not evars.BYTE_WEAPONS[userId] then return end
 
 			local _weapon = evars.BYTE_WEAPONS[userId][args[4]]
-			local _isValidProjectile = module.modelList[_weapon == 'Slingshot' and args[6] or args[5]] and (typeof(args[6]) == 'Instance' or _weapon and table.find({'Slingshot'},_weapon))
+			local _isValidProjectile = module.modelList[_weapon == 'Slingshot' and '' or args[5]] and (typeof(args[6]) == 'Instance' or _weapon and table.find({'Slingshot'},_weapon))
 
 			if not _weapon or not isOurs and _isValidProjectile then
 				if _weapon and PROJ_THROW_ACTIVE[_weapon] then
