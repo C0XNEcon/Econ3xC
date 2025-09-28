@@ -112,6 +112,8 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 			end
 		end
 	end
+	
+	local TweenService_upvr = game:GetService('TweenService')
 
 	local funcs = {
 		['Neon Lights'] = function()
@@ -192,14 +194,38 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 						local speed, dir = v:GetAttribute('Speed'), v:GetAttribute('Direction')
 						if speed and dir then
 							v.OffsetStudsU = tick() * speed * dir.X % v.StudsPerTileU
-							--v.OffsetStudsV = tick() * speed * dir.Y % v.StudsPerTileU
 						end
 					end
 				else
 					z:Disconnect()
 				end
 			end)
-		end,
+		end;Aegis = function()
+			local z
+			z = run.Heartbeat:Connect(function()
+				local var12 = workspace:GetServerTimeNow() / 4
+				local clamped = math.clamp(math.sin(var12 * 24) / 3 + 0.5, 0, 1)
+				local clamped_2 = math.clamp(math.sin((var12 + 3.5342917352885173) * 24) / 3 + 0.5, 0, 1)
+
+				for i, v in new do
+					local nameFuncs = {
+						Sparkles = function()
+							v.OffsetStudsV = var12 % v.StudsPerTileV
+							v.Transparency = clamped
+						end; Sparkles2 = function()
+							v.OffsetStudsV = var12 % v.StudsPerTileV
+							v.Transparency = clamped_2
+						end;
+					};
+					
+					if nameFuncs[v.Name] then
+						nameFuncs[v.Name]();
+					end;
+				end
+			end)
+		end;Encroached = function()
+			
+		end;
 	}
 
 	if funcs[wrapx] then funcs[wrapx]() end
