@@ -380,10 +380,15 @@ task.spawn(function()
 	end
 end)
 
+local aimPredictionXZ, aimPredictionY = 1, 1
+
 local function car(right, needs, head)
 	local weapon = getWeapon()
 	if (spactivate or silactive or needs) and weapon and (not table.find(carRight, weapon) or needs) then
 		local targetHead = head or f or getNearestHead()
+		local targetChar = targetHead and targetHead.Parent
+		local targetHum = targetChar and targetChar:FindFirstChild('Humanoid')
+		local targetRoot = targetChar and targetChar.PrimaryPart
 		if targetHead then
 			f = nil
 
@@ -394,12 +399,20 @@ local function car(right, needs, head)
 				pos = typ == 'Changing' and targetHead.Position+changeVal.Value or targetHead.Parent.HumanoidRootPart.Position
 			end
 
-			-- a/i/m/p/o/s
-			local apos = pos--+Vector3.new(Random.new(.3, -.3), Random.new(-.2, -2), Random.new(.3, -.3))
+			local apos = pos
 			local l = Camera.CFrame
 
 			if weapon == 'Daggers' or weapon == 'Bow' then
 				apos += Vector3.new(0, 1, 0)
+			end
+			
+			if targetRoot then
+				local vel = targetRoot.Velocity::Vector3;
+				local max = 20;
+				
+				local xz = max/aimPredictionXZ;
+				local y = max/aimPredictionY;
+				apos += Vector3.new(vel.X/xz,vel.Y/y,vel.Z/xz)
 			end
 
 			local x, y, z = targetHead.CFrame:ToOrientation()
@@ -532,12 +545,38 @@ local trackTypeDropdown = homeTab:CreateDropdown({
 local aymLerping = homeTab:CreateSlider({
 	Name = 'A'..'im' ..' Lerping Alpha',
 	Range = {10, 100},
-	Increment = 1,
+	Increment = .5,
 	Suffix = '',
 	CurrentValue = 100,
 	Flag = 'lerpSlider',
 	Callback = function(Value)
 		lerp = Value/100
+	end,
+})
+
+homeTab:CreateSection('Aim Prediction')
+
+local aimPredXZ = homeTab:CreateSlider({
+	Name = 'Aim Prediction X-Z',
+	Range = {1, 100},
+	Increment = .5,
+	Suffix = '',
+	CurrentValue = 20,
+	Flag = 'apXZ',
+	Callback = function(Value)
+		aimPredictionXZ = Value/85
+	end,
+})
+
+local aimPredY = homeTab:CreateSlider({
+	Name = 'Aim Prediction Y',
+	Range = {1, 100},
+	Increment = .5,
+	Suffix = '',
+	CurrentValue = 20,
+	Flag = 'apY',
+	Callback = function(Value)
+		aimPredictionY = Value/85
 	end,
 })
 
