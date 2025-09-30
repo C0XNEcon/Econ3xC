@@ -57,7 +57,7 @@ local module = {
 
 --[[ ADDING NEW SKINS ]|
 
-- Copying rivals ItemLibrary to -- << TODO:Econ/WeaponTypes >>
+- Copying ItemLibrary to -- << TODO:Econ/WeaponTypes >>
 - Run Clipboard script and pasting to -- << TODO:Econ/AnimSound >>
 - Put new 'add_animations' from AnimLib to -- << TODO:Econ/Anim >>
 - Put new 'add_viewmodel' from ItemLibrary to  -- << TODO:Econ/Skin >>
@@ -66,10 +66,6 @@ local module = {
 --[[ ADDING NEW WRAPS ]|
 
 - Put 'add_wrap' from CosmeticLibrary to -- << TODO:Econ/UTILS.WRAPPER_MOD.txt >>
-
---[[ ADDING NEW ITEMS ]|
-
-- Primary, Secondary, Melee, Utility from ItemLib to WeaponTypes 'str'
 
 ]]
 
@@ -109,10 +105,10 @@ local temp = repAssets:WaitForChild'Temp'
 local vms = workspace:WaitForChild('ViewModels').FirstPerson
 local tempvms = temp:WaitForChild('ViewModels')
 
-local misc = assets:WaitForChild('Misc')
-local throwables = assets:WaitForChild('Throwables')
+local misc        = assets:WaitForChild('Misc')
+local throwables  = assets:WaitForChild('Throwables')
 local projectiles = assets:WaitForChild('Projectiles')
-local skins = assets:WaitForChild('ViewModels')
+local skins       = assets:WaitForChild('ViewModels')
 
 local vmModsOG = modules:FindFirstChild('OriginalViewModels')
 local vmModules = vmModsOG or modules:WaitForChild('ViewModels')
@@ -319,7 +315,7 @@ local HANDLED_WEAPONS = evars.HANDLED_WEAPONS
 local PROJ_THROW_ACTIVE = evars.PROJ_THROW_ACTIVE
 
 function __updVMMod(weapon, enabled, PROJ_THROW)
-	local BOTH = typeof(PROJ_THROW)  ~= 'boolean'
+	local BOTH = typeof(PROJ_THROW) ~= 'boolean'
 
 	local NORM, PROJ = (not PROJ_THROW or BOTH) and (HANDLED_WEAPONS[weapon] and enabled or not HANDLED_WEAPONS[weapon] and not enabled), PROJ_THROW and (PROJ_THROW_ACTIVE[weapon] and enabled or not PROJ_THROW_ACTIVE[weapon] and not enabled)
 	if NORM or PROJ then
@@ -502,9 +498,9 @@ local UI_WINDOW = _G.WINDOW_REPLACEMENT or UTILS.ECON_UI:CreateWindow({
 	DisableBuildWarnings = true,
 
 	ConfigurationSaving = {
-		Enabled = true,
-		FolderName = 'cone',
-		FileName = "econ"
+		Enabled = false,
+		FolderName = '!coneskins.nosave',
+		FileName = '!nosave'
 	},
 })
 
@@ -635,7 +631,6 @@ _G.hd = {
 						end
 					end
 				end
-
 				return
 			end
 
@@ -645,31 +640,6 @@ _G.hd = {
 		elseif args[5] == 'GameOver' then
 			__removeSkins()
 		end
-		
-		--if args[5] == '!' then
-		--	local _byteID = args[2]
-
-		--	local userId = evars.RIVALS_BYTEPLR[_byteID]
-		--	local isOurs = plr.UserId == userId
-
-		--	if not evars.BYTE_WEAPONS[userId] then return end
-
-		--	local _weapon = evars.BYTE_WEAPONS[userId][args[4]]
-
-		--	if not _weapon or not isOurs then
-		--		for n, v in NAME_FINISHER do
-		--			v.Name = n
-		--		end
-				
-		--		return
-		--	end
-
-		--	if isOurs then
-		--		for n, v in NAME_FINISHER do
-		--			v.Name = n == finisherSkinInfo[_weapon] and 'Ragdoll' or `_econ.{n:lower()}/conparty:)`
-		--		end
-		--	end
-		--end
 	end); UI_Imgs = fighterInterfaces.ChildAdded:Connect(UTILS.VISUALS_UI.__handleFighterInterface)
 }
 
@@ -708,6 +678,7 @@ for t, weapons in pairs(UTILS.WEAPON_TYPES.typeToWeapons) do
 			CurrentValue = tostring(evars.CURRENT_ID),
 			PlaceholderText = 'ConePartyy',
 			RemoveTextAfterFocusLost = false,
+			Ext = true;
 			Flag = 'appearancechangerid',
 			Callback = function(t)
 				local suc, z = false, 'Lid Exists'
@@ -866,82 +837,6 @@ for t, weapons in pairs(UTILS.WEAPON_TYPES.typeToWeapons) do
 			end,
 		})
 		
-		-- // Finishers
-		
-		--local finisherSection = gameplayTab:CreateSection('Finishers - Hold a weapon')
-		--local finishers = {}
-		--local typeFinisher = nil
-		
-		--local tfinishers = {}
-		
-		--for _, v in pairs(rep.Modules.Finishers:GetChildren()) do
-		--	table.insert(finishers,v.Name)
-		--end
-		
-		--for _, v in pairs(finishers) do
-		--	table.insert(tfinishers,v:lower())
-		--end
-		
-		--local finishersDropdown = gameplayTab:CreateDropdown({
-		--	Name = 'Finisher',
-		--	Options = finishers,
-		--	CurrentOption = {selectedFinisher},
-		--	SpecialOptions = {},
-		--	MultipleOptions = false,
-		--	Ext = true,
-		--	Flag = 'fcdropdown',
-		--	Callback = function(Options, nosound)
-		--		selectedFinisher = Options[1]
-
-		--		if not nosound and not (not vms or #vms:GetChildren() == 0) then
-		--			updateSkin()
-		--		elseif not nosound then
-		--			UTILS.ECON_UI:Notify({
-		--				Title = 'Error',
-		--				Content = 'Hold a weapon to change their finisher', 
-		--				Image = 6026568210,
-		--				Duration = 2,
-		--			})
-		--		end
-		--	end,
-		--})
-		
-		--typeFinisher = gameplayTab:CreateInput({
-		--	Name = 'Type Finisher',
-		--	CurrentValue = selectedFinisher,
-		--	PlaceholderText = selectedFinisher,
-		--	RemoveTextAfterFocusLost = true,
-		--	Ext = true,
-		--	Flag = 'wcwcinput',
-		--	Callback = function(txt, nosound)
-		--		if table.find(tfinishers, txt:lower()) then
-		--			local realFinisher = 'Ragdoll'
-		--			for w, v in pairs(finishers) do
-		--				if v:lower() == txt:lower() then
-		--					realFinisher = v
-		--					break
-		--				end
-		--			end
-
-		--			if not (not vms or #vms:GetChildren() == 0) then
-		--				finishersDropdown:Set({realFinisher}, nosound)
-		--			end
-
-		--			selectedFinisher = realFinisher
-
-		--			if not nosound and not (not vms or #vms:GetChildren() == 0) then
-		--			elseif not nosound then
-		--				UTILS.ECON_UI:Notify({
-		--					Title = 'Error',
-		--					Content = 'Hold a weapon to change their finisher', 
-		--					Image = 6026568210,
-		--					Duration = 2,
-		--				})
-		--			end
-		--		end
-		--	end,
-		--})
-		
 		-- // Rest
 
 		local function _vmAdded(v)
@@ -961,15 +856,10 @@ for t, weapons in pairs(UTILS.WEAPON_TYPES.typeToWeapons) do
 			local finisher = finisherSkinInfo[n]
 			
 			visualSection:Set(n and 'Wraps - '..n or 'Wraps - Hold a weapon')
-			--finisherSection:Set(n and 'Finishers - '..n or 'Finishers - Hold a weapon')
-			
+
 			task.spawn(function()
 				typeWrap:Set(inf and inf.wrap or 'None', 1)
 			end)
-			
-			--task.spawn(function()
-			--	typeFinisher:Set(finisher or 'Ragdoll', 1)
-			--end)
 
 			task.spawn(function()
 				invertedToggle:Set(inf and inf.inverted, 1)	
@@ -1014,6 +904,7 @@ for t, weapons in pairs(UTILS.WEAPON_TYPES.typeToWeapons) do
 				SpecialOptions = specials,
 				MultipleOptions = false,
 				Flag = skin,
+				Ext = true;
 				Callback = function(Options, nosound, nowrite)
 					selectedSkin = Options[1]
 
