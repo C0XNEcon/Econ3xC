@@ -924,7 +924,7 @@ end
 
 local zlodconf = LoadConfiguration
 
-local function SaveConfiguration()
+local function SaveConfiguration(_,specificLocation)
 	if debugX then
 		print('Saving')
 	end
@@ -968,7 +968,7 @@ local function SaveConfiguration()
 		warn(HttpService:JSONEncode(Data))
 	end
 
-	writefile(RayfieldLibrary.CONE_FILE_NAME .. ConfigurationExtension, tostring(HttpService:JSONEncode(Data)))
+	writefile((specificLocation or RayfieldLibrary.CONE_FILE_NAME .. ConfigurationExtension), tostring(HttpService:JSONEncode(Data)))
 end
 
 function RayfieldLibrary:Notify(data) -- action e.g open messages
