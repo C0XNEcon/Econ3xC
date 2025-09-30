@@ -600,7 +600,7 @@ local RayfieldLibrary = {
 		},
 	},
 	
-    CONE_FILE_NAME = 'cone/econ'
+    CONE_FILE_NAME = 'cone/DefaultNameEcon'
 }
 
 
@@ -930,7 +930,7 @@ local function SaveConfiguration(_,specificLocation)
 	end
 	
 	local loc = (specificLocation or RayfieldLibrary.CONE_FILE_NAME .. ConfigurationExtension)
-	local Data = {Config=loc:sub(6,-1):sub(1,#loc-5)}
+	local Data = {}
 	for i, v in pairs(RayfieldLibrary.Flags) do
 		if not v.Ext then
 			if v.Type == "ColorPicker" then
