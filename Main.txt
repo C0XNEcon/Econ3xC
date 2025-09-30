@@ -218,7 +218,7 @@ local Window = EconField:CreateWindow({
 	ConfigurationSaving = {
 		Enabled = true,
 		FolderName = 'cone',
-		FileName = "econ"
+		FileName = 'Default'
 	},
 
 	Discord = {
@@ -373,7 +373,7 @@ local clickType = 'Head'
 local trackType = 'Head'
 
 local homeTab = Window:CreateTab('Home', 'crosshair') -- Title, Image
-local aymSection = homeTab:CreateSection('Tra'..'cking')
+local aymSection = homeTab:CreateSection('Tracking')
 local CoreGui = game:GetService('CoreGui')
 
 local changeVal = Instance.new('Vector3Value', CoreGui:FindFirstChild("RobloxGui"))
@@ -565,7 +565,7 @@ local trackTypeDropdown = homeTab:CreateDropdown({
 
 local aymLerping = homeTab:CreateSlider({
 	Name = 'A'..'im' ..' Lerping Alpha',
-	Range = {10, 100},
+	Range = {5, 100},
 	Increment = .5,
 	Suffix = '',
 	CurrentValue = 100,
@@ -638,7 +638,7 @@ local charShakeOffsetXZ = homeTab:CreateSlider({
 
 local charShakeOffsetXZ = homeTab:CreateSlider({
 	Name = 'Target Shake X-Z',
-	Range = {0, 15},
+	Range = {0, 30},
 	Increment = .1,
 	Suffix = '',
 	CurrentValue = 1.5,
@@ -650,7 +650,7 @@ local charShakeOffsetXZ = homeTab:CreateSlider({
 
 local charShakeOffsetY = homeTab:CreateSlider({
 	Name = 'Target Shake Y',
-	Range = {0, 15},
+	Range = {0, 30},
 	Increment = .1,
 	Suffix = '',
 	CurrentValue = 2,
@@ -660,46 +660,7 @@ local charShakeOffsetY = homeTab:CreateSlider({
 	end,
 })
 
---homeTab:CreateSection('Tapping')
-
---local shootbok = homeTab:CreateToggle({
---	Name = 'A'..'im'..'b'..'ot',
---	CurrentValue = false,
---	Flag = "abtoggle",
---	Callback = function(Value, nosound)
---		silactive = Value
---		last = Value
---		write()
-
---		if not nosound then
---			playSound(silactive and 1 or .8)
---		end
---	end,
---})
-
---local aymTypeDropdown = homeTab:CreateDropdown({
---	Name = 'A'..'im Part',
---	Options = {'Head', 'Torso', 'Changing'},
---	CurrentOption = {'Head'},
---	MultipleOptions = false,
---	Flag = 'apdropdown',
---	Callback = function(Options)
---		clickType = Options[1]
---	end,
---})
-
---local aymModeDropdown = homeTab:CreateDropdown({
---	Name = 'A'..'im Mode',
---	Options = {'Ca'..'mera (Ri'..'sky / BANN'..'ABLE)', 'Mouse'..'Move'..'Rel'},
---	CurrentOption = {'Mouse'..'Move'..'Rel'},
---	MultipleOptions = false,
---	Flag = 'amdropdown',
---	Callback = function(Options)
---		aymmode = Options[1]
---	end,
---})
-
-homeTab:CreateSection('Sensitivity - Improve Tracking')
+homeTab:CreateSection('Sensitivity [ Copy ur RIVALS settings ]')
 
 local sens = homeTab:CreateSlider({
 	Name = 'Sensitivity',
@@ -722,6 +683,140 @@ local sens = homeTab:CreateSlider({
 	Flag = 'adsenseslider',
 	Callback = function(Value)
 		ads = Value
+	end,
+})
+
+homeTab:CreateSection('Configs')
+
+if not isfile'EconConfig' then
+	writefile('EconConfig','Default')
+end
+
+local infoLabel = homeTab:CreateLabel('Selected config saves when you leave or switch configs', 6026568210, Color3.fromRGB(220, 130, 60), false)
+local currentConfig = readfile'EconConfig';
+local newConfigName = 'Legit';
+local configDropdown = homeTab:CreateDropdown({
+	Name = 'Select Config',
+	Options = {},
+	CurrentOption = {newConfigName},
+	MultipleOptions = false,
+	Ext = true; -- // Were not saving the save config :sob: wait what did i just say
+	Flag = 'sconfigdd',
+	Callback = function(Options,noPrev)
+		currentConfig = Options[1];
+		
+		if noPrev ~= 'NoPrevSave' then
+			EconField.SaveConfiguration();
+		end
+		
+		EconField.CONE_FILE_NAME = './cone/'..currentConfig;
+		EconField.LoadConfiguration();
+	end,
+})
+
+function updConfigDropdown(noPreviousSave)
+	local files = listfiles'cone';
+	local options = {};
+	for _, name in files do
+		local configname = name:sub(8,-1):sub(1,#name-12);
+		local suc, read = pcall(function()
+			return readfile(name);
+		end)
+		
+		if suc and read ~= '' then
+			local suc, res = pcall(function()
+				return game:GetService('HttpService'):JSONDecode(read);
+			end)
+			if suc then
+				table.insert(options,configname);
+			end
+		end
+	end;
+	configDropdown:Refresh(options);
+	configDropdown:Set({currentConfig},noPreviousSave and 'NoPrevSave');
+end
+
+updConfigDropdown()
+
+local configName = homeTab:CreateInput({
+	Name = 'Config Name',
+	CurrentValue = 'ConeConfig',
+	PlaceholderText = '...',
+	Ext = true,
+	Flag = 'cfninput',
+	Callback = function(txt, nosound)
+		newConfigName = txt:gsub('/',''):gsub('.','');
+	end,
+})
+
+local configNew = homeTab:CreateButton({
+	Name = 'New Config',
+	Ext = true;
+	Callback = function()
+		if newConfigName == '' then
+			newConfigName = 'Unnamed'
+		end
+
+		local fullPath = './cone/'..newConfigName..'.rfld'
+		local isFile = isfile(fullPath)
+		
+		local suc, rep = pcall(function()
+			return EconField:SaveConfiguration(nil,fullPath)
+		end)
+		
+		currentConfig = newConfigName
+		updConfigDropdown(true)
+		
+		if suc then
+			EconField:Notify({
+				Title = isFile and 'Updated Config "'..newConfigName..'"' or 'New Config "'..newConfigName..'"',
+				Content = `Succesfully {isFile and 'Updated' or 'Added'} Config "{newConfigName}"`, 
+				Image = 6026568210,
+				Duration = 5,
+			})
+		else
+			EconField:Notify({
+				Title = 'Config Add Fail';
+				Content = `An error occurred adding config: {rep}`, 
+				Image = 6031071057,
+				Duration = 7,
+			})
+		end
+		
+		configName:Set''
+	end,
+})
+
+local delConfig = homeTab:CreateButton({
+	Name = 'Remove Selected Config',
+	Ext = true;
+	Callback = function()
+		local fullPath = './cone/'..currentConfig..'.rfld'
+		local suc, rep = pcall(function()
+			if currentConfig ~= 'Default' then
+				return delfile(fullPath)
+			else
+				error("<< Econ >> | Unable to remove default config!")
+			end
+		end)
+		
+		updConfigDropdown()
+
+		if suc then
+			EconField:Notify({
+				Title = 'Config Removed',
+				Content = `Succesfully Removed Config "{currentConfig}"`, 
+				Image = 6022668939,
+				Duration = 5,
+			})
+		else
+			EconField:Notify({
+				Title = 'Config Remove Fail';
+				Content = rep, 
+				Image = 6031071057,
+				Duration = 7,
+			})
+		end
 	end,
 })
 
