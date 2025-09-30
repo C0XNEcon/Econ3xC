@@ -1480,7 +1480,7 @@ end
 
 table.insert(evars.INIT_CONS, plr.CharacterAdded:Connect(function()
 	if enableCharChanging then
-		UTILS.ID_CHANGER.cchar
+		UTILS.ID_CHANGER.cchar()
 	end
 end))
 
