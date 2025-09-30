@@ -29,7 +29,7 @@ __RET.init = function(ECON_TOKEN)
 	local RAD = math.rad
 	local v3Zero = V3()
 
-	local CameraShakeInstance = loadstring(__GETURL'CameraShakeInstance')
+	local CameraShakeInstance = loadstring(__GETURL'CameraShakeInstance')()
 	local CameraShakeState = CameraShakeInstance.CameraShakeState
 
 	local defaultPosInfluence = V3(0.15, 0.15, 0.15)
