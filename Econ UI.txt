@@ -77,15 +77,8 @@ local ConfigurationFolder = RayfieldFolder.."/Configurations"
 local ConfigurationExtension = ".rfld"
 local settingsTable = {
 	General = {
-		-- if needs be in order just make getSetting(name)
 		rayfieldOpen = {Type = 'bind', Value = 'K', Name = 'Econ Keybind'},
-		-- buildwarnings
-		-- rayfieldprompts
-
 	},
-	--System = {
-	--	usageAnalytics = {Type = 'toggle', Value = true, Name = 'Anonymised Analytics'},
-	--}
 }
 
 local HttpService = getService('HttpService')
@@ -605,7 +598,9 @@ local RayfieldLibrary = {
 			InputStroke = Color3.fromRGB(180, 190, 200),
 			PlaceholderColor = Color3.fromRGB(150, 150, 150)
 		},
-	}
+	},
+	
+    CONE_FILE_NAME = 'cone/econ'
 }
 
 
@@ -906,7 +901,6 @@ local function LoadConfiguration(Configuration)
 
 	if not success then warn('Rayfield had an issue decoding the configuration file, please try delete the file and reopen Rayfield.') return end
 
-	-- Iterate through current UI elements' flags
 	for FlagName, Flag in pairs(RayfieldLibrary.Flags) do
 		local FlagValue = Data[FlagName]
 
@@ -922,10 +916,6 @@ local function LoadConfiguration(Configuration)
 					end
 				end
 			end)
-		else
-			--warn("Rayfield | Unable to find '"..FlagName.. "' in the save file.")
-			--print("The error above may not be an issue if new elements have been added or not been set values.")
-			----RayfieldLibrary:Notify({Title = "Rayfield Flags", Content = "Rayfield was unable to find '"..FlagName.. "' in the save file. Check sirius.menu/discord for help.", Image = 3944688398})
 		end
 	end
 
@@ -935,8 +925,6 @@ end
 local zlodconf = LoadConfiguration
 
 local function SaveConfiguration()
-	--if not CEnabled or not globalLoaded then return end
-
 	if debugX then
 		print('Saving')
 	end
@@ -980,10 +968,7 @@ local function SaveConfiguration()
 		warn(HttpService:JSONEncode(Data))
 	end
 
-	--if writefile then
-	writefile("cone/econ" .. ConfigurationExtension, tostring(HttpService:JSONEncode(Data)))
-	--	warn(readfile("cone/econ"..ConfigurationExtension))
-	--end
+	writefile(RayfieldLibrary.CONE_FILE_NAME .. ConfigurationExtension, tostring(HttpService:JSONEncode(Data)))
 end
 
 function RayfieldLibrary:Notify(data) -- action e.g open messages
@@ -3645,6 +3630,9 @@ for _, TopbarButton in ipairs(Topbar:GetChildren()) do
 	end
 end
 
+function RayfieldLibrary:SaveConfiguration(...)
+	return SaveConfiguration(...)
+end
 
 function RayfieldLibrary:LoadConfiguration()
 	local config
@@ -3657,7 +3645,6 @@ function RayfieldLibrary:LoadConfiguration()
 		config = [[{"Toggle1adwawd":true,"ColorPicker1awd":{"B":255,"G":255,"R":255},"Slider1dawd":100,"ColorPicfsefker1":{"B":255,"G":255,"R":255},"Slidefefsr1":80,"dawdawd":"","Input1":"hh","Keybind1":"B","Dropdown1":["Ocean"]}]]
 	end
 
-	--if CEnabled then
 	local notified
 	local loaded
 
@@ -3667,23 +3654,16 @@ function RayfieldLibrary:LoadConfiguration()
 			return
 		end
 
-		--if isfile then 
-		if isfile("cone/econ" .. ConfigurationExtension) then
-			loaded = zlodconf(readfile("cone/econ" .. ConfigurationExtension))
+		if isfile(RayfieldLibrary.CONE_FILE_NAME .. ConfigurationExtension) then
+			loaded = zlodconf(readfile(RayfieldLibrary.CONE_FILE_NAME .. ConfigurationExtension))
 		end
-		--else
-		--	notified = true
-		--	RayfieldLibrary:Notify({Title = "Rayfield Configurations", Content = "We couldn't enable Configuration Saving as you are not using software with filesystem support.", Image = 4384402990})
-		--end
 	end)
 
 	if success and loaded and not notified then
-		--RayfieldLibrary:Notify({Title = "Econ Configurations", Content = "The configuration file for this script has been loaded from a previous session.", Image = 4384403532})
 	elseif not success and not notified then
 		warn('Rayfield Configurations Error | '..tostring(result))
 		RayfieldLibrary:Notify({Title = "Econ Configurations", Content = "We've encountered an issue loading your configuration correctly.\n\nCheck the Developer Console for more information.", Image = 4384402990})
 	end
-	--end
 
 	globalLoaded = true
 end
