@@ -32,7 +32,8 @@ local defaultPosInfluence = V3(0.15, 0.15, 0.15)
 local defaultRotInfluence = V3(1, 1, 1)
 
 function CameraShaker.new(renderPriority, callback)
-	CameraShaker.CameraShakeInstance = loadstring(__GETURL'CameraShakeInstance')();
+	CameraShakeInstance = loadstring(__GETURL'CameraShakeInstance')();
+	CameraShaker.CameraShakeInstance = CameraShakeInstance;
 	CameraShakeState = CameraShakeInstance.CameraShakeState;
 
 	assert(type(renderPriority) == "number", "RenderPriority must be a number (e.g.: Enum.RenderPriority.Camera.Value)")
