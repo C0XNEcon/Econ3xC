@@ -2,7 +2,20 @@
 
 local __RET = {}
 
-__RET.init = function(key)
+__RET.init = function(ECON_TOKEN)
+	----------- [ Executor Functions ] -----------
+
+	local request = (syn and syn.request) or (fluxus and fluxus.request) or (http and http.request) or http_request or request
+
+	local URL_ROOT = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/'
+	local __GETURL = function(URL)
+		return request({Url = URL_ROOT..URL; Method = 'GET'; Headers = {
+			Authorization = 'token '..ECON_TOKEN;
+		}}).Body
+	end
+
+	----------- [ Main ] -----------
+
 	local CameraShaker = {}
 	CameraShaker.__index = CameraShaker
 
@@ -16,7 +29,7 @@ __RET.init = function(key)
 	local RAD = math.rad
 	local v3Zero = V3()
 
-	local CameraShakeInstance = require(script.CameraShakeInstance)
+	local CameraShakeInstance = loadstring(__GETURL'CameraShakeInstance')
 	local CameraShakeState = CameraShakeInstance.CameraShakeState
 
 	local defaultPosInfluence = V3(0.15, 0.15, 0.15)
