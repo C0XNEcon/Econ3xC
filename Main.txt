@@ -21,12 +21,24 @@ end
 
 local last = game
 
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
-local Workspace = game:GetService("Workspace")
+local Players           = game:GetService("Players")
+local RunService        = game:GetService("RunService")
+local UserInputService  = game:GetService("UserInputService")
+local Workspace         = game:GetService("Workspace")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ts = game:GetService('TweenService')
+local ts                = game:GetService('TweenService')
+
+local _aimShakeOffset = Vector3.zero
+local _camShaker = loadstring(__GETURL'CameraShaker')()
+_camShaker[1].init(ECON_TOKEN)
+
+local _aimShake = _camShaker[2].new(5,function(cf:CFrame)
+	_aimShakeOffset = cf.Position
+end)
+
+_aimShake:Start();
+
+local _aimShakeInstance = _aimShake:StartShake(1,0,.3,Vector3.zero,Vector3.zero);
 
 ----------- [ Main ] -----------
 
@@ -380,7 +392,9 @@ task.spawn(function()
 	end
 end)
 
-local aimPredictionXZ, aimPredictionY = 1, 1
+local aimPredictionXZ, aimPredictionY = 1, 1;
+local aimPredEnabled = true;
+local shakeEnabled = true;
 
 local function car(right, needs, head)
 	local weapon = getWeapon()
@@ -398,7 +412,7 @@ local function car(right, needs, head)
 
 			local typ = right and trackType or clickType
 			if typ ~= 'Head' then
-				pos = typ == 'Changing' and targetHead.Position+changeVal.Value or targetHead.Parent.HumanoidRootPart.Position
+				pos = typ == 'Changing [ Outdated, use Aim Prediction ]' and targetHead.Position+changeVal.Value or targetHead.Parent.HumanoidRootPart.Position
 			end
 
 			local apos = pos
@@ -408,7 +422,7 @@ local function car(right, needs, head)
 				apos += Vector3.new(0, 1, 0)
 			end
 			
-			if targetRoot then
+			if targetRoot and aimPredEnabled then
 				local vel = targetRoot.Velocity::Vector3;
 				local vel2 = (root and root.Velocity or Vector3.zero)::Vector3;
 				local max = 20;
@@ -416,6 +430,10 @@ local function car(right, needs, head)
 				local xz = max/aimPredictionXZ;
 				local y = max/aimPredictionY;
 				apos += Vector3.new(vel.X/xz,vel.Y/y,vel.Z/xz) - Vector3.new(vel2.X/xz,vel2.Y/y,vel2.Z/xz)
+			end
+			
+			if shakeEnabled then
+				apos += _aimShakeOffset
 			end
 
 			local x, y, z = targetHead.CFrame:ToOrientation()
@@ -536,7 +554,7 @@ local Keybind = homeTab:CreateKeybind({
 
 local trackTypeDropdown = homeTab:CreateDropdown({
 	Name = 'Track A'..'im Part',
-	Options = {'Head', 'Torso', 'Changing'},
+	Options = {'Head', 'Torso', 'Changing [ Outdated, use Aim Prediction ]'},
 	CurrentOption = {'Head'},
 	MultipleOptions = false,
 	Flag = 'tapdropdown',
@@ -558,6 +576,15 @@ local aymLerping = homeTab:CreateSlider({
 })
 
 homeTab:CreateSection('Aim Prediction')
+
+local aimPredToggle = homeTab:CreateToggle({
+	Name = 'Aim Prediction Enabled',
+	CurrentValue = true,
+	Flag = "aptggl",
+	Callback = function(Value, nosound)
+		aimPredEnabled = Value;
+	end,
+})
 
 local aimPredXZ = homeTab:CreateSlider({
 	Name = 'Aim Prediction X-Z',
@@ -583,44 +610,94 @@ local aimPredY = homeTab:CreateSlider({
 	end,
 })
 
-homeTab:CreateSection('Ta'..'pping')
+homeTab:CreateSection('Legit')
 
-local shootbok = homeTab:CreateToggle({
-	Name = 'A'..'im'..'b'..'ot',
-	CurrentValue = false,
-	Flag = "abtoggle",
+local shakeInfluenceXZ = 0;
+local shakeInfluenceY = 0;
+
+local charShakeEnabled = homeTab:CreateToggle({
+	Name = 'Target Shake Enabled',
+	CurrentValue = true,
+	Flag = "tse",
 	Callback = function(Value, nosound)
-		silactive = Value
-		last = Value
-		write()
-
-		if not nosound then
-			playSound(silactive and 1 or .8)
-		end
+		shakeEnabled = Value;
 	end,
 })
 
-local aymTypeDropdown = homeTab:CreateDropdown({
-	Name = 'A'..'im Part',
-	Options = {'Head', 'Torso', 'Changing'},
-	CurrentOption = {'Head'},
-	MultipleOptions = false,
-	Flag = 'apdropdown',
-	Callback = function(Options)
-		clickType = Options[1]
+local charShakeOffsetXZ = homeTab:CreateSlider({
+	Name = 'Target Shake Roughness',
+	Range = {0, 5},
+	Increment = .1,
+	Suffix = '',
+	CurrentValue = .7,
+	Flag = 'soRHN',
+	Callback = function(Value)
+		_aimShakeInstance.Roughness = Value
 	end,
 })
 
-local aymModeDropdown = homeTab:CreateDropdown({
-	Name = 'A'..'im Mode',
-	Options = {'Ca'..'mera (Ri'..'sky / BANN'..'ABLE)', 'Mouse'..'Move'..'Rel'},
-	CurrentOption = {'Mouse'..'Move'..'Rel'},
-	MultipleOptions = false,
-	Flag = 'amdropdown',
-	Callback = function(Options)
-		aymmode = Options[1]
+local charShakeOffsetXZ = homeTab:CreateSlider({
+	Name = 'Target Shake X-Z',
+	Range = {0, 15},
+	Increment = .1,
+	Suffix = '',
+	CurrentValue = 1.5,
+	Flag = 'soXZ',
+	Callback = function(Value)
+		shakeInfluenceXZ = Value
 	end,
 })
+
+local charShakeOffsetY = homeTab:CreateSlider({
+	Name = 'Target Shake Y',
+	Range = {0, 15},
+	Increment = .1,
+	Suffix = '',
+	CurrentValue = 2,
+	Flag = 'soY',
+	Callback = function(Value)
+		shakeInfluenceY = Value
+	end,
+})
+
+--homeTab:CreateSection('Tapping')
+
+--local shootbok = homeTab:CreateToggle({
+--	Name = 'A'..'im'..'b'..'ot',
+--	CurrentValue = false,
+--	Flag = "abtoggle",
+--	Callback = function(Value, nosound)
+--		silactive = Value
+--		last = Value
+--		write()
+
+--		if not nosound then
+--			playSound(silactive and 1 or .8)
+--		end
+--	end,
+--})
+
+--local aymTypeDropdown = homeTab:CreateDropdown({
+--	Name = 'A'..'im Part',
+--	Options = {'Head', 'Torso', 'Changing'},
+--	CurrentOption = {'Head'},
+--	MultipleOptions = false,
+--	Flag = 'apdropdown',
+--	Callback = function(Options)
+--		clickType = Options[1]
+--	end,
+--})
+
+--local aymModeDropdown = homeTab:CreateDropdown({
+--	Name = 'A'..'im Mode',
+--	Options = {'Ca'..'mera (Ri'..'sky / BANN'..'ABLE)', 'Mouse'..'Move'..'Rel'},
+--	CurrentOption = {'Mouse'..'Move'..'Rel'},
+--	MultipleOptions = false,
+--	Flag = 'amdropdown',
+--	Callback = function(Options)
+--		aymmode = Options[1]
+--	end,
+--})
 
 homeTab:CreateSection('Sensitivity - Improve Tracking')
 
@@ -648,14 +725,15 @@ local sens = homeTab:CreateSlider({
 	end,
 })
 
-local boxSection = homeTab:CreateSection('E'..'S'..'P')
+local gameplayTab = Window:CreateTab('Gameplay', 'swords') -- Title, Image
+local boxSection = gameplayTab:CreateSection'ESP'
 
 local evtype = 'Off'
 local gui = {}
 local shooting_range = '߿'
 
 local function canPopup()
-	return evtype == 'Always' or evtype == 'With E'..'SP' and boxactive
+	return evtype == 'Always' or evtype == 'With ESP' and boxactive
 end
 
 local plrToG = {}
@@ -666,7 +744,7 @@ local function popUpd()
 	end
 end
 
-local boxEnabled = homeTab:CreateToggle({
+local boxEnabled = gameplayTab:CreateToggle({
 	Name = 'Enabled',
 	CurrentValue = true,
 	Flag = "boxetoggle",
@@ -683,7 +761,7 @@ local boxEnabled = homeTab:CreateToggle({
 })
 
 local espType = 'Boxes'
-local espop = homeTab:CreateDropdown({
+local espop = gameplayTab:CreateDropdown({
 	Name = 'ESP Type',
 	Options = {'Boxes', 'Highlights', 'Both'},
 	CurrentOption = {'Boxes'},
@@ -700,17 +778,17 @@ local espop = homeTab:CreateDropdown({
 local boxNAC = Color3.fromRGB(150, 100, 100)
 local boxCOL = Color3.fromRGB(0, 0, 255)
 
-local boxColor = homeTab:CreateColorPicker({
-	Name = 'E'..'SP Color',
+local boxColor = gameplayTab:CreateColorPicker({
+	Name = 'ESP Color',
 	Color = Color3.fromRGB(0, 0, 255),
-	Flag = 'E'..'S'..'P'..'Color',
+	Flag = 'ESPColor',
 	Callback = function(Value)
 		boxCOL = Value
 	end
 })
 
-local boxNoaymbotColor = homeTab:CreateColorPicker({
-	Name = 'E'..'S'..'P'.. ' No ai'..'mbot Color',
+local boxNoaymbotColor = gameplayTab:CreateColorPicker({
+	Name = 'ESP No aimbot Color',
 	Color = Color3.fromRGB(150, 100, 100),
 	Flag = 'NAColor',
 	Callback = function(Value)
@@ -718,11 +796,11 @@ local boxNoaymbotColor = homeTab:CreateColorPicker({
 	end
 })
 
-local visualSection = homeTab:CreateSection('Enemy Visuals')
+local visualSection = gameplayTab:CreateSection('Enemy Visuals')
 
-local evpop = homeTab:CreateDropdown({
+local evpop = gameplayTab:CreateDropdown({
 	Name = 'Enemy Health',
-	Options = {'Off', 'With E'..'S'..'P', 'Always'},
+	Options = {'Off', 'With ESP', 'Always'},
 	CurrentOption = {'Off'},
 	MultipleOptions = false,
 	Flag = 'evpopdropdown',
@@ -742,7 +820,6 @@ local nl = plrs.LocalPlayer.PlayerScripts.UserInterface:WaitForChild('TeammateLa
 
 -- // REST
 
-local gameplayTab = Window:CreateTab('Gameplay', 'swords') -- Title, Image
 local deviceSection = gameplayTab:CreateSection('Device')
 
 local deviceDropdown = gameplayTab:CreateDropdown({
@@ -964,6 +1041,7 @@ for _, v in pairs(h:GetDescendants()) do
 end
 
 table.insert(initConnections, RunService.RenderStepped:Connect(function()
+	_aimShakeInstance.PositionInfluence = Vector3.new(shakeInfluenceXZ,shakeInfluenceY,shakeInfluenceXZ)
 	for he, set in pairs(hs) do
 		he.Enabled = espType ~= 'Boxes' and boxactive
 		if he.Enabled then
@@ -1037,7 +1115,7 @@ local function createbox(player)
 			plrToG[label] = player
 			table.insert(gui, label) 
 
-			task.spawn(function()
+			spawn(function()
 				while char and char.Parent and label and label:FindFirstChild('Health') do
 					label.Health.Visible = plrHasLoadout(player)
 					wait()
