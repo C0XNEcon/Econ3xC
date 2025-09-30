@@ -516,7 +516,7 @@ local gui = plr.PlayerGui
 local last = true
 
 local legtrek = homeTab:CreateToggle({
-	Name = 'Tra'..'ckb'..'ot',
+	Name = 'Trackbot',
 	CurrentValue = true,
 	Flag = "tbtoggle",
 	Callback = function(Value, nosound)
@@ -695,10 +695,13 @@ end
 local infoLabel = homeTab:CreateLabel('Selected config saves when you leave or switch configs', 6026568210, Color3.fromRGB(220, 130, 60), false)
 local currentConfig = readfile'EconConfig';
 local newConfigName = 'Legit';
+
+EconField.CONE_FILE_NAME = './cone/'..currentConfig
+
 local configDropdown = homeTab:CreateDropdown({
 	Name = 'Select Config',
 	Options = {},
-	CurrentOption = {newConfigName},
+	CurrentOption = {currentConfig},
 	MultipleOptions = false,
 	Ext = true; -- // Were not saving the save config :sob: wait what did i just say
 	Flag = 'sconfigdd',
@@ -709,6 +712,7 @@ local configDropdown = homeTab:CreateDropdown({
 			EconField.SaveConfiguration();
 		end
 		
+		writefile('EconConfig',currentConfig)
 		EconField.CONE_FILE_NAME = './cone/'..currentConfig;
 		EconField.LoadConfiguration();
 	end,
@@ -740,8 +744,8 @@ updConfigDropdown()
 
 local configName = homeTab:CreateInput({
 	Name = 'Config Name',
-	CurrentValue = 'ConeConfig',
-	PlaceholderText = '...',
+	CurrentValue = '',
+	PlaceholderText = 'Input Config Name',
 	Ext = true,
 	Flag = 'cfninput',
 	Callback = function(txt, nosound)
@@ -782,8 +786,6 @@ local configNew = homeTab:CreateButton({
 				Duration = 7,
 			})
 		end
-		
-		configName:Set''
 	end,
 })
 
@@ -800,7 +802,11 @@ local delConfig = homeTab:CreateButton({
 			end
 		end)
 		
-		updConfigDropdown()
+		if isfile(fullPath) then
+			repeat RunService.Stepped:Wait() until not isfile(fullPath)
+		end
+		
+		updConfigDropdown(true)
 
 		if suc then
 			EconField:Notify({
@@ -916,7 +922,6 @@ local nl = plrs.LocalPlayer.PlayerScripts.UserInterface:WaitForChild('TeammateLa
 -- // REST
 
 local deviceSection = gameplayTab:CreateSection('Device')
-
 local deviceDropdown = gameplayTab:CreateDropdown({
 	Name = 'Change Device',
 	Options = {'VR', 'Touch', 'Gamepad', 'MouseKeyboard'},
@@ -931,7 +936,7 @@ local deviceDropdown = gameplayTab:CreateDropdown({
 local gameplaySection = gameplayTab:CreateSection('Gameplay')
 
 local CARRELOAD = gameplayTab:CreateToggle({
-	Name = 'Au'.. 'to' .. ' Reload',
+	Name = 'Auto Reload',
 	CurrentValue = false,
 	Flag = "artoggle",
 	Callback = function(Value, nosound)
@@ -945,7 +950,7 @@ local CARRELOAD = gameplayTab:CreateToggle({
 })
 
 local carshoot = gameplayTab:CreateToggle({
-	Name = 'Au' ..'to'.. ' Sho'..'ot '.. '(Buggy)',
+	Name = 'Auto Shoot [ Buggy ]',
 	CurrentValue = false,
 	Flag = "astoggle",
 	Callback = function(Value, nosound)
@@ -958,7 +963,7 @@ local carshoot = gameplayTab:CreateToggle({
 })
 
 local carKatana = gameplayTab:CreateToggle({
-	Name = 'Au'.. 'to '.. 'Katana (Unreliable)',
+	Name = 'Auto Katana [ Unreliable ]',
 	CurrentValue = true,
 	Flag = "aktoggle",
 	Callback = function(Value, nosound)
@@ -971,7 +976,7 @@ local carKatana = gameplayTab:CreateToggle({
 })
 
 local teamCheck = gameplayTab:CreateToggle({
-	Name = 'Team Check (Recommended)',
+	Name = 'Team Check [ Recommended ]',
 	CurrentValue = true,
 	Flag = "tctoggle",
 	Callback = function(Value, nosound)
@@ -988,7 +993,7 @@ local teamCheck = gameplayTab:CreateToggle({
 })
 
 local ingameCheck = gameplayTab:CreateToggle({
-	Name = 'Match Check (Recommended)',
+	Name = 'Match Check [ Recommended ]',
 	CurrentValue = true,
 	Flag = "ictoggle",
 	Callback = function(Value, nosound)
