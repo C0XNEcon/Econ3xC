@@ -138,6 +138,7 @@ _G.ECON_VARS = _G.ECON_VARS or {
 }
 
 local evars = _G.ECON_VARS
+local enableCharChanging = false;
 
 evars.BYTEID_REMOTE = rep.Remotes.Replication.Fighter.Replicate.OnClientEvent:Connect(function(...)
 	local args = {...}
@@ -522,22 +523,32 @@ function readFile()
 	if rf then
 		local splits = readfile(ECON_FILE):split''
 		for i, v in pairs(splits) do
-			if i == 1 and v ~= ERR_NSC then
-				evars.CURRENT_ID = tonumber(v)
-			elseif i > 1 then
+			local f = {
+				function()
+					if v ~= ERR_NSC then
+						evars.CURRENT_ID = tonumber(v)
+					end
+				end; function()
+					enableCharChanging = v == string.char(3)
+				end,
+			}
+			
+			if f[i] then
+				f[i]()
+			else
 				local inf = v:split(string.char(1))
 				local b = weaponToButton[inf[1]]
 				if b then
 					_G.toskin[inf[1]] = inf[2]
 					b:Set({inf[2]}, true)
-					
+
 					local finisherSplits = v:split(string.char(3))
 					local inf = finisherSplits[1]:split''
-					
+
 					if finisherSplits[2] then
 						finisherSkinInfo[inf[1]] = finisherSplits[2]
 					end
-					
+
 					wrapSkinInfo[inf[1]] = {
 						wrap = inf[3] or 'None',
 						inverted = inf[4]
@@ -551,7 +562,7 @@ function readFile()
 end
 
 function writeFile()
-	local str = evars.CURRENT_ID..''
+	local str = evars.CURRENT_ID..''..(enableCharChanging and string.char(3) or '')..''
 	for weapon, skin in pairs(_G.toskin) do
 		local wrap = wrapSkinInfo[weapon]
 		local finisher = finisherSkinInfo[weapon]
@@ -672,7 +683,19 @@ for t, weapons in pairs(UTILS.WEAPON_TYPES.typeToWeapons) do
 	if t == 1 then
 		local sec = gameplayTab:CreateSection'Character Changer'
 		local getAll_result = UTILS.WRAPPER_MOD:getAll()
-
+		
+		local charToggle = gameplayTab:CreateToggle({
+			Name = 'Enable Character Change',
+			CurrentValue = false,
+			Ext = true,
+			Flag = 'cchtoggle',
+			Callback = function(Value, nosound)
+				enableCharChanging = Value;
+			end,
+		})
+		
+		charToggle:Set(enableCharChanging)
+		
 		local charchanger = gameplayTab:CreateInput({
 			Name = 'Player ID / Name',
 			CurrentValue = tostring(evars.CURRENT_ID),
@@ -695,7 +718,10 @@ for t, weapons in pairs(UTILS.WEAPON_TYPES.typeToWeapons) do
 				if id then
 					evars.NAME_ID[t] = id
 					evars.CURRENT_ID = id
-					UTILS.ID_CHANGER.cchar(id)
+					
+					if enableCharChanging then
+						UTILS.ID_CHANGER.cchar(id)
+					end
 
 					if READ_FILE then
 						writeFile()
@@ -1448,8 +1474,15 @@ end
 
 readFile()
 
-UTILS.ID_CHANGER.cchar()
-table.insert(evars.INIT_CONS, plr.CharacterAdded:Connect(UTILS.ID_CHANGER.cchar))
+if enableCharChanging then
+	UTILS.ID_CHANGER.cchar()
+end
+
+table.insert(evars.INIT_CONS, plr.CharacterAdded:Connect(function()
+	if enableCharChanging then
+		UTILS.ID_CHANGER.cchar
+	end
+end))
 
 -- //
 
