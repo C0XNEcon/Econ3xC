@@ -1,5 +1,8 @@
 --!nolint
 
+local CameraShaker = {}
+CameraShaker.__index = CameraShaker
+
 local __RET = {}
 
 __RET.init = function(ECON_TOKEN)
@@ -15,9 +18,6 @@ __RET.init = function(ECON_TOKEN)
 	end
 
 	----------- [ Main ] -----------
-
-	local CameraShaker = {}
-	CameraShaker.__index = CameraShaker
 
 	local profileBegin = debug.profilebegin
 	local profileEnd = debug.profileend
