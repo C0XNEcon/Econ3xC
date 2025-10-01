@@ -895,7 +895,7 @@ local function UnpackColor(Color)
 	return Color3.fromRGB(Color.R, Color.G, Color.B)
 end
 
-local function LoadConfiguration(Configuration)
+local function LoadConfiguration(Configuration,applySetting)
 	local success, Data = pcall(function() return HttpService:JSONDecode(Configuration) end)
 	local changed
 
@@ -910,7 +910,7 @@ local function LoadConfiguration(Configuration)
 					changed = true
 					Flag:Set(UnpackColor(FlagValue), true)
 				else
-					if (Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color) ~= FlagValue then 
+					if (Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color) ~= FlagValue or applySetting then 
 						changed = true
 						Flag:Set(FlagValue, true) 	
 					end
@@ -3635,7 +3635,7 @@ function RayfieldLibrary:SaveConfiguration(...)
 	return SaveConfiguration(...)
 end
 
-function RayfieldLibrary:LoadConfiguration()
+function RayfieldLibrary:LoadConfiguration(...)
 	local config
 
 	if debugX then
@@ -3648,15 +3648,17 @@ function RayfieldLibrary:LoadConfiguration()
 
 	local notified
 	local loaded
-
+	
+	local args = ...
+	
 	local success, result = pcall(function()
 		if useStudio and config then
-			loaded = zlodconf(config)
+			loaded = zlodconf(config,args)
 			return
 		end
 
 		if isfile(RayfieldLibrary.CONE_FILE_NAME .. ConfigurationExtension) then
-			loaded = zlodconf(readfile(RayfieldLibrary.CONE_FILE_NAME .. ConfigurationExtension))
+			loaded = zlodconf(readfile(RayfieldLibrary.CONE_FILE_NAME .. ConfigurationExtension),args)
 		end
 	end)
 
