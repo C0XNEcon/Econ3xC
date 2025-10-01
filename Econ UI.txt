@@ -913,7 +913,6 @@ local function LoadConfiguration(Configuration,applySetting)
 					if (Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color) ~= FlagValue or applySetting then 
 						changed = true
 						Flag:Set(FlagValue, true) 	
-						warn(FlagName,FlagValue)
 					end
 				end
 			end)
@@ -3365,7 +3364,6 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 				local Success, Response = pcall(function()
 					SliderSettings.Callback(NewVal, any, any2)
-					warn('slider calbak: ',SliderSettings.Name,NewVal)
 				end)
 
 				if not Success then
