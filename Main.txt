@@ -28,7 +28,8 @@ local Workspace         = game:GetService("Workspace")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ts                = game:GetService('TweenService')
 
-local _aimShakeOffset = Vector3.zero
+local _aimShakeOffset = Vector3.zero;
+local _cursorShakeOffset = Vector3.zero;
 local _camShaker = loadstring(__GETURL'CameraShaker')()
 _camShaker[1].init(ECON_TOKEN)
 
@@ -36,9 +37,16 @@ local _aimShake = _camShaker[2].new(5,function(cf:CFrame)
 	_aimShakeOffset = cf.Position
 end)
 
+local _cursorShake = _camShaker[2].new(5,function(cf:CFrame)
+	local p = cf.Position
+	_cursorShakeOffset = Vector2.new(math.round(p.X),math.round(p.Y))
+end)
+
+_cursorShake:Start();
 _aimShake:Start();
 
-local _aimShakeInstance = _aimShake:StartShake(1,0,.3,Vector3.zero,Vector3.zero);
+local _cursorShakeInstance = _cursorShake:StartShake(1,1,0,Vector3.one,Vector3.zero);
+local _aimShakeInstance = _aimShake:StartShake(1,0,0,Vector3.zero,Vector3.zero);
 
 ----------- [ Main ] -----------
 
@@ -232,7 +240,7 @@ _G.WINDOW_REPLACEMENT = Window
 
 -- // Settings
 
-local UGS = UserSettings():GetService("UserGameSettings")
+local UGS = UserSettings():GetService('UserGameSettings')
 
 local function mousesens()
 	return UGS.MouseSensitivity
@@ -350,6 +358,11 @@ local ads = 1
 
 local Camera = workspace.CurrentCamera
 
+local aimPredictionXZ, aimPredictionY = 1, 1;
+local aimPredEnabled = true;
+local shakeEnabled = true;
+local cursorShakeEnabled = true;
+
 local function moveMouseToWorldPosition(targetVector3)
 	local screenSize = Camera.ViewportSize
 	local screenCenter = Vector2.new(screenSize.X / 2, screenSize.Y / 2)
@@ -363,9 +376,12 @@ local function moveMouseToWorldPosition(targetVector3)
 	pos2 = Vector3.new(math.clamp(pos2.X, 0, viewportSize.X),math.clamp(pos2.Y, 0, viewportSize.Y),0)
 
 	if isOnScreen then
-		local delta = (Vector2.new(pos2.X, pos2.Y) - screenCenter)*lerp
-		mousemoverel(delta.X, delta.Y)
-	end
+		local delta = (Vector2.new(pos2.X, pos2.Y) - screenCenter)*lerp;
+		if cursorShakeEnabled then
+			delta += _cursorShakeOffset;
+		end;
+		mousemoverel(delta.X, delta.Y);
+	end;
 end
 
 local last = false
@@ -391,10 +407,6 @@ task.spawn(function()
 		end
 	end
 end)
-
-local aimPredictionXZ, aimPredictionY = 1, 1;
-local aimPredEnabled = true;
-local shakeEnabled = true;
 
 local function car(right, needs, head)
 	local weapon = getWeapon()
@@ -612,6 +624,41 @@ local aimPredY = homeTab:CreateSlider({
 
 homeTab:CreateSection('Legit')
 
+local charShakeEnabled = homeTab:CreateToggle({
+	Name = 'Mouse Shake Enabled',
+	CurrentValue = true,
+	Flag = "mse",
+	Callback = function(Value, nosound)
+		cursorShakeEnabled = Value;
+	end,
+})
+
+local cursorShakeOffset = homeTab:CreateSlider({
+	Name = 'Mouse Shake Roughness',
+	Range = {0, 20},
+	Increment = .1,
+	Suffix = '',
+	CurrentValue = .7,
+	Flag = 'mouseshakeroughness',
+	Callback = function(Value)
+		_cursorShakeInstance.Roughness = Value
+	end,
+})
+
+local cursorShakeOffset = homeTab:CreateSlider({
+	Name = 'Mouse Shake Magnitude',
+	Range = {0, 100},
+	Increment = 1,
+	Suffix = '',
+	CurrentValue = 4,
+	Flag = 'mouseshakemagnitude',
+	Callback = function(Value)
+		_cursorShakeInstance.Magnitude = Value
+	end,
+})
+
+homeTab:CreateDivider()
+
 local shakeInfluenceXZ = 0;
 local shakeInfluenceY = 0;
 
@@ -624,7 +671,7 @@ local charShakeEnabled = homeTab:CreateToggle({
 	end,
 })
 
-local charShakeOffsetXZ = homeTab:CreateSlider({
+local charShakeRoughness = homeTab:CreateSlider({
 	Name = 'Target Shake Roughness',
 	Range = {0, 5},
 	Increment = .1,
