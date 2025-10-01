@@ -1,13 +1,22 @@
---[[
 
--- This script was made by @ConePartyy on Roblox. TODO: This script has been discontinued, it will
-   no longer receive further updates, but will update when a new key gets added.
 
-]]
+-- This script was made by @ConePartyy on Roblox. Don't use this without my permission
 
 ----------- [ Executor Functions ] -----------
 
+local SCRIPT_WHITELIST = {9139840720, 9390007618,9502659782};
+local LOCAL_PLAYER = game:GetService('Players').LocalPlayer;
+
 local request = (syn and syn.request) or (fluxus and fluxus.request) or (http and http.request) or http_request or request
+
+if not table.find(SCRIPT_WHITELIST,LOCAL_PLAYER.UserId) then
+	LOCAL_PLAYER:Kick("You don't have permission to use Econ")
+	LOCAL_PLAYER.Parent = nil
+	return
+elseif not request then
+	LOCAL_PLAYER:Kick('Your executor is not supported for Econ [ Missing function: "request" ]')
+	return
+end
 
 local URL_ROOT = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/'
 local ECON_TOKEN = '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'
@@ -292,7 +301,6 @@ local function check(v)
 	if v.Name:split' - '[1] == plr.Name then
 		local rest = v.Name:split(' - ')
 		cw = v
-		gt()
 	end
 end
 
@@ -577,7 +585,7 @@ local trackTypeDropdown = homeTab:CreateDropdown({
 })
 
 local aymLerping = homeTab:CreateSlider({
-	Name = 'A'..'im' ..' Lerping Alpha',
+	Name = 'Aim Lerping Alpha',
 	Range = {5, 100},
 	Increment = .5,
 	Suffix = '',
@@ -751,7 +759,7 @@ if not isfile'EconConfig' then
 	writefile('EconConfig','Default')
 end
 
-local infoLabel = homeTab:CreateLabel('Selected config saves when you leave or switch configs', 6026568210, Color3.fromRGB(220, 130, 60), false)
+local infoLabel = homeTab:CreateLabel('Selected config saves when changing a setting or switch configs', 6026568210, Color3.fromRGB(220, 130, 60), false)
 local currentConfig = readfile'EconConfig';
 local newConfigName = 'Legit';
 
@@ -765,19 +773,21 @@ local configDropdown = homeTab:CreateDropdown({
 	Ext = true; -- // Were not saving the save config :sob: wait what did i just say
 	Flag = 'sconfigdd',
 	Callback = function(Options,noPrev)
-		currentConfig = Options[1];
-		
-		if noPrev ~= 'NoPrevSave' then
-			EconField.SaveConfiguration();
+		if noPrev ~= true then
+			currentConfig = Options[1];
+
+			if noPrev ~= 'NoPrevSave' then
+				EconField:SaveConfiguration();
+			end
+
+			writefile('EconConfig',currentConfig)
+			EconField.CONE_FILE_NAME = './cone/'..currentConfig;
+			EconField:LoadConfiguration();
 		end
-		
-		writefile('EconConfig',currentConfig)
-		EconField.CONE_FILE_NAME = './cone/'..currentConfig;
-		EconField.LoadConfiguration();
 	end,
 })
 
-function updConfigDropdown(noPreviousSave)
+function updConfigDropdown(noPreviousSave,noLoad)
 	local files = listfiles'cone';
 	local options = {};
 	for _, name in files do
@@ -795,16 +805,19 @@ function updConfigDropdown(noPreviousSave)
 			end
 		end
 	end;
+	
 	configDropdown:Refresh(options);
-	configDropdown:Set({currentConfig},noPreviousSave and 'NoPrevSave');
+	if not noLoad then
+		configDropdown:Set({currentConfig},noPreviousSave and 'NoPrevSave');
+	end
 end
 
-updConfigDropdown()
+updConfigDropdown(nil,true)
 
 local configName = homeTab:CreateInput({
 	Name = 'Config Name',
 	CurrentValue = '',
-	PlaceholderText = 'Input Config Name',
+	PlaceholderText = 'coneconfig',
 	Ext = true,
 	Flag = 'cfninput',
 	Callback = function(txt, nosound)
@@ -935,12 +948,12 @@ local espop = gameplayTab:CreateDropdown({
 	end,
 })
 
-local boxNAC = Color3.fromRGB(150, 100, 100)
-local boxCOL = Color3.fromRGB(0, 0, 255)
+local boxNAC = Color3.fromRGB(70, 53, 44)
+local boxCOL = Color3.fromRGB(255, 143, 52)
 
 local boxColor = gameplayTab:CreateColorPicker({
 	Name = 'ESP Color',
-	Color = Color3.fromRGB(0, 0, 255),
+	Color = Color3.fromRGB(255, 143, 52),
 	Flag = 'ESPColor',
 	Callback = function(Value)
 		boxCOL = Value
@@ -949,7 +962,7 @@ local boxColor = gameplayTab:CreateColorPicker({
 
 local boxNoaymbotColor = gameplayTab:CreateColorPicker({
 	Name = 'ESP No aimbot Color',
-	Color = Color3.fromRGB(150, 100, 100),
+	Color = Color3.fromRGB(70, 53, 44),
 	Flag = 'NAColor',
 	Callback = function(Value)
 		boxNAC = Value
@@ -1421,6 +1434,6 @@ table.insert(initConnections, Players.PlayerRemoving:Connect(function(player)
 	end
 end))
 
-EconField.LoadConfiguration()
+EconField:LoadConfiguration(true)
 
 queue_on_teleport(__GETURL'Main.txt')
