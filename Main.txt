@@ -546,7 +546,7 @@ local keytrack = nil
 local is = false
 local Keybind = homeTab:CreateKeybind({
 	Name = 'Trackbot Hold Keybind',
-	CurrentKeybind = '`',
+	CurrentKeybind = 'Backquote',
 	HoldToInteract = false,
 	Flag = 'tkey',
 	Callback = function(x, nosound)
@@ -1421,6 +1421,6 @@ table.insert(initConnections, Players.PlayerRemoving:Connect(function(player)
 	end
 end))
 
-EconField.LoadConfiguration(true)
+EconField.LoadConfiguration()
 
 queue_on_teleport(__GETURL'Main.txt')
