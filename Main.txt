@@ -362,6 +362,7 @@ local aimPredictionXZ, aimPredictionY = 1, 1;
 local aimPredEnabled = true;
 local shakeEnabled = true;
 local cursorShakeEnabled = true;
+local softLockEnabled = true;
 
 local function moveMouseToWorldPosition(targetVector3)
 	local screenSize = Camera.ViewportSize
@@ -622,7 +623,18 @@ local aimPredY = homeTab:CreateSlider({
 	end,
 })
 
-homeTab:CreateSection('Legit')
+--homeTab:CreateSection('Legit')
+
+--local charShakeEnabled = homeTab:CreateToggle({
+--	Name = 'Soft Lock Enabled',
+--	CurrentValue = true,
+--	Flag = "sfle",
+--	Callback = function(Value, nosound)
+--		softLockEnabled = Value;
+--	end,
+--})
+
+homeTab:CreateDivider()
 
 local charShakeEnabled = homeTab:CreateToggle({
 	Name = 'Mouse Shake Enabled',
