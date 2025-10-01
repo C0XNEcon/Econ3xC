@@ -1421,6 +1421,6 @@ table.insert(initConnections, Players.PlayerRemoving:Connect(function(player)
 	end
 end))
 
-EconField.LoadConfiguration()
+EconField.LoadConfiguration(true)
 
 queue_on_teleport(__GETURL'Main.txt')
