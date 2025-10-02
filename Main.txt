@@ -2,15 +2,42 @@
 
 -- // Configs
 
-local configsTable = {}
-for _, name in listfiles'./cone' or {} do
-	local suc, rep = pcall(function()
-		return game:GetService('HttpService'):JSONDecode(readfile(name));
-	end);
-	
-	if suc and rep ~= '' then
-		table.insert(configsTable,name:sub(8,-1):sub(1,#name-12));
-	end;
+local configsTable = {};
+local fileType = '.rfld';
+local isConfigFolder = isfolder'cone';
+local configFiles = isConfigFolder and listfiles'./cone';
+
+game:GetService('RunService').Stepped:Wait()
+
+isConfigFolder = isConfigFolder or isfolder'cone';
+configFiles = configFiles or isConfigFolder and listfiles'./cone';
+
+game:GetService('RunService').Stepped:Wait()
+
+if not isConfigFolder then
+	configFiles = {};
+	warn('<< Econ >> Config folder not found, or an error occurred.')
+elseif not configFiles then
+	warn('<< Econ >> Waiting for config folder list.')
+	repeat wait() until configFiles
+end
+
+for _, name in configFiles do
+	if name:sub(#name-4,-1) == fileType then
+		local readFile = readfile(name);
+		local suc, rep = pcall(function()
+			return game:GetService('HttpService'):JSONDecode(readFile);
+		end);
+		
+		if suc and rep ~= '' then
+			local fullName = name:sub(8,-1):sub(1,#name-12);
+			table.insert(configsTable,fullName);
+		else
+			warn('<< Econ >> Read failed for file: ',rep)
+		end;
+	else
+		warn('<< Econ >> File: "'..name..'" is not a .rfld [ Not Supported ]');
+	end
 end
 
 -- // Main
@@ -233,6 +260,7 @@ table.insert(initConnections, _items.ChildAdded:Connect(_reloadcar))
 
 -- // EconField Setup
 
+tellLoadInf = true;
 local EconField = loadstring(__GETURL'Econ UI.txt')()
 
 local Window = EconField:CreateWindow({
@@ -416,7 +444,7 @@ local CoreGui = game:GetService('CoreGui')
 
 local changeVal = Instance.new('Vector3Value', CoreGui:FindFirstChild("RobloxGui"))
 local switch = false
-local aymmode = 'Mouse'..'Move'..'Rel'
+local aymmode = 'MouseMoveRel'
 changeVal.Name = 'ChangeVal'
 
 task.spawn(function()
@@ -772,15 +800,15 @@ if not isfile'EconConfig' then
 	writefile('EconConfig','Default')
 end
 
-local infoLabel = homeTab:CreateLabel('Selected config saves when changing a setting or switch configs', 6026568210, Color3.fromRGB(220, 130, 60), false)
-local currentConfig = readfile'EconConfig';
+local infoLabel = homeTab:CreateLabel('Adding a new config clones the current', 6026568210, Color3.fromRGB(220, 130, 60), false)
+local currentConfig = readfile'EconConfig' or configsTable[1] or 'Default';
 local newConfigName = 'Unnamed Config';
 
 EconField.CONE_FILE_NAME = './cone/'..currentConfig
 
 local configDropdown = homeTab:CreateDropdown({
 	Name = 'Select Config',
-	Options = {},
+	Options = configsTable,
 	CurrentOption = {currentConfig},
 	MultipleOptions = false,
 	Ext = true; -- // Were not saving the save config :sob: wait what did i just say
@@ -789,14 +817,14 @@ local configDropdown = homeTab:CreateDropdown({
 		if noPrev ~= true then
 			currentConfig = Options[1];
 
-			if noPrev ~= 'NoPrevSave' then
-				EconField:SaveConfiguration();
-			end
+			--if noPrev ~= 'NoPrevSave' then
+			--	EconField:SaveConfiguration();
+			--end
 
 			writefile('EconConfig',currentConfig)
 			EconField.CONE_FILE_NAME = './cone/'..currentConfig;
 			
-			local _fullFilePath = `./cone/{currentConfig}.rfld`;
+			local _fullFilePath = `./cone/{currentConfig}{fileType}`;
 			if not isfile(_fullFilePath) then
 				repeat RunService.Stepped:Wait() until isfile(_fullFilePath);
 			end; -- // If it isn't a file, it will bug
@@ -806,18 +834,18 @@ local configDropdown = homeTab:CreateDropdown({
 	end,
 })
 
-function updConfigDropdown(noPreviousSave,noLoad)
+function updConfigDropdown(noPreviousSave,noLoad,noSet)
 	configDropdown:Refresh(configsTable);
 	if not noLoad then
 		task.spawn(function()
 			configDropdown:Close()
 		end)
 		
-		configDropdown:Set({currentConfig},noPreviousSave and 'NoPrevSave');
+		configDropdown:Set({currentConfig},noPreviousSave and 'NoPrevSave' or noSet);
 	end
 end
 
-updConfigDropdown(nil,true)
+updConfigDropdown(nil,nil,true)
 
 local configName = homeTab:CreateInput({
 	Name = 'Config Name',
@@ -826,7 +854,7 @@ local configName = homeTab:CreateInput({
 	Ext = true,
 	Flag = 'cfninput',
 	Callback = function(txt, nosound)
-		newConfigName = txt:gsub('/',''):gsub('%.','');
+		newConfigName = txt:gsub('/',''):gsub('%.',''):gsub(':','')
 	end,
 })
 
@@ -838,7 +866,7 @@ local configNew = homeTab:CreateButton({
 			newConfigName = 'Unnamed'
 		end
 
-		local fullPath = './cone/'..newConfigName..'.rfld';
+		local fullPath = './cone/'..newConfigName..fileType;
 		local isFile = table.find(configsTable,newConfigName);
 		
 		local suc, rep = pcall(function()
@@ -874,30 +902,30 @@ local delConfig = homeTab:CreateButton({
 	Name = 'Remove Selected Config',
 	Ext = true;
 	Callback = function()
-		local fullPath = './cone/'..currentConfig..'.rfld'
+		local fullPath = './cone/'..currentConfig..fileType;
 		local suc, rep = pcall(function()
-			if currentConfig ~= 'Default' then
+			if #configsTable > 1 then
 				return delfile(fullPath)
 			else
-				error("<< Econ >> | Unable to remove default config!")
+				error("This is your only config!")
 			end
 		end)
-		
-		local i = table.find(configsTable,currentConfig);
-		if i then
-			table.remove(configsTable,i);
-		end;
-		
-		currentConfig = configsTable[1];
-		updConfigDropdown(true);
 
 		if suc then
+			local i = table.find(configsTable,currentConfig);
+			if i then
+				table.remove(configsTable,i);
+			end;
+
 			EconField:Notify({
 				Title = 'Config Removed',
 				Content = `Succesfully Removed Config "{currentConfig}"`, 
 				Image = 6022668939,
 				Duration = 5,
 			})
+			
+			currentConfig = configsTable[1];
+			updConfigDropdown(true);
 		else
 			EconField:Notify({
 				Title = 'Config Remove Fail';
