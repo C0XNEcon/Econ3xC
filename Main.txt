@@ -260,7 +260,6 @@ table.insert(initConnections, _items.ChildAdded:Connect(_reloadcar))
 
 -- // EconField Setup
 
-tellLoadInf = true;
 local EconField = loadstring(__GETURL'Econ UI.txt')()
 
 local Window = EconField:CreateWindow({
@@ -816,10 +815,6 @@ local configDropdown = homeTab:CreateDropdown({
 	Callback = function(Options,noPrev)
 		if noPrev ~= true then
 			currentConfig = Options[1];
-
-			--if noPrev ~= 'NoPrevSave' then
-			--	EconField:SaveConfiguration();
-			--end
 
 			writefile('EconConfig',currentConfig)
 			EconField.CONE_FILE_NAME = './cone/'..currentConfig;
