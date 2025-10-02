@@ -2955,7 +2955,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 					end
 				end
 
-				--SaveConfiguration()
+				SaveConfiguration()
 			end
 
 			function DropdownSettings:Refresh(optionsTable: table) -- updates a dropdown with new options from optionsTable
