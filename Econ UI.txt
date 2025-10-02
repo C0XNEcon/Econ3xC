@@ -948,6 +948,10 @@ local function SaveConfiguration(_,specificLocation)
 			end
 		end
 	end
+	
+	if encode then
+		warn(loc,tostring(HttpService:JSONEncode(Data)))
+	end
 
 	if useStudio then
 		if script.Parent:FindFirstChild('configuration') then script.Parent.configuration:Destroy() end
