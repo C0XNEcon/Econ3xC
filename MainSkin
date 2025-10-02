@@ -246,6 +246,10 @@ local __REQUIRE = function(name, URL)
 						_newText.Parent = _newFolder
 					end
 				end
+				
+				if not REQUIRED_URL.add_wrap then
+					repeat run.Stepped:Wait() until REQUIRED_URL.add_wrap
+				end
 
 				local function add_wrap(...)
 					table.insert(specialWraps,({...})[2])
@@ -260,6 +264,7 @@ local __REQUIRE = function(name, URL)
 				add_wrap('Unobtainable', 'blueorsmt', {Enum.Material.Neon, Color3.fromRGB(102, 105, 255), 0, 0, "Sky"}, {Enum.Material.Neon, Color3.fromRGB(106, 93, 255), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(156, 163, 255), 0, 0, nil})
 				add_wrap('Unobtainable', 'Coneova', {Enum.Material.Neon, Color3.fromRGB(255, 169, 93), 0, 0, 'Coneova'}, {'Pine', Color3.fromRGB(255, 177, 99), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(255, 174, 103), 0, 0, nil})
 			end;SKIN_MOD = function()
+				repeat run.Stepped:Wait() until REQUIRED_URL and REQUIRED_URL.add_viewmodel
 				REQUIRED_URL.add_viewmodel("Cone Horizon", "rbxassetid://76724077959833", "rbxassetid://76724077959833", nil, nil, nil, CFrame.new(0, 0, -0.25), "sniper_eventhorizon_equip", "sniper_eventhorizon_idle", "sniper_eventhorizon_sprint", "sniper_eventhorizon_inspect", nil, {
 					Shoot1 = "sniper_eventhorizon_shoot1";
 					FinalShoot = nil;
