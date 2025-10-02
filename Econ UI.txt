@@ -919,7 +919,7 @@ local function LoadConfiguration(Configuration,applySetting)
 				else
 					if (Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color) ~= FlagValue or applySetting then 
 						changed = true
-						if tellLoadInf then warn(FlagName,FlagValue) end
+						if tellLoadInf then warn(FlagName,typeof(FlagValue) == 'table' and FlagValue[1] or FlagValue) end
 						Flag:Set(FlagValue, true) 	
 					end
 				end
