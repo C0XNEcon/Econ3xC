@@ -1,6 +1,19 @@
-
-
 -- This script was made by @ConePartyy on Roblox. Don't use this without my permission
+
+-- // Configs
+
+local configsTable = {}
+for _, name in listfiles'./cone' or {} do
+	local suc, rep = pcall(function()
+		return game:GetService('HttpService'):JSONDecode(readfile(name));
+	end);
+	
+	if suc and rep ~= '' then
+		table.insert(configsTable,name:sub(8,-1):sub(1,#name-12));
+	end;
+end
+
+-- // Main
 
 ----------- [ Executor Functions ] -----------
 
@@ -539,7 +552,7 @@ local last = true
 local legtrek = homeTab:CreateToggle({
 	Name = 'Trackbot',
 	CurrentValue = true,
-	Flag = "tbtoggle",
+	Flag = 'aimtracktogglekey',
 	Callback = function(Value, nosound)
 		spactivate = Value
 
@@ -556,7 +569,7 @@ local Keybind = homeTab:CreateKeybind({
 	Name = 'Trackbot Hold Keybind',
 	CurrentKeybind = 'Backquote',
 	HoldToInteract = false,
-	Flag = 'tkey',
+	Flag = 'trackforcekey',
 	Callback = function(x, nosound)
 		is = not is
 		if is then
@@ -574,11 +587,11 @@ local Keybind = homeTab:CreateKeybind({
 })
 
 local trackTypeDropdown = homeTab:CreateDropdown({
-	Name = 'Track A'..'im Part',
+	Name = 'Track Aim Part',
 	Options = {'Head', 'Torso', 'Changing [ Outdated, use Aim Prediction ]'},
 	CurrentOption = {'Torso'},
 	MultipleOptions = false,
-	Flag = 'tapdropdown',
+	Flag = 'trackaimpart',
 	Callback = function(Options)
 		trackType = Options[1]
 	end,
@@ -761,7 +774,7 @@ end
 
 local infoLabel = homeTab:CreateLabel('Selected config saves when changing a setting or switch configs', 6026568210, Color3.fromRGB(220, 130, 60), false)
 local currentConfig = readfile'EconConfig';
-local newConfigName = 'Legit';
+local newConfigName = 'Unnamed Config';
 
 EconField.CONE_FILE_NAME = './cone/'..currentConfig
 
@@ -782,32 +795,24 @@ local configDropdown = homeTab:CreateDropdown({
 
 			writefile('EconConfig',currentConfig)
 			EconField.CONE_FILE_NAME = './cone/'..currentConfig;
+			
+			local _fullFilePath = `./cone/{currentConfig}.rfld`;
+			if not isfile(_fullFilePath) then
+				repeat RunService.Stepped:Wait() until isfile(_fullFilePath);
+			end; -- // If it isn't a file, it will bug
+			
 			EconField:LoadConfiguration();
 		end
 	end,
 })
 
 function updConfigDropdown(noPreviousSave,noLoad)
-	local files = listfiles'cone';
-	local options = {};
-	for _, name in files do
-		local configname = name:sub(8,-1):sub(1,#name-12);
-		local suc, read = pcall(function()
-			return readfile(name);
+	configDropdown:Refresh(configsTable);
+	if not noLoad then
+		task.spawn(function()
+			configDropdown:Close()
 		end)
 		
-		if suc and read ~= '' then
-			local suc, res = pcall(function()
-				return game:GetService('HttpService'):JSONDecode(read);
-			end)
-			if suc then
-				table.insert(options,configname);
-			end
-		end
-	end;
-	
-	configDropdown:Refresh(options);
-	if not noLoad then
 		configDropdown:Set({currentConfig},noPreviousSave and 'NoPrevSave');
 	end
 end
@@ -817,11 +822,11 @@ updConfigDropdown(nil,true)
 local configName = homeTab:CreateInput({
 	Name = 'Config Name',
 	CurrentValue = '',
-	PlaceholderText = 'coneconfig',
+	PlaceholderText = 'Unnamed Config',
 	Ext = true,
 	Flag = 'cfninput',
 	Callback = function(txt, nosound)
-		newConfigName = txt:gsub('/',''):gsub('.','');
+		newConfigName = txt:gsub('/',''):gsub('%.','');
 	end,
 })
 
@@ -833,12 +838,16 @@ local configNew = homeTab:CreateButton({
 			newConfigName = 'Unnamed'
 		end
 
-		local fullPath = './cone/'..newConfigName..'.rfld'
-		local isFile = isfile(fullPath)
+		local fullPath = './cone/'..newConfigName..'.rfld';
+		local isFile = table.find(configsTable,newConfigName);
 		
 		local suc, rep = pcall(function()
 			return EconField:SaveConfiguration(nil,fullPath)
 		end)
+		
+		if not table.find(configsTable,newConfigName) then
+			table.insert(configsTable,newConfigName);
+		end;
 		
 		currentConfig = newConfigName
 		updConfigDropdown(true)
@@ -874,11 +883,13 @@ local delConfig = homeTab:CreateButton({
 			end
 		end)
 		
-		if isfile(fullPath) then
-			repeat RunService.Stepped:Wait() until not isfile(fullPath)
-		end
+		local i = table.find(configsTable,currentConfig);
+		if i then
+			table.remove(configsTable,i);
+		end;
 		
-		updConfigDropdown(true)
+		currentConfig = configsTable[1];
+		updConfigDropdown(true);
 
 		if suc then
 			EconField:Notify({
