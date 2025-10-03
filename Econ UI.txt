@@ -600,7 +600,7 @@ local RayfieldLibrary = {
 		},
 	},
 	
-    CONE_FILE_NAME = 'cone/DefaultNameEcon'
+    CONE_FILE_NAME = nil;
 }
 
 
@@ -933,6 +933,7 @@ end
 local zlodconf = LoadConfiguration
 
 local function SaveConfiguration(_,specificLocation)
+	if not RayfieldLibrary.CONE_FILE_NAME then return end
 	if debugX then
 		print('Saving')
 	end
@@ -3656,6 +3657,7 @@ function RayfieldLibrary:SaveConfiguration(...)
 end
 
 function RayfieldLibrary:LoadConfiguration(...)
+	if not RayfieldLibrary.CONE_FILE_NAME then return end
 	local config
 
 	if debugX then
