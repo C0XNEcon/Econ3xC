@@ -82,7 +82,7 @@ local _camShaker = loadstring(__GETURL'CameraShaker')()
 _camShaker[1].init(ECON_TOKEN)
 
 local _cursorSpring = _springMod.new(Vector3.zAxis,1.5,8);
-local _movementSpring = _springMod.new(Vector3.zAxis,1,8);
+local _movementSpring = _springMod.new(Vector3.zAxis,1.5,8);
 
 local _aimShake = _camShaker[2].new(5,function(cf:CFrame)
 	_aimShakeOffset = cf.Position
@@ -413,8 +413,12 @@ local aimPredEnabled = true;
 local shakeEnabled = true;
 local cursorShakeEnabled = true;
 local softLockEnabled = true;
+
 local cursorSpringEnabled = true;
 local cursorSpringDivider = 1;
+
+local movementSpringEnabled = true;
+local movementSpringXZ, movementSpringY = 1, 1;
 
 local function moveMouseToWorldPosition(targetVector3)
 	local screenSize = Camera.ViewportSize
@@ -430,12 +434,20 @@ local function moveMouseToWorldPosition(targetVector3)
 
 	if isOnScreen then
 		local delta = (Vector2.new(pos2.X, pos2.Y) - screenCenter)*lerp;
-		if cursorShakeEnabled then
-			delta += _cursorShakeOffset;
+		
+		-- // Delta Adders
+		
+		local function assertPos(val:boolean,pos)
+			if val then
+				delta += pos
+			end
 		end;
-		if cursorSpringEnabled then
-			delta += Vector2.new(_cursorSpring.p.X/cursorSpringDivider,_cursorSpring.p.Y/cursorSpringDivider);
-		end
+		
+		assertPos(cursorShakeEnabled,_cursorShakeOffset);
+		assertPos(cursorSpringEnabled,Vector2.new(_cursorSpring.p.X/cursorSpringDivider,_cursorSpring.p.Y/cursorSpringDivider));
+
+		-- // MoveMouse
+		
 		mousemoverel(delta.X, delta.Y);
 		_cursorSpring:Impulse(Vector3.new(delta.X,delta.Y,1));
 	end;
@@ -488,18 +500,32 @@ local function car(right, needs, head)
 			local l = Camera.CFrame
 
 			if weapon == 'Daggers' or weapon == 'Bow' then
-				apos += Vector3.new(0, 1, 0)
-			end
+				apos += Vector3.new(0, 1, 0);
+			end;
+			
+			-- // Movement Based Legit Settings
+			
+			local vel = (targetRoot and targetRoot.Velocity or Vector3.zero)::Vector3;
+			local vel2 = (root and root.Velocity or Vector3.zero)::Vector3;
+			
+			if movementSpringEnabled then
+				local max = 20;
+
+				local xz = max/movementSpringXZ;
+				local y = max/movementSpringY;
+				_movementSpring:Impulse(Vector3.new((vel.X-vel2.X)/xz,(vel.Y-vel2.Y)/y,(vel.Z-vel2.Z)/xz));
+				apos += _movementSpring.p
+			end;
 			
 			if targetRoot and aimPredEnabled then
-				local vel = targetRoot.Velocity::Vector3;
-				local vel2 = (root and root.Velocity or Vector3.zero)::Vector3;
 				local max = 20;
 				
 				local xz = max/aimPredictionXZ;
 				local y = max/aimPredictionY;
-				apos += Vector3.new(vel.X/xz,vel.Y/y,vel.Z/xz) - Vector3.new(vel2.X/xz,vel2.Y/y,vel2.Z/xz)
-			end
+				apos += Vector3.new(vel.X/xz,vel.Y/y,vel.Z/xz) - Vector3.new(vel2.X/xz,vel2.Y/y,vel2.Z/xz);
+			end;
+			
+			-- // Other
 			
 			if shakeEnabled then
 				apos += _aimShakeOffset
@@ -554,6 +580,11 @@ table.insert(initConnections, m.Button2Down:Connect(function()
 
 		local lhead = nil
 		local a = RunService.RenderStepped:Connect(function()
+			local hum = lhead and lhead.Parent and lhead.Parent:FindFirstChild('Humanoid')
+			if not hum or hum.Health <= 0 then
+				lhead = nil;
+			end
+			
 			if not lhead then
 				lhead = getNearestHead()
 			end
@@ -681,12 +712,10 @@ local aimPredY = homeTab:CreateSlider({
 
 
 local legitTab = Window:CreateTab('Legit', 'search-check') -- Title, Image
---homeTab:CreateSection('Legit')
-
-legitTab:CreateSection('Mouse Spring')
+legitTab:CreateSection('Cursor Movement Spring')
 
 local mouseSpringEnabled = legitTab:CreateToggle({
-	Name = 'Mouse Spring Enabled',
+	Name = 'Cursor Spring Enabled',
 	CurrentValue = true,
 	Flag = "mspre",
 	Callback = function(Value, nosound)
@@ -695,7 +724,7 @@ local mouseSpringEnabled = legitTab:CreateToggle({
 })
 
 local mouseSpringDivider = legitTab:CreateSlider({
-	Name = 'Mouse Spring Divider',
+	Name = 'Cursor Spring Divider',
 	Range = {.3, 10},
 	Increment = .05,
 	Suffix = '',
@@ -718,7 +747,7 @@ local mouseSpringDivider = legitTab:CreateSlider({
 legitTab:CreateDivider()
 
 local charShakeEnabled = legitTab:CreateToggle({
-	Name = 'Mouse Shake Enabled',
+	Name = 'Cursor Shake Enabled',
 	CurrentValue = true,
 	Flag = "mse",
 	Callback = function(Value, nosound)
@@ -727,7 +756,7 @@ local charShakeEnabled = legitTab:CreateToggle({
 })
 
 local cursorShakeOffset = legitTab:CreateSlider({
-	Name = 'Mouse Shake Roughness',
+	Name = 'Cursor Shake Roughness',
 	Range = {0, 40},
 	Increment = .1,
 	Suffix = '',
@@ -739,7 +768,7 @@ local cursorShakeOffset = legitTab:CreateSlider({
 })
 
 local cursorShakeOffset = legitTab:CreateSlider({
-	Name = 'Mouse Shake Magnitude',
+	Name = 'Cursor Shake Magnitude',
 	Range = {0, 100},
 	Increment = 1,
 	Suffix = '',
@@ -747,6 +776,41 @@ local cursorShakeOffset = legitTab:CreateSlider({
 	Flag = 'mouseshakemagnitude',
 	Callback = function(Value)
 		_cursorShakeInstance.Magnitude = Value
+	end,
+})
+
+legitTab:CreateSection('Target Spring')
+
+local movementSpringEnabled = legitTab:CreateToggle({
+	Name = 'Movement Spring Enabled',
+	CurrentValue = true,
+	Flag = "movementspringenabled",
+	Callback = function(Value, nosound)
+		movementSpringEnabled = Value;
+	end,
+})
+
+local movementSpringXZ = legitTab:CreateSlider({
+	Name = 'Movement Spring X-Z',
+	Range = {1, 100},
+	Increment = .5,
+	Suffix = '',
+	CurrentValue = 20,
+	Flag = 'msXZ',
+	Callback = function(Value)
+		movementSpringXZ = Value/85
+	end,
+})
+
+local movementSpringY = legitTab:CreateSlider({
+	Name = 'Movement Spring Y',
+	Range = {1, 100},
+	Increment = .5,
+	Suffix = '',
+	CurrentValue = 20,
+	Flag = 'msY',
+	Callback = function(Value)
+		movementSpringY = Value/85
 	end,
 })
 
