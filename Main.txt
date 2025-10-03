@@ -803,8 +803,6 @@ local infoLabel = homeTab:CreateLabel('Adding a new config clones the current', 
 local currentConfig = readfile'EconConfig' or configsTable[1] or 'Default';
 local newConfigName = 'Unnamed Config';
 
-EconField.CONE_FILE_NAME = './cone/'..currentConfig
-
 local configDropdown = homeTab:CreateDropdown({
 	Name = 'Select Config',
 	Options = configsTable,
@@ -839,8 +837,6 @@ function updConfigDropdown(noPreviousSave,noLoad,noSet)
 		configDropdown:Set({currentConfig},noPreviousSave and 'NoPrevSave' or noSet);
 	end
 end
-
-updConfigDropdown(nil,nil,true)
 
 local configName = homeTab:CreateInput({
 	Name = 'Config Name',
@@ -1468,6 +1464,8 @@ table.insert(initConnections, Players.PlayerRemoving:Connect(function(player)
 	end
 end))
 
+EconField.CONE_FILE_NAME = './cone/'..currentConfig
 EconField:LoadConfiguration(true)
+updConfigDropdown(nil,nil,true)
 
 queue_on_teleport(__GETURL'Main.txt')
