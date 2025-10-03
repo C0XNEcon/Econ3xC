@@ -68,8 +68,6 @@ end
 
 ----------- [ Services ] -----------
 
-local last = game
-
 local Players           = game:GetService("Players")
 local RunService        = game:GetService("RunService")
 local UserInputService  = game:GetService("UserInputService")
@@ -79,8 +77,12 @@ local ts                = game:GetService('TweenService')
 
 local _aimShakeOffset = Vector3.zero;
 local _cursorShakeOffset = Vector3.zero;
+local _springMod = loadstring(__GETURL'Spring')();
 local _camShaker = loadstring(__GETURL'CameraShaker')()
 _camShaker[1].init(ECON_TOKEN)
+
+local _cursorSpring = _springMod.new(Vector3.zAxis,1.5,8);
+local _movementSpring = _springMod.new(Vector3.zAxis,1,8);
 
 local _aimShake = _camShaker[2].new(5,function(cf:CFrame)
 	_aimShakeOffset = cf.Position
@@ -411,6 +413,8 @@ local aimPredEnabled = true;
 local shakeEnabled = true;
 local cursorShakeEnabled = true;
 local softLockEnabled = true;
+local cursorSpringEnabled = true;
+local cursorSpringDivider = 1;
 
 local function moveMouseToWorldPosition(targetVector3)
 	local screenSize = Camera.ViewportSize
@@ -429,7 +433,11 @@ local function moveMouseToWorldPosition(targetVector3)
 		if cursorShakeEnabled then
 			delta += _cursorShakeOffset;
 		end;
+		if cursorSpringEnabled then
+			delta += Vector2.new(_cursorSpring.p.X/cursorSpringDivider,_cursorSpring.p.Y/cursorSpringDivider);
+		end
 		mousemoverel(delta.X, delta.Y);
+		_cursorSpring:Impulse(Vector3.new(delta.X,delta.Y,1));
 	end;
 end
 
@@ -671,7 +679,32 @@ local aimPredY = homeTab:CreateSlider({
 	end,
 })
 
+
+local legitTab = Window:CreateTab('Legit', 'search-check') -- Title, Image
 --homeTab:CreateSection('Legit')
+
+legitTab:CreateSection('Mouse Spring')
+
+local mouseSpringEnabled = legitTab:CreateToggle({
+	Name = 'Mouse Spring Enabled',
+	CurrentValue = true,
+	Flag = "mspre",
+	Callback = function(Value, nosound)
+		cursorSpringEnabled = Value;
+	end,
+})
+
+local mouseSpringDivider = legitTab:CreateSlider({
+	Name = 'Mouse Spring Divider',
+	Range = {.3, 10},
+	Increment = .05,
+	Suffix = '',
+	CurrentValue = 1.7,
+	Flag = 'mousespringdivider',
+	Callback = function(Value)
+		cursorSpringDivider = Value
+	end,
+})
 
 --local charShakeEnabled = homeTab:CreateToggle({
 --	Name = 'Soft Lock Enabled',
@@ -682,9 +715,9 @@ local aimPredY = homeTab:CreateSlider({
 --	end,
 --})
 
-homeTab:CreateDivider()
+legitTab:CreateDivider()
 
-local charShakeEnabled = homeTab:CreateToggle({
+local charShakeEnabled = legitTab:CreateToggle({
 	Name = 'Mouse Shake Enabled',
 	CurrentValue = true,
 	Flag = "mse",
@@ -693,7 +726,7 @@ local charShakeEnabled = homeTab:CreateToggle({
 	end,
 })
 
-local cursorShakeOffset = homeTab:CreateSlider({
+local cursorShakeOffset = legitTab:CreateSlider({
 	Name = 'Mouse Shake Roughness',
 	Range = {0, 40},
 	Increment = .1,
@@ -705,7 +738,7 @@ local cursorShakeOffset = homeTab:CreateSlider({
 	end,
 })
 
-local cursorShakeOffset = homeTab:CreateSlider({
+local cursorShakeOffset = legitTab:CreateSlider({
 	Name = 'Mouse Shake Magnitude',
 	Range = {0, 100},
 	Increment = 1,
@@ -717,12 +750,12 @@ local cursorShakeOffset = homeTab:CreateSlider({
 	end,
 })
 
-homeTab:CreateDivider()
+legitTab:CreateDivider()
 
 local shakeInfluenceXZ = 0;
 local shakeInfluenceY = 0;
 
-local charShakeEnabled = homeTab:CreateToggle({
+local charShakeEnabled = legitTab:CreateToggle({
 	Name = 'Target Shake Enabled',
 	CurrentValue = true,
 	Flag = "tse",
@@ -731,7 +764,7 @@ local charShakeEnabled = homeTab:CreateToggle({
 	end,
 })
 
-local charShakeRoughness = homeTab:CreateSlider({
+local charShakeRoughness = legitTab:CreateSlider({
 	Name = 'Target Shake Roughness',
 	Range = {0, 15},
 	Increment = .1,
@@ -743,7 +776,7 @@ local charShakeRoughness = homeTab:CreateSlider({
 	end,
 })
 
-local charShakeOffsetXZ = homeTab:CreateSlider({
+local charShakeOffsetXZ = legitTab:CreateSlider({
 	Name = 'Target Shake X-Z',
 	Range = {0, 30},
 	Increment = .1,
@@ -755,7 +788,7 @@ local charShakeOffsetXZ = homeTab:CreateSlider({
 	end,
 })
 
-local charShakeOffsetY = homeTab:CreateSlider({
+local charShakeOffsetY = legitTab:CreateSlider({
 	Name = 'Target Shake Y',
 	Range = {0, 30},
 	Increment = .1,
