@@ -821,6 +821,30 @@ local mouseSpringDivider = legitTab:CreateSlider({
 	end,
 })
 
+local mouseSpringDamper = legitTab:CreateSlider({
+	Name = 'Cursor Spring Damper',
+	Range = {.1, 20},
+	Increment = .05,
+	Suffix = '',
+	CurrentValue = .5,
+	Flag = 'mousespringdamper',
+	Callback = function(Value)
+		_cursorSpring.Damper = Value
+	end,
+})
+
+local mouseSpringDamper = legitTab:CreateSlider({
+	Name = 'Cursor Spring Speed',
+	Range = {.1, 20},
+	Increment = .05,
+	Suffix = '',
+	CurrentValue = 8,
+	Flag = 'mousespringspeed',
+	Callback = function(Value)
+		_cursorSpring.Speed = Value
+	end,
+})
+
 legitTab:CreateDivider()
 
 local charShakeEnabled = legitTab:CreateToggle({
