@@ -267,7 +267,7 @@ local EconField = loadstring(__GETURL'Econ UI.txt')()
 
 local Window = EconField:CreateWindow({
 	Name = "Econ",
-	Icon = 'code-xml',
+	Icon = 'radar',
 	LoadingTitle = '',
 	LoadingSubtitle = "by ConePartyy",
 	Theme = "AmberGlow", 
