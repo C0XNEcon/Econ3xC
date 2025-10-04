@@ -747,11 +747,11 @@ local aimPredToggle = homeTab:CreateToggle({
 })
 
 local aimPredXZ = homeTab:CreateSlider({
-	Name = 'Aim Prediction X-Z',
+	Name = 'Aim Prediction Multiplication X-Z',
 	Range = {.1, 100},
 	Increment = .1,
 	Suffix = '',
-	CurrentValue = 60.5,
+	CurrentValue = .2,
 	Flag = 'apXZ',
 	Callback = function(Value)
 		aimPredictionXZ = Value/85
@@ -759,11 +759,11 @@ local aimPredXZ = homeTab:CreateSlider({
 })
 
 local aimPredY = homeTab:CreateSlider({
-	Name = 'Aim Prediction Y',
+	Name = 'Aim Prediction Multiplication Y',
 	Range = {.1, 100},
 	Increment = .1,
 	Suffix = '',
-	CurrentValue = 42.5,
+	CurrentValue = .3,
 	Flag = 'apY',
 	Callback = function(Value)
 		aimPredictionY = Value/85
@@ -866,7 +866,7 @@ local movementSpringEnabled = legitTab:CreateToggle({
 
 local movementSpringXZ = legitTab:CreateSlider({
 	Name = 'Movement Spring X-Z',
-	Range = {1, 100},
+	Range = {1, 200},
 	Increment = .5,
 	Suffix = '',
 	CurrentValue = 20,
@@ -878,7 +878,7 @@ local movementSpringXZ = legitTab:CreateSlider({
 
 local movementSpringY = legitTab:CreateSlider({
 	Name = 'Movement Spring Y',
-	Range = {1, 100},
+	Range = {1, 200},
 	Increment = .5,
 	Suffix = '',
 	CurrentValue = 20,
