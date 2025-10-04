@@ -53,12 +53,12 @@ local SCRIPT_WHITELIST = {9139840720, 9390007618,9502659782};
 
 local request = (syn and syn.request) or (fluxus and fluxus.request) or (http and http.request) or http_request or request
 
-if not table.find(SCRIPT_WHITELIST,LOCAL_PLAYER.UserId) then
-	LOCAL_PLAYER:Kick("You don't have permission to use Econ")
-	LOCAL_PLAYER.Parent = nil
+if not table.find(SCRIPT_WHITELIST,plr.UserId) then
+	plr:Kick("You don't have permission to use Econ")
+	plr.Parent = nil
 	return
 elseif not request then
-	LOCAL_PLAYER:Kick('Your executor is not supported for Econ [ Missing function: "request" ]')
+	plr:Kick('Your executor is not supported for Econ [ Missing function: "request" ]')
 	return
 end
 
