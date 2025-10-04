@@ -702,12 +702,13 @@ local Keybind = homeTab:CreateKeybind({
 					else
 						CURRENT_APOS = nil;
 					end;
-				end
-			end)
+				end;
+			end);
 
-			keytrack = a
+			keytrack = a;
 		elseif keytrack then
-			keytrack:Disconnect()
+			keytrack:Disconnect();
+			aimbotUp();
 		end
 	end,
 })
@@ -989,11 +990,11 @@ local equalizerEnabled = homeTab:CreateToggle({
 homeTab:CreateSection('Configs')
 
 if not isfile'EconConfig' then
-	writefile('EconConfig','Default')
+	writefile('EconConfig','ConeLegitDefault')
 end
 
 local infoLabel = homeTab:CreateLabel('Adding a new config clones the current', 6026568210, Color3.fromRGB(220, 130, 60), false)
-local currentConfig = readfile'EconConfig' or configsTable[1] or 'Default';
+local currentConfig = readfile'EconConfig' or configsTable[1] or 'ConeLegitDefault';
 local newConfigName = 'Unnamed Config';
 
 local configDropdown = homeTab:CreateDropdown({
