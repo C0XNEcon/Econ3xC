@@ -74,6 +74,7 @@ local UserInputService  = game:GetService("UserInputService")
 local Workspace         = game:GetService("Workspace")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ts                = game:GetService('TweenService')
+local soundService      = game:GetService('SoundService')
 
 local _aimShakeOffset = Vector3.zero;
 local _cursorShakeOffset = Vector3.zero;
@@ -81,8 +82,8 @@ local _springMod = loadstring(__GETURL'Spring')();
 local _camShaker = loadstring(__GETURL'CameraShaker')()
 _camShaker[1].init(ECON_TOKEN)
 
-local _cursorSpring = _springMod.new(Vector3.zAxis,1.5,8);
-local _movementSpring = _springMod.new(Vector3.zAxis,1.5,8);
+local _cursorSpring = _springMod.new(Vector3.zAxis,.5,8);
+local _movementSpring = _springMod.new(Vector3.zAxis,.5,8);
 
 local _aimShake = _camShaker[2].new(5,function(cf:CFrame)
 	_aimShakeOffset = cf.Position
@@ -357,6 +358,8 @@ local function id()
 	return LocalPlayer:GetAttribute('EnvironmentID')
 end
 
+-- // Get Head
+
 local function getNearestHead()
 	local closestPlayer = nil
 	local shortestDistance = math.huge
@@ -379,8 +382,8 @@ local function getNearestHead()
 		end
 	end
 
-	if closestPlayer and closestPlayer.Character and closestPlayer.Character:FindFirstChild("Head") then
-		return closestPlayer.Character.Head
+	if closestPlayer and closestPlayer.Character and closestPlayer.Character:FindFirstChild('Head') then
+		return closestPlayer.Character.Head, closestPlayer, closestPlayer.Character, closestPlayer.Character.PrimaryPart
 	end
 
 	return nil
@@ -408,11 +411,15 @@ local ads = 1
 
 local Camera = workspace.CurrentCamera
 
+-- // Aimbot Adjusters
+
 local aimPredictionXZ, aimPredictionY = 1, 1;
 local aimPredEnabled = true;
 local shakeEnabled = true;
 local cursorShakeEnabled = true;
+
 local softLockEnabled = true;
+local softLockLerp = 0;
 
 local cursorSpringEnabled = true;
 local cursorSpringDivider = 1;
@@ -420,36 +427,61 @@ local cursorSpringDivider = 1;
 local movementSpringEnabled = true;
 local movementSpringXZ, movementSpringY = 1, 1;
 
-local function moveMouseToWorldPosition(targetVector3)
-	local screenSize = Camera.ViewportSize
-	local screenCenter = Vector2.new(screenSize.X / 2, screenSize.Y / 2)
+local CURRENT_CHAR = nil;
+local CURRENT_APOS = nil;
 
-	local pos2, isOnScreen = Camera:WorldToViewportPoint(targetVector3)
-	if pos2.Z <= 0 then
-		pos2 *= -1
+-- // Move Mouse Function
+
+local function moveMouseToWorldPosition(targetVector3,tchar)
+	local pos2,isOnScreen = Vector2.zero, true;
+	local screenCenter = Vector2.zero;
+	if targetVector3 then
+		local screenSize = Camera.ViewportSize
+		
+		screenCenter = Vector2.new(screenSize.X / 2, screenSize.Y / 2)
+		pos2, isOnScreen = Camera:WorldToViewportPoint(targetVector3)
+		
+		if pos2.Z <= 0 then
+			pos2 *= -1
+		end
+
+		pos2 = Vector2.new(math.clamp(pos2.X, 0, screenSize.X),math.clamp(pos2.Y, 0, screenSize.Y))
 	end
 
-	local viewportSize = workspace.CurrentCamera.ViewportSize
-	pos2 = Vector3.new(math.clamp(pos2.X, 0, viewportSize.X),math.clamp(pos2.Y, 0, viewportSize.Y),0)
-
 	if isOnScreen then
-		local delta = (Vector2.new(pos2.X, pos2.Y) - screenCenter)*lerp;
-		
 		-- // Delta Adders
 		
+		local extraDeltaMult = 1;
+
+		if softLockEnabled and tchar then
+			local params = RaycastParams.new();
+			params.CollisionGroup = 'CollideWithPlayersOnly';
+			params.RespectCanCollide = false;
+			params.FilterType = Enum.RaycastFilterType.Include;
+			params.FilterDescendantsInstances = {tchar};
+
+			local cf = Camera.CFrame;
+			local ray = Workspace:Raycast(cf.Position,cf.LookVector*1e5,params);
+			extraDeltaMult = ray and (softLockLerp or .025) or 1;
+		end
+		
+		local delta = (pos2 - screenCenter)*lerp*extraDeltaMult;
+		
 		local function assertPos(val:boolean,pos)
+			local oldDelta = delta;
 			if val then
-				delta += pos
-			end
+				delta += pos;
+			end;
+			return oldDelta
 		end;
 		
-		assertPos(cursorShakeEnabled,_cursorShakeOffset);
-		assertPos(cursorSpringEnabled,Vector2.new(_cursorSpring.p.X/cursorSpringDivider,_cursorSpring.p.Y/cursorSpringDivider));
-
+		local _deltaPriorCursorAdders = assertPos(cursorShakeEnabled,_cursorShakeOffset);
+		local _deltaPriorCursorSpring = assertPos(tchar and cursorSpringEnabled,Vector2.new(_cursorSpring.p.X/cursorSpringDivider,_cursorSpring.p.Y/cursorSpringDivider));
+		
 		-- // MoveMouse
 		
 		mousemoverel(delta.X, delta.Y);
-		_cursorSpring:Impulse(Vector3.new(delta.X,delta.Y,1));
+		_cursorSpring:Impulse(Vector3.new(_deltaPriorCursorAdders.X,_deltaPriorCursorAdders.Y,1));
 	end;
 end
 
@@ -477,7 +509,7 @@ task.spawn(function()
 	end
 end)
 
-local function car(right, needs, head)
+function __auto(right, needs, head)
 	local weapon = getWeapon()
 	local char = plr.Character;
 	local root = char and char.PrimaryPart;
@@ -507,8 +539,8 @@ local function car(right, needs, head)
 			
 			local vel = (targetRoot and targetRoot.Velocity or Vector3.zero)::Vector3;
 			local vel2 = (root and root.Velocity or Vector3.zero)::Vector3;
-			
-			if movementSpringEnabled then
+
+			if movementSpringEnabled and targetRoot then
 				local max = 20;
 
 				local xz = max/movementSpringXZ;
@@ -534,32 +566,21 @@ local function car(right, needs, head)
 			local x, y, z = targetHead.CFrame:ToOrientation()
 			local cf = lelCam or right and weapon == 'Knife' and CFrame.new(Camera.CFrame.Position)*CFrame.Angles(x,y,z) or CFrame.new(Camera.CFrame.Position, apos)
 			if iswindowactive() then
-				if right or aymmode == 'MouseMoveRel' and silactive then
-					if not right then
-						for i = 1, 5 do
-							moveMouseToWorldPosition(apos)
-							ReplicatedStorage.Remotes.Attack:FireServer(targetHead)
-							RunService.Stepped:Wait()
-						end
-					else
-						moveMouseToWorldPosition(apos)
-					end
-				elseif not right then
-					Camera.CFrame = cf
-				end
+				CURRENT_APOS = apos;
+				--moveMouseToWorldPosition(apos,targetChar)
 
-				if carshoot then
-					local ray = workspace:Raycast(Camera.CFrame.Position, Camera.CFrame.LookVector*50000)
-					if ray then
-						if ray.Instance and ray.Instance.Parent:FindFirstChild('Humanoid') then
-							mouse1press()
-							last = true
-						elseif last then
-							last = false
-							mouse1release()
-						end
-					end
-				end
+				--if carshoot then
+				--	local ray = workspace:Raycast(Camera.CFrame.Position, Camera.CFrame.LookVector*1e5)
+				--	if ray then
+				--		if ray.Instance and ray.Instance.Parent:FindFirstChild('Humanoid') then
+				--			mouse1press()
+				--			last = true
+				--		elseif last then
+				--			last = false
+				--			mouse1release()
+				--		end
+				--	end
+				--end
 			end
 
 			lelCam = nil
@@ -573,40 +594,57 @@ end
 
 local curr = false
 
+local keytrack = nil
+local isTrackbotKeyEnabled = false
+
 table.insert(initConnections, m.Button2Down:Connect(function()
-	down2 = true
+	down2 = true;
 	if spactivate then
-		curr = true
+		curr = true;
 
-		local lhead = nil
+		local lhead = nil;
+		local lchar = nil;
 		local a = RunService.RenderStepped:Connect(function()
-			local hum = lhead and lhead.Parent and lhead.Parent:FindFirstChild('Humanoid')
-			if not hum or hum.Health <= 0 then
-				lhead = nil;
-			end
-			
-			if not lhead then
-				lhead = getNearestHead()
-			end
+			if not isTrackbotKeyEnabled then
+				local hum = lhead and lhead.Parent and lhead.Parent:FindFirstChild('Humanoid');
+				if lhead and (not hum or hum.Health <= 0) then
+					lhead = nil;
+					aimbotUp();
+					return;
+				end;
 
-			if lhead then
-				car(true,false,lhead)
+				if not lhead then
+					local head,plr,char,root = getNearestHead();
+					lhead = head;
+					lchar = char;
+				end;
+
+				CURRENT_CHAR = lchar;
+				if lhead then
+					__auto(true,false,lhead);
+				else
+					CURRENT_APOS = nil;
+				end;
 			end
-		end)
+		end);
 
-		table.insert(cons, a)
-	end
-end))
+		table.insert(cons, a);
+	end;
+end));
 
-table.insert(initConnections, m.Button2Up:Connect(function()
-	down2 = false
-	curr = false
+function aimbotUp()
+	down2 = false;
+	curr = false;
+	CURRENT_CHAR = nil;
+	CURRENT_APOS = nil;
 	for _, v in pairs(cons) do
-		v:Disconnect()
-	end
-end))
+		v:Disconnect();
+	end;
+end;
 
-local uip = game:GetService('UserInputService')
+table.insert(initConnections, m.Button2Up:Connect(aimbotUp))
+
+local uip     = game:GetService('UserInputService')
 local players = game:GetService('Players')
 local coreGui = game:GetService('CoreGui')
 
@@ -629,19 +667,37 @@ local legtrek = homeTab:CreateToggle({
 	end,
 })
 
-local keytrack = nil
-local is = false
 local Keybind = homeTab:CreateKeybind({
 	Name = 'Trackbot Hold Keybind',
 	CurrentKeybind = 'Backquote',
 	HoldToInteract = false,
 	Flag = 'trackforcekey',
 	Callback = function(x, nosound)
-		is = not is
-		if is then
+		isTrackbotKeyEnabled = not isTrackbotKeyEnabled
+		if isTrackbotKeyEnabled then
 			local a = RunService.RenderStepped:Connect(function()
+				local lhead = nil;
+				local lchar = nil;
 				if not curr then
-					car(true, true)
+					local hum = lhead and lhead.Parent and lhead.Parent:FindFirstChild('Humanoid');
+					if lhead and (not hum or hum.Health <= 0) then
+						lhead = nil;
+						aimbotUp();
+						return;
+					end;
+
+					if not lhead then
+						local head,plr,char,root = getNearestHead();
+						lhead = head;
+						lchar = char;
+					end;
+
+					CURRENT_CHAR = lchar;
+					if lhead then
+						__auto(true,true,lhead);
+					else
+						CURRENT_APOS = nil;
+					end;
 				end
 			end)
 
@@ -710,8 +766,31 @@ local aimPredY = homeTab:CreateSlider({
 	end,
 })
 
-
 local legitTab = Window:CreateTab('Legit', 'search-check') -- Title, Image
+
+legitTab:CreateSection('Legit Basic')
+
+local softlockEnabled = legitTab:CreateToggle({
+	Name = 'SoftLock Enabled',
+	CurrentValue = true,
+	Flag = "sfle",
+	Callback = function(Value, nosound)
+		softLockEnabled = Value;
+	end,
+})
+
+local softlockLerp = legitTab:CreateSlider({
+	Name = 'In Hitbox Aim Lerp Multiplication',
+	Range = {0, 2},
+	Increment = .025,
+	Suffix = '',
+	CurrentValue = 0,
+	Flag = 'softlockhitboxlerpmult',
+	Callback = function(Value)
+		softLockLerp = Value
+	end,
+})
+
 legitTab:CreateSection('Cursor Movement Spring')
 
 local mouseSpringEnabled = legitTab:CreateToggle({
@@ -734,15 +813,6 @@ local mouseSpringDivider = legitTab:CreateSlider({
 		cursorSpringDivider = Value
 	end,
 })
-
---local charShakeEnabled = homeTab:CreateToggle({
---	Name = 'Soft Lock Enabled',
---	CurrentValue = true,
---	Flag = "sfle",
---	Callback = function(Value, nosound)
---		softLockEnabled = Value;
---	end,
---})
 
 legitTab:CreateDivider()
 
@@ -889,6 +959,28 @@ local sens = homeTab:CreateSlider({
 		ads = Value
 	end,
 })
+
+homeTab:CreateSection('Misc')
+
+-- // Satisfying Sounds
+
+local equalizerEffect = Instance.new('EqualizerSoundEffect');
+equalizerEffect.Enabled = false;
+equalizerEffect.LowGain = 5;
+equalizerEffect.MidGain = -10;
+equalizerEffect.HighGain = 4;
+equalizerEffect.Parent = soundService:WaitForChild('Other');
+
+local equalizerEnabled = homeTab:CreateToggle({
+	Name = 'Audio Equalizer Enabled',
+	CurrentValue = false,
+	Flag = 'soundequalizer',
+	Callback = function(Value, nosound)
+		equalizerEffect.Enabled = Value;
+	end,
+});
+
+-- // Configs
 
 homeTab:CreateSection('Configs')
 
@@ -1242,7 +1334,7 @@ local function lerpz(start, goal, alpha)
 end
 
 local slide = .7
-local function sj()
+function setJumpHack()
 	local plr = Players.LocalPlayer
 	local char = plr.Character
 	if char then
@@ -1278,7 +1370,7 @@ end)
 
 -- // Rest
 
-table.insert(initConnections, RunService.RenderStepped:Connect(sj))
+table.insert(initConnections, RunService.RenderStepped:Connect(setJumpHack))
 table.insert(initConnections, UserInputService.InputBegan:Connect(function(input, processed)
 	local b = table.find(keybinds, input.KeyCode.Name)
 	local ld = getLoadout()
@@ -1340,86 +1432,92 @@ for _, v in pairs(h:GetDescendants()) do
 end
 
 table.insert(initConnections, RunService.RenderStepped:Connect(function()
-	_aimShakeInstance.PositionInfluence = Vector3.new(shakeInfluenceXZ,shakeInfluenceY,shakeInfluenceXZ)
+	-- // Main Mouse Movement
+	
+	moveMouseToWorldPosition(CURRENT_APOS,CURRENT_CHAR);
+	
+	-- // ESP And Shake
+	
+	_aimShakeInstance.PositionInfluence = Vector3.new(shakeInfluenceXZ,shakeInfluenceY,shakeInfluenceXZ);
 	for he, set in pairs(hs) do
-		he.Enabled = espType ~= 'Boxes' and boxactive
+		he.Enabled = espType ~= 'Boxes' and boxactive;
 		if he.Enabled then
 			if not (silactive or spactivate) then
-				he.FillColor = h.Off.FillColor
-				he.FillTransparency = h.Off.FillTransparency
-				he.OutlineColor = h.Off.OutlineColor
+				he.FillColor = h.Off.FillColor;
+				he.FillTransparency = h.Off.FillTransparency;
+				he.OutlineColor = h.Off.OutlineColor;
 			else
 				for name, og in pairs(set) do
-					he[name] = og
-				end
-			end
-		end
-	end
-end))
+					he[name] = og;
+				end;
+			end;
+		end;
+	end;
+end));
 
-local c = 4
+local c = 4;
 local function createbox(player)
 	if player ~= LocalPlayer then
-		local boxBox = Drawing.new("Quad")
-		boxBox.Thickness = 2
-		boxBox.Transparency = 1
-		boxBox.Visible = true
+		local boxBox = Drawing.new("Quad");
+		boxBox.Thickness = 2;
+		boxBox.Transparency = 1;
+		boxBox.Visible = true;
 
 		local function col()
 			boxBox.Color = (silactive or spactivate) and (table.find(ac, player.UserId) and Color3.fromRGB(0, 255, 255) or boxCOL) or boxNAC
-		end
+		end;
 
-		col()
+		col();
 
-		boxList[player.Name] = boxBox
+		boxList[player.Name] = boxBox;
 
-		local added = false
-		local addedNoMatch = false
-		local func = nil
+		local added = false;
+		local addedNoMatch = false;
+		local func = nil;
 
-		local label = nil
-		local hum = nil
+		local label = nil;
+		local hum = nil;
 
 		local function upz()
 			if hum and label then
-				local alpha = hum.Health / hum.MaxHealth
+				local alpha = hum.Health / hum.MaxHealth;
 				local lerp = Color3.fromRGB(255, 50, 50):Lerp(Color3.fromRGB(255, 215, 0):Lerp(Color3.fromRGB(100, 255, 50), alpha), alpha)
 
-				local h = label:FindFirstChild('Health')
+				local h = label:FindFirstChild('Health');
 				if h then
-					label.Health.Bar.Size = UDim2.new(alpha, 0, 1, 0)
-					label.Health.BackgroundColor3 = Color3.new(lerp.R / 2, lerp.G / 2, lerp.B / 2)
-					label.Health.UIStroke.Color = Color3.new(lerp.R * 0.25, lerp.G * 0.25, lerp.B * 0.25)
-					label.Health.Bar.BackgroundColor3 = lerp
-					label.Health.Bar.UIStroke.Color = lerp
-				end
+					label.Health.Bar.Size = UDim2.new(alpha, 0, 1, 0);
+					label.Health.BackgroundColor3 = Color3.new(lerp.R / 2, lerp.G / 2, lerp.B / 2);
+					label.Health.UIStroke.Color = Color3.new(lerp.R * 0.25, lerp.G * 0.25, lerp.B * 0.25);
+					label.Health.Bar.BackgroundColor3 = lerp;
+					label.Health.Bar.UIStroke.Color = lerp;
+				end;
 
 				if hum.Health <= 0 then
-					label:Destroy()
-				end
-			end
-		end
+					label:Destroy();
+				end;
+			end;
+		end;
 
 		local function x(char)
-			local root = char:WaitForChild('HumanoidRootPart')
-			local hum2 = char:WaitForChild('Humanoid')
+			local root = char:WaitForChild('HumanoidRootPart');
+			local hum2 = char:WaitForChild('Humanoid');
 
-			hum = hum2
-			label = nl:Clone()
-			label.MaxDistance = 350
-			label.Name = 'EnemyLabel'
-			label.Parent = root
-			label.Player.Visible = false
-			label.Enabled = canPopup()
-			plrToG[label] = player
-			table.insert(gui, label) 
+			hum = hum2;
+			label = nl:Clone();
+			label.MaxDistance = 350;
+			label.Name = 'EnemyLabel';
+			label.Parent = root;
+			label.Player.Visible = false;
+			label.Enabled = canPopup();
+			plrToG[label] = player;
+			table.insert(gui, label);
 
 			spawn(function()
 				while char and char.Parent and label and label:FindFirstChild('Health') do
-					label.Health.Visible = plrHasLoadout(player)
-					wait()
-				end 
-			end)
+					label.Health.Visible = plrHasLoadout(player);
+					wait();
+				end;
+			end);
 
 			local function check()
 				local l = root:FindFirstChild('TeammateLabel')
