@@ -433,6 +433,10 @@ local CURRENT_APOS = nil;
 -- // Move Mouse Function
 
 local function moveMouseToWorldPosition(targetVector3,tchar)
+	if tchar and not tchar.Parent then
+		tchar = nil;
+	end;
+	
 	local pos2,isOnScreen = Vector2.zero, true;
 	local screenCenter = Vector2.zero;
 	if targetVector3 then
@@ -475,7 +479,7 @@ local function moveMouseToWorldPosition(targetVector3,tchar)
 			return oldDelta
 		end;
 		
-		local _deltaPriorCursorAdders = assertPos(cursorShakeEnabled,_cursorShakeOffset);
+		local _deltaPriorCursorAdders = assertPos(tchar and cursorShakeEnabled,_cursorShakeOffset);
 		local _deltaPriorCursorSpring = assertPos(tchar and cursorSpringEnabled,Vector2.new(_cursorSpring.p.X/cursorSpringDivider,_cursorSpring.p.Y/cursorSpringDivider));
 		
 		-- // MoveMouse
@@ -525,7 +529,7 @@ function __auto(right, needs, head)
 
 			local typ = right and trackType or clickType
 			if typ ~= 'Head' then
-				pos = typ == 'Changing [ Outdated, use Aim Prediction ]' and targetHead.Position+changeVal.Value or targetHead.Parent.HumanoidRootPart.Position
+				pos = typ == 'Changing [ Outdated ]' and targetHead.Position+changeVal.Value or targetHead.Parent.HumanoidRootPart.Position
 			end
 
 			local apos = pos
@@ -710,7 +714,7 @@ local Keybind = homeTab:CreateKeybind({
 
 local trackTypeDropdown = homeTab:CreateDropdown({
 	Name = 'Track Aim Part',
-	Options = {'Head', 'Torso', 'Changing [ Outdated, use Aim Prediction ]'},
+	Options = {'Head', 'Torso', 'Changing [ Outdated ]'},
 	CurrentOption = {'Torso'},
 	MultipleOptions = false,
 	Flag = 'trackaimpart',
@@ -744,8 +748,8 @@ local aimPredToggle = homeTab:CreateToggle({
 
 local aimPredXZ = homeTab:CreateSlider({
 	Name = 'Aim Prediction X-Z',
-	Range = {1, 100},
-	Increment = .5,
+	Range = {.1, 100},
+	Increment = .1,
 	Suffix = '',
 	CurrentValue = 60.5,
 	Flag = 'apXZ',
@@ -756,8 +760,8 @@ local aimPredXZ = homeTab:CreateSlider({
 
 local aimPredY = homeTab:CreateSlider({
 	Name = 'Aim Prediction Y',
-	Range = {1, 100},
-	Increment = .5,
+	Range = {.1, 100},
+	Increment = .1,
 	Suffix = '',
 	CurrentValue = 42.5,
 	Flag = 'apY',
