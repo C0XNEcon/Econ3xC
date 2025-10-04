@@ -40,12 +40,16 @@ for _, name in configFiles do
 	end
 end
 
+-- // Important Vars
+
+local plr = game:GetService('Players').LocalPlayer;
+local m = plr:GetMouse()
+
 -- // Main
 
 ----------- [ Executor Functions ] -----------
 
 local SCRIPT_WHITELIST = {9139840720, 9390007618,9502659782};
-local LOCAL_PLAYER = game:GetService('Players').LocalPlayer;
 
 local request = (syn and syn.request) or (fluxus and fluxus.request) or (http and http.request) or http_request or request
 
@@ -103,7 +107,6 @@ local _aimShakeInstance = _aimShake:StartShake(1,0,0,Vector3.zero,Vector3.zero);
 ----------- [ Main ] -----------
 
 local Camera = workspace.CurrentCamera
-local LocalPlayer = Players.LocalPlayer
 
 local success, message = pcall(function()
 	return
@@ -177,17 +180,17 @@ local function playSound(sp, rep, vol)
 	end)
 end
 
-if LocalPlayer:GetAttribute('OriginalPosition') then 
-	LocalPlayer:SetAttribute('OriginalPosition', nil)		
+if plr:GetAttribute('OriginalPosition') then 
+	plr:SetAttribute('OriginalPosition', nil)		
 end
 
-LocalPlayer:SetAttribute('OriginalPosition', true)
+plr:SetAttribute('OriginalPosition', true)
 
 local initConnections = {}
 local on = true
 local going = true
 
-table.insert(initConnections, LocalPlayer:GetAttributeChangedSignal('OriginalPosition'):Connect(function()
+table.insert(initConnections, plr:GetAttributeChangedSignal('OriginalPosition'):Connect(function()
 	for _, v in pairs(initConnections) do
 		v:Disconnect()
 	end
@@ -209,9 +212,6 @@ f = true
 
 local prms = RaycastParams.new()
 prms.RespectCanCollide = true
-
-local plr = Players.LocalPlayer
-local m = plr:GetMouse()
 
 -- // CARRELOAD
 
@@ -338,7 +338,7 @@ local function getLoadout()
 	return t
 end
 
-local ps = LocalPlayer.PlayerScripts:WaitForChild('Assets')
+local ps = plr.PlayerScripts:WaitForChild('Assets')
 
 local function check(v)
 	if v.Name:split' - '[1] == plr.Name then
@@ -355,7 +355,7 @@ local shra = true
 local igam = true
 
 local function id()
-	return LocalPlayer:GetAttribute('EnvironmentID')
+	return plr:GetAttribute('EnvironmentID')
 end
 
 -- // Get Head
@@ -364,14 +364,17 @@ local function getNearestHead()
 	local closestPlayer = nil
 	local shortestDistance = math.huge
 	local shortestDistance2 = math.huge
+	
+	local ourChar = plr.Character;
+	local ourPos = ourChar and ourChar:GetPivot().Position or Camera.CFrame.Position;
 
 	for _, player in pairs(Players:GetPlayers()) do
-		if player ~= LocalPlayer and (player:GetAttribute('EnvironmentID') == id() or not igCheck) and (not id() or id() ~= '߿' and igam or id() == '߿' and shra) and not table.find(noPlayers, player.UserId) and player.Character and player.Character:FindFirstChild("Head") then
+		if player ~= plr and (player:GetAttribute('EnvironmentID') == id() or not igCheck) and (not id() or id() ~= '߿' and igam or id() == '߿' and shra) and not table.find(noPlayers, player.UserId) and player.Character and player.Character:FindFirstChild("Head") then
 			local char = player.Character
 			local hum = char and char:FindFirstChild('Humanoid')
 			local head = char.Head
 			local headPos, headVisible = Camera:WorldToViewportPoint(head.Position + Vector3.new(0, 0.5, 0))
-			local distance = (head.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+			local distance = (head.Position - ourPos).Magnitude
 			local distance2 = (Vector2.new(m.X, m.Y)-Vector2.new(headPos.X, headPos.Y)).Magnitude/2
 
 			if distance2 < shortestDistance2 and hum.Health > 0 and headVisible then
@@ -652,7 +655,6 @@ local uip     = game:GetService('UserInputService')
 local players = game:GetService('Players')
 local coreGui = game:GetService('CoreGui')
 
-local plr = players.LocalPlayer 
 local gui = plr.PlayerGui
 
 local last = true
@@ -1213,7 +1215,7 @@ local evpop = gameplayTab:CreateDropdown({
 -- // HEALTH
 
 local plrs = game:GetService('Players')
-local nl = plrs.LocalPlayer.PlayerScripts.UserInterface:WaitForChild('TeammateLabel')
+local nl = plrs.plr.PlayerScripts.UserInterface:WaitForChild('TeammateLabel')
 
 -- // REST
 
@@ -1340,7 +1342,7 @@ end
 
 local slide = .7
 function setJumpHack()
-	local plr = Players.LocalPlayer
+	local plr = Players.plr
 	local char = plr.Character
 	if char then
 		local fm2 = char:FindFirstChild('FakeMass')
@@ -1462,7 +1464,7 @@ end));
 
 local c = 4;
 local function createbox(player)
-	if player ~= LocalPlayer then
+	if player ~= plr then
 		local boxBox = Drawing.new("Quad");
 		boxBox.Thickness = 2;
 		boxBox.Transparency = 1;
@@ -1569,7 +1571,7 @@ local function createbox(player)
 			local hum = char and char:FindFirstChild('Humanoid')
 			local root = char and char:FindFirstChild('HumanoidRootPart')
 
-			if boxactive and not table.find(noPlayers, player.UserId) and (player:GetAttribute('EnvironmentID') == LocalPlayer:GetAttribute('EnvironmentID') or not igCheck) and (not id() or id() ~= '߿' and igam or id() == '߿' and shra) and root and hum and hum.Health > 0 and player.Character:FindFirstChild("HumanoidRootPart") and getWeapon() then
+			if boxactive and not table.find(noPlayers, player.UserId) and (player:GetAttribute('EnvironmentID') == plr:GetAttribute('EnvironmentID') or not igCheck) and (not id() or id() ~= '߿' and igam or id() == '߿' and shra) and root and hum and hum.Health > 0 and player.Character:FindFirstChild("HumanoidRootPart") and getWeapon() then
 				local head = player.Character:FindFirstChild("Head")
 
 				if root and head then
