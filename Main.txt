@@ -1365,10 +1365,9 @@ end
 
 local slide = .7
 function setJumpHack()
-	local plr = Players.plr
 	local char = plr.Character
 	if char then
-		local fm2 = char:FindFirstChild('FakeMass')
+		local fm2 = char:FindFirstChild'FakeMass'
 		local root = char.PrimaryPart
 		if fm2 then
 			local c = fm2.CurrentPhysicalProperties
