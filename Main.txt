@@ -1,5 +1,16 @@
 -- This script was made by @ConePartyy on Roblox. Don't use this without my permission
 
+----------- [ Services ] -----------
+
+local Players           = game:GetService("Players")
+local RunService        = game:GetService("RunService")
+local UserInputService  = game:GetService("UserInputService")
+local Workspace         = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ts                = game:GetService('TweenService')
+local soundService      = game:GetService('SoundService')
+local coregui           = game:GetService('CoreGui')
+
 -- // Configs
 
 local configsTable = {};
@@ -23,27 +34,44 @@ elseif not configFiles then
 end
 
 for _, name in configFiles do
-	if name:sub(#name-4,-1) == fileType then
+	--if name:sub(#name-4,-1) == fileType then
 		local readFile = readfile(name);
 		local suc, rep = pcall(function()
 			return game:GetService('HttpService'):JSONDecode(readFile);
 		end);
 		
 		if suc and rep ~= '' then
-			local fullName = name:sub(8,-1):sub(1,#name-12);
+			local fullName = name:sub(8,-1):split'.'[1];
 			table.insert(configsTable,fullName);
 		else
 			warn('<< Econ >> Read failed for file: ',rep)
 		end;
-	else
-		warn('<< Econ >> File: "'..name..'" is not a .rfld [ Not Supported ]');
-	end
+	--else
+	--	warn('<< Econ >> File: "'..name..'" is not a .rfld [ Not Supported ]');
+	--end
 end
 
 -- // Important Vars
 
-local plr = game:GetService('Players').LocalPlayer;
-local m = plr:GetMouse()
+local plr = Players.LocalPlayer;
+local mouse = plr:GetMouse();
+local cam = Workspace.CurrentCamera;
+
+local FOVCIRCLE_UI = (coregui:FindFirstChild'EconFOV')::ScreenGui;
+local FOVCIRCLE_FRAME = (FOVCIRCLE_UI and FOVCIRCLE_UI:FindFirstChild('Root'))::ImageLabel;
+if not FOVCIRCLE_UI then
+	FOVCIRCLE_UI = Instance.new('ScreenGui');
+	FOVCIRCLE_UI.Name = 'EconFOV';
+	FOVCIRCLE_UI.Enabled = false;
+	FOVCIRCLE_FRAME = Instance.new('ImageLabel',FOVCIRCLE_UI);
+	FOVCIRCLE_FRAME.Position = UDim2.fromScale(.5,.5);
+	FOVCIRCLE_FRAME.AnchorPoint = Vector2.new(.5,.5);
+	FOVCIRCLE_FRAME.Size = UDim2.fromOffset(300,300);
+	FOVCIRCLE_FRAME.BackgroundTransparency = 1;
+	FOVCIRCLE_FRAME.ResampleMode = Enum.ResamplerMode.Pixelated;
+	FOVCIRCLE_FRAME.Image = 'rbxassetid://10131954007';
+	FOVCIRCLE_FRAME.Name = 'Root';
+end
 
 -- // Main
 
@@ -69,16 +97,6 @@ local __GETURL = function(URL)
 		Authorization = 'token '..ECON_TOKEN;
 	}}).Body
 end
-
------------ [ Services ] -----------
-
-local Players           = game:GetService("Players")
-local RunService        = game:GetService("RunService")
-local UserInputService  = game:GetService("UserInputService")
-local Workspace         = game:GetService("Workspace")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ts                = game:GetService('TweenService')
-local soundService      = game:GetService('SoundService')
 
 local _aimShakeOffset = Vector3.zero;
 local _cursorShakeOffset = Vector3.zero;
@@ -106,8 +124,6 @@ local _aimShakeInstance = _aimShake:StartShake(1,0,0,Vector3.zero,Vector3.zero);
 
 ----------- [ Main ] -----------
 
-local Camera = workspace.CurrentCamera
-
 local success, message = pcall(function()
 	return
 end)
@@ -117,7 +133,7 @@ if not success then
 end
 
 local file = success and message or 'true-false-true-false-true'
-local splits = string.split(file, '-')
+local splits = file:split'-'
 
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -366,16 +382,16 @@ local function getNearestHead()
 	local shortestDistance2 = math.huge
 	
 	local ourChar = plr.Character;
-	local ourPos = ourChar and ourChar:GetPivot().Position or Camera.CFrame.Position;
+	local ourPos = ourChar and ourChar:GetPivot().Position or cam.CFrame.Position;
 
 	for _, player in pairs(Players:GetPlayers()) do
 		if player ~= plr and (player:GetAttribute('EnvironmentID') == id() or not igCheck) and (not id() or id() ~= '߿' and igam or id() == '߿' and shra) and not table.find(noPlayers, player.UserId) and player.Character and player.Character:FindFirstChild("Head") then
 			local char = player.Character
 			local hum = char and char:FindFirstChild('Humanoid')
 			local head = char.Head
-			local headPos, headVisible = Camera:WorldToViewportPoint(head.Position + Vector3.new(0, 0.5, 0))
+			local headPos, headVisible = cam:WorldToViewportPoint(head.Position + Vector3.new(0, 0.5, 0))
 			local distance = (head.Position - ourPos).Magnitude
-			local distance2 = (Vector2.new(m.X, m.Y)-Vector2.new(headPos.X, headPos.Y)).Magnitude/2
+			local distance2 = (Vector2.new(mouse.X, mouse.Y)-Vector2.new(headPos.X, headPos.Y)).Magnitude/2
 
 			if distance2 < shortestDistance2 and hum.Health > 0 and headVisible then
 				shortestDistance2 = distance2
@@ -412,8 +428,6 @@ local lerp = 1
 local sens = 1
 local ads = 1
 
-local Camera = workspace.CurrentCamera
-
 -- // Aimbot Adjusters
 
 local aimPredictionXZ, aimPredictionY = 1, 1;
@@ -430,6 +444,9 @@ local cursorSpringDivider = 1;
 local movementSpringEnabled = true;
 local movementSpringXZ, movementSpringY = 1, 1;
 
+local FOVCircleEnabled = true;
+local FOVCircleSize = 10;
+
 local CURRENT_CHAR = nil;
 local CURRENT_APOS = nil;
 
@@ -443,10 +460,10 @@ local function moveMouseToWorldPosition(targetVector3,tchar)
 	local pos2,isOnScreen = Vector2.zero, true;
 	local screenCenter = Vector2.zero;
 	if targetVector3 then
-		local screenSize = Camera.ViewportSize
+		local screenSize = cam.ViewportSize
 		
 		screenCenter = Vector2.new(screenSize.X / 2, screenSize.Y / 2)
-		pos2, isOnScreen = Camera:WorldToViewportPoint(targetVector3)
+		pos2, isOnScreen = cam:WorldToViewportPoint(targetVector3)
 		
 		if pos2.Z <= 0 then
 			pos2 *= -1
@@ -467,7 +484,7 @@ local function moveMouseToWorldPosition(targetVector3,tchar)
 			params.FilterType = Enum.RaycastFilterType.Include;
 			params.FilterDescendantsInstances = {tchar};
 
-			local cf = Camera.CFrame;
+			local cf = cam.CFrame;
 			local ray = Workspace:Raycast(cf.Position,cf.LookVector*1e5,params);
 			extraDeltaMult = ray and (softLockLerp or .025) or 1;
 		end
@@ -536,7 +553,7 @@ function __auto(right, needs, head)
 			end
 
 			local apos = pos
-			local l = Camera.CFrame
+			local l = cam.CFrame
 
 			if weapon == 'Daggers' or weapon == 'Bow' then
 				apos += Vector3.new(0, 1, 0);
@@ -571,13 +588,13 @@ function __auto(right, needs, head)
 			end
 
 			local x, y, z = targetHead.CFrame:ToOrientation()
-			local cf = lelCam or right and weapon == 'Knife' and CFrame.new(Camera.CFrame.Position)*CFrame.Angles(x,y,z) or CFrame.new(Camera.CFrame.Position, apos)
+			local cf = lelCam or right and weapon == 'Knife' and CFrame.new(cam.CFrame.Position)*CFrame.Angles(x,y,z) or CFrame.new(cam.CFrame.Position, apos)
 			if iswindowactive() then
 				CURRENT_APOS = apos;
 				--moveMouseToWorldPosition(apos,targetChar)
 
 				--if carshoot then
-				--	local ray = workspace:Raycast(Camera.CFrame.Position, Camera.CFrame.LookVector*1e5)
+				--	local ray = workspace:Raycast(cam.CFrame.Position, cam.CFrame.LookVector*1e5)
 				--	if ray then
 				--		if ray.Instance and ray.Instance.Parent:FindFirstChild('Humanoid') then
 				--			mouse1press()
@@ -604,7 +621,7 @@ local curr = false
 local keytrack = nil
 local isTrackbotKeyEnabled = false
 
-table.insert(initConnections, m.Button2Down:Connect(function()
+table.insert(initConnections, mouse.Button2Down:Connect(function()
 	down2 = true;
 	if spactivate then
 		curr = true;
@@ -649,11 +666,7 @@ function aimbotUp()
 	end;
 end;
 
-table.insert(initConnections, m.Button2Up:Connect(aimbotUp))
-
-local uip     = game:GetService('UserInputService')
-local players = game:GetService('Players')
-local coreGui = game:GetService('CoreGui')
+table.insert(initConnections, mouse.Button2Up:Connect(aimbotUp))
 
 local gui = plr.PlayerGui
 
@@ -798,7 +811,39 @@ local softlockLerp = legitTab:CreateSlider({
 	end,
 })
 
-legitTab:CreateSection('Cursor Movement Spring')
+legitTab:CreateSection('Lock FOV')
+
+local lockFOVEnabled = legitTab:CreateToggle({
+	Name = 'Lock FOV Enabled',
+	CurrentValue = false,
+	Flag = 'lockfovenabled',
+	Callback = function(Value, nosound)
+		FOVCircleEnabled = Value;
+	end,
+})
+
+local lockFOVCircleVisible = legitTab:CreateToggle({
+	Name = 'Lock FOV Circle Visible',
+	CurrentValue = false,
+	Flag = 'lockfovcirclevisible',
+	Callback = function(Value, nosound)
+		FOVCIRCLE_UI.Enabled = Value;
+	end,
+})
+
+local lockFOVSize = legitTab:CreateSlider({
+	Name = 'Lock FOV Size',
+	Range = {10, 100},
+	Increment = .1,
+	Suffix = '',
+	CurrentValue = 25,
+	Flag = 'lockfovsize',
+	Callback = function(Value)
+		FOVCircleSize = (Value/100)*1200;
+	end,
+})
+
+legitTab:CreateSection'Cursor Movement Spring'
 
 local mouseSpringEnabled = legitTab:CreateToggle({
 	Name = 'Cursor Spring Enabled',
@@ -823,7 +868,7 @@ local mouseSpringDivider = legitTab:CreateSlider({
 
 local mouseSpringDamper = legitTab:CreateSlider({
 	Name = 'Cursor Spring Damper',
-	Range = {.1, 20},
+	Range = {.3, 20},
 	Increment = .05,
 	Suffix = '',
 	CurrentValue = .5,
@@ -835,7 +880,7 @@ local mouseSpringDamper = legitTab:CreateSlider({
 
 local mouseSpringDamper = legitTab:CreateSlider({
 	Name = 'Cursor Spring Speed',
-	Range = {.1, 20},
+	Range = {1, 20},
 	Increment = .05,
 	Suffix = '',
 	CurrentValue = 8,
@@ -1461,8 +1506,13 @@ for _, v in pairs(h:GetDescendants()) do
 end
 
 table.insert(initConnections, RunService.RenderStepped:Connect(function()
-	-- // Main Mouse Movement
+	-- // Main
 	
+	local screenSize = cam.ViewportSize/Vector2.new(1536,864); -- // [ My screen size ];
+	local finalMult = (screenSize.X+screenSize.Y)/2;
+	local finalPixels = FOVCircleSize*finalMult;
+	
+	FOVCIRCLE_FRAME.Size = UDim2.fromOffset(finalPixels,finalPixels);
 	moveMouseToWorldPosition(CURRENT_APOS,CURRENT_CHAR);
 	
 	-- // ESP And Shake
@@ -1597,8 +1647,8 @@ local function createbox(player)
 				local head = player.Character:FindFirstChild("Head")
 
 				if root and head then
-					local rootPos, rootVisible = Camera:WorldToViewportPoint(root.Position)
-					local headPos, headVisible = Camera:WorldToViewportPoint(head.Position + Vector3.new(0, 0.5, 0))
+					local rootPos, rootVisible = cam:WorldToViewportPoint(root.Position)
+					local headPos, headVisible = cam:WorldToViewportPoint(head.Position + Vector3.new(0, 0.5, 0))
 
 					if rootVisible and headVisible then
 						if espType == 'Both' then
