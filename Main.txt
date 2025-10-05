@@ -157,10 +157,6 @@ if not isfolder(fold) then
 	makefolder(fold)
 end
 
-local function write()
-
-end
-
 local boxList = {}
 
 local glassRevertList = {}
@@ -679,7 +675,6 @@ local legtrek = homeTab:CreateToggle({
 	Callback = function(Value, nosound)
 		spactivate = Value
 
-		write()
 		if not nosound then
 			playSound(spactivate and 1 or .8)
 		end
@@ -1218,7 +1213,6 @@ local boxEnabled = gameplayTab:CreateToggle({
 	Flag = "boxetoggle",
 	Callback = function(Value, nosound)
 		boxactive = Value
-		write()
 
 		popUpd()
 
@@ -1307,7 +1301,6 @@ local CARRELOAD = gameplayTab:CreateToggle({
 	Flag = "artoggle",
 	Callback = function(Value, nosound)
 		reload = Value
-		write()
 
 		if not nosound then
 			playSound(reload and 1 or .8)
@@ -1506,13 +1499,12 @@ for _, v in pairs(h:GetDescendants()) do
 end
 
 table.insert(initConnections, RunService.RenderStepped:Connect(function()
-	-- // Main
-	
-	local screenSize = cam.ViewportSize/Vector2.new(1536,864); -- // [ My screen size ];
+	local screenSize = cam.ViewportSize/Vector2.new(1536,864);
 	local finalMult = (screenSize.X+screenSize.Y)/2;
 	local finalPixels = FOVCircleSize*finalMult;
 	
 	FOVCIRCLE_FRAME.Size = UDim2.fromOffset(finalPixels,finalPixels);
+	
 	moveMouseToWorldPosition(CURRENT_APOS,CURRENT_CHAR);
 	
 	-- // ESP And Shake
