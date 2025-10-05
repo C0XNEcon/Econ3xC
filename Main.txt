@@ -82,7 +82,7 @@ local soundService      = game:GetService('SoundService')
 
 local _aimShakeOffset = Vector3.zero;
 local _cursorShakeOffset = Vector3.zero;
-local _springMod = require(workspace.Spring) --loadstring(__GETURL'Spring')();
+local _springMod = loadstring(__GETURL'Spring')();
 local _camShaker = loadstring(__GETURL'CameraShaker')()
 _camShaker[1].init(ECON_TOKEN)
 
