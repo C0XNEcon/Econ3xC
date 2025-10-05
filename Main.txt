@@ -34,7 +34,7 @@ elseif not configFiles then
 end
 
 for _, name in configFiles do
-	--if name:sub(#name-4,-1) == fileType then
+	if name:sub(#name-4,-1) == fileType then
 		local readFile = readfile(name);
 		local suc, rep = pcall(function()
 			return game:GetService('HttpService'):JSONDecode(readFile);
@@ -46,9 +46,9 @@ for _, name in configFiles do
 		else
 			warn('<< Econ >> Read failed for file: ',rep)
 		end;
-	--else
-	--	warn('<< Econ >> File: "'..name..'" is not a .rfld [ Not Supported ]');
-	--end
+	else
+		warn('<< Econ >> File: "'..name..'" is not a .rfld [ Not Supported ]');
+	end
 end
 
 -- // Important Vars
