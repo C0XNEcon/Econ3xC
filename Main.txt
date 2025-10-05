@@ -82,7 +82,7 @@ local soundService      = game:GetService('SoundService')
 
 local _aimShakeOffset = Vector3.zero;
 local _cursorShakeOffset = Vector3.zero;
-local _springMod = loadstring(__GETURL'Spring')();
+local _springMod = require(workspace.Spring) --loadstring(__GETURL'Spring')();
 local _camShaker = loadstring(__GETURL'CameraShaker')()
 _camShaker[1].init(ECON_TOKEN)
 
@@ -829,7 +829,7 @@ local mouseSpringDamper = legitTab:CreateSlider({
 	CurrentValue = .5,
 	Flag = 'mousespringdamper',
 	Callback = function(Value)
-		_cursorSpring.Damper = Value
+		_cursorSpring.Speed = Value
 	end,
 })
 
@@ -841,7 +841,7 @@ local mouseSpringDamper = legitTab:CreateSlider({
 	CurrentValue = 8,
 	Flag = 'mousespringspeed',
 	Callback = function(Value)
-		_cursorSpring.Speed = Value
+		_cursorSpring.Damping = Value
 	end,
 })
 
@@ -965,7 +965,7 @@ local charShakeOffsetY = legitTab:CreateSlider({
 	end,
 })
 
-homeTab:CreateSection('Sensitivity [ Copy ur RIVALS settings ]')
+homeTab:CreateSection('Sensitivity [ Copy ur Rivals settings ]')
 
 local sens = homeTab:CreateSlider({
 	Name = 'Sensitivity',
@@ -1040,7 +1040,7 @@ local configDropdown = homeTab:CreateDropdown({
 			local _fullFilePath = `./cone/{currentConfig}{fileType}`;
 			if not isfile(_fullFilePath) then
 				repeat RunService.Stepped:Wait() until isfile(_fullFilePath);
-			end; -- // If it isn't a file, it will bug
+			end;
 			
 			EconField:LoadConfiguration();
 		end
