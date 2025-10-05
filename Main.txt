@@ -1238,8 +1238,7 @@ local evpop = gameplayTab:CreateDropdown({
 
 -- // HEALTH
 
-local plrs = game:GetService('Players')
-local nl = plrs.plr.PlayerScripts.UserInterface:WaitForChild('TeammateLabel')
+local nl = plr.PlayerScripts.UserInterface:WaitForChild('TeammateLabel')
 
 -- // REST
 
