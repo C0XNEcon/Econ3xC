@@ -18,12 +18,12 @@ local fileType = '.rfld';
 local isConfigFolder = isfolder'cone';
 local configFiles = isConfigFolder and listfiles'./cone';
 
-game:GetService('RunService').Stepped:Wait()
+RunService.Stepped:Wait()
 
 isConfigFolder = isConfigFolder or isfolder'cone';
 configFiles = configFiles or isConfigFolder and listfiles'./cone';
 
-game:GetService('RunService').Stepped:Wait()
+RunService.Stepped:Wait()
 
 if not isConfigFolder then
 	configFiles = {};
