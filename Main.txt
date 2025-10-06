@@ -374,60 +374,6 @@ local function id()
 	return plr:GetAttribute('EnvironmentID')
 end
 
--- // Get Head
-
-local function getNearestHead()
-	local closestPlayer = nil
-	local shortestDistance = math.huge
-	local shortestDistance2 = math.huge
-	
-	local ourChar = plr.Character;
-	local ourPos = ourChar and ourChar:GetPivot().Position or cam.CFrame.Position;
-
-	for _, player in pairs(Players:GetPlayers()) do
-		if player ~= plr and (player:GetAttribute('EnvironmentID') == id() or not igCheck) and (not id() or id() ~= '߿' and igam or id() == '߿' and shra) and not table.find(noPlayers, player.UserId) and player.Character and player.Character:FindFirstChild("Head") then
-			local char = player.Character
-			local hum = char and char:FindFirstChild('Humanoid')
-			local head = char.Head
-			local headPos, headVisible = cam:WorldToViewportPoint(head.Position + Vector3.new(0, 0.5, 0))
-			local distance = (head.Position - ourPos).Magnitude
-			local distance2 = (Vector2.new(mouse.X, mouse.Y)-Vector2.new(headPos.X, headPos.Y)).Magnitude/2
-
-			if distance2 < shortestDistance2 and hum.Health > 0 and headVisible then
-				shortestDistance2 = distance2
-				shortestDistance = distance
-				closestPlayer = player
-			end
-		end
-	end
-
-	if closestPlayer and closestPlayer.Character and closestPlayer.Character:FindFirstChild('Head') then
-		return closestPlayer.Character.Head, closestPlayer, closestPlayer.Character, closestPlayer.Character.PrimaryPart
-	end
-
-	return nil
-end
-
-local cons = {}
-local carRight = {'Knife', 'Grenade', 'Medkit', 'Smoke Grenade', 'Flashbang', 'Molotov', 'Fists'}
-
-local katana = true
-local carshoot = false
-
-local f = nil
-local lelCam = nil
-
-local function char()
-	return plr.Character, plr.Character.HumanoidRootPart
-end
-
-local ltick = tick()
-local down2 = false
-
-local lerp = 1
-local sens = 1
-local ads = 1
-
 -- // Aimbot Adjusters
 
 local aimPredictionXZ, aimPredictionY = 1, 1;
@@ -450,7 +396,74 @@ local FOVCircleSize = 10;
 local CURRENT_CHAR = nil;
 local CURRENT_APOS = nil;
 
+local targetPriority = 'Center of Screen'
+
+-- // Get Head
+
+local function getNearestHead()
+	local closestPlayer = nil;
+	local nearestPos = math.huge;
+	local nearestScreenPoint = math.huge;
+	
+	-- // Main
+	
+	local ourChar = plr.Character;
+	local ourPos = ourChar and ourChar:GetPivot().Position or cam.CFrame.Position;
+	
+	local COF = targetPriority == 'Center of Screen'
+
+	for _, player in pairs(Players:GetPlayers()) do
+		if player ~= plr and (player:GetAttribute('EnvironmentID') == id() or not igCheck) and (not id() or id() ~= '߿' and igam or id() == '߿' and shra) and not table.find(noPlayers, player.UserId) and player.Character and player.Character:FindFirstChild("Head") then
+			local char = player.Character;
+			local hum = char and char:FindFirstChild('Humanoid');
+			local head = char.Head;
+			
+			local screenSize = cam.ViewportSize;
+			local headPos, headVisible = cam:WorldToViewportPoint(head.Position);
+			if headPos.Z <= 0 then
+				headPos *= -1;
+			end;
+
+			headPos = Vector2.new(math.clamp(headPos.X, 0, screenSize.X),math.clamp(headPos.Y, 0, screenSize.Y));
+			
+			local posDist = (head.Position-ourPos).Magnitude;
+			local screenDist = (screenSize/2-headPos).Magnitude;
+			if (COF and screenDist < nearestScreenPoint or not COF and posDist < nearestPos) and hum.Health > 0 and headVisible then
+				nearestScreenPoint = screenDist;
+				nearestPos = posDist;
+				closestPlayer = player;
+			end;
+		end;
+	end;
+
+	if closestPlayer and closestPlayer.Character and closestPlayer.Character:FindFirstChild('Head') then
+		return closestPlayer.Character.Head, closestPlayer, closestPlayer.Character, closestPlayer.Character.PrimaryPart;
+	end;
+
+	return nil;
+end
+
+local cons = {}
+local carRight = {'Knife', 'Grenade', 'Medkit', 'Smoke Grenade', 'Flashbang', 'Molotov', 'Fists'}
+
+local katana = true
+local carshoot = false
+
+local f = nil
+local lelCam = nil
+
+local function char()
+	return plr.Character, plr.Character.HumanoidRootPart
+end
+
+local ltick = tick()
+local down2 = false
+
 -- // Move Mouse Function
+
+local lerp = 1
+local sens = 1
+local ads = 1
 
 local function moveMouseToWorldPosition(targetVector3,tchar)
 	if tchar and not tchar.Parent then
@@ -738,6 +751,17 @@ local trackTypeDropdown = homeTab:CreateDropdown({
 	end,
 })
 
+local targetPriority = homeTab:CreateDropdown({
+	Name = 'Target Priority',
+	Options = {'Closest to Player','Center of Screen'},
+	CurrentOption = {'Center of Screen'},
+	MultipleOptions = false,
+	Flag = 'targetpriority',
+	Callback = function(Options)
+		targetPriority = Options[1]
+	end,
+})
+
 local aymLerping = homeTab:CreateSlider({
 	Name = 'Aim Lerping Alpha',
 	Range = {5, 100},
@@ -834,7 +858,7 @@ local lockFOVCircleVisible = legitTab:CreateToggle({
 local lockFOVSize = legitTab:CreateSlider({
 	Name = 'Lock FOV Size',
 	Range = {10, 100},
-	Increment = .1,
+	Increment = .25,
 	Suffix = '',
 	CurrentValue = 25,
 	Flag = 'lockfovsize',
