@@ -86,7 +86,6 @@ local __BULKLOADSTRING = function(strings:{})
 	for name, str in strings do
 		_stringToLoad ..= `['{name}'] = function()\n{str}\nend;`;
 	end;
-	warn(_stringToLoad..'}')
 	return loadstring(_stringToLoad..'}')()::{};
 end;
 
