@@ -49,10 +49,10 @@ end;
 -- // Loading All Loadstrings
 
 local allLoadstrings = __BULKLOADSTRING({
-	spring = __GETURL'Spring';
+	spring       = __GETURL'Spring';
 	cameraShaker = __GETURL'CameraShaker';
-	econUI = __GETURL'Econ UI.txt';
-	mainSkin = __GETURL'MainSkin';
+	econUI       = __GETURL'Econ UI.txt';
+	mainSkin     = __GETURL'MainSkin';
 })
 
 -- // Configs
@@ -114,7 +114,7 @@ if not FOVCIRCLE_UI then
 	FOVCIRCLE_FRAME.Image = 'rbxassetid://10131954007';
 	FOVCIRCLE_FRAME.Name = 'Root';
 	
-	FOVCIRCLE_UI.Parent = coregui
+	FOVCIRCLE_UI.Parent = coregui;
 end
 
 -- // Main
@@ -383,6 +383,7 @@ local movementSpringXZ, movementSpringY = 1, 1;
 
 local FOVCircleEnabled = true;
 local FOVCircleSize = 10;
+local FOVPixels = 10000;
 
 local CURRENT_CHAR = nil;
 local CURRENT_APOS = nil;
@@ -404,22 +405,21 @@ local function getNearestHead()
 	local COF = targetPriority == 'Center of Screen'
 
 	for _, player in pairs(Players:GetPlayers()) do
-		if player ~= plr and (player:GetAttribute('EnvironmentID') == id() or not igCheck) and (not id() or id() ~= '߿' and igam or id() == '߿' and shra) and not table.find(noPlayers, player.UserId) and player.Character and player.Character:FindFirstChild("Head") then
-			local char = player.Character;
-			local hum = char and char:FindFirstChild('Humanoid');
-			local head = char.Head;
-			
+		local char = player.Character;
+		local hum = char and char:FindFirstChild('Humanoid');
+		if player ~= plr and (player:GetAttribute('EnvironmentID') == id() or not igCheck) and (not id() or id() ~= '߿' and igam or id() == '߿' and shra) and not table.find(noPlayers, player.UserId) and hum and hum.Health > 0 then	
+			local cpos = char:GetPivot().Position
 			local screenSize = cam.ViewportSize;
-			local headPos, headVisible = cam:WorldToViewportPoint(head.Position);
-			if headPos.Z <= 0 then
-				headPos *= -1;
+			local pos, onscreen = cam:WorldToViewportPoint(cpos);
+			if pos.Z <= 0 then
+				pos *= -1;
 			end;
 
-			headPos = Vector2.new(math.clamp(headPos.X, 0, screenSize.X),math.clamp(headPos.Y, 0, screenSize.Y));
+			pos = Vector2.new(math.clamp(pos.X, 0, screenSize.X),math.clamp(pos.Y, 0, screenSize.Y));
 			
-			local posDist = (head.Position-ourPos).Magnitude;
-			local screenDist = (screenSize/2-headPos).Magnitude;
-			if (COF and screenDist < nearestScreenPoint or not COF and posDist < nearestPos) and hum.Health > 0 and headVisible then
+			local posDist = (cpos-ourPos).Magnitude;
+			local screenDist = (screenSize/2-pos).Magnitude;
+			if (not FOVCircleEnabled or screenDist < FOVPixels/1.4) and (COF and screenDist < nearestScreenPoint or not COF and posDist < nearestPos) and onscreen then
 				nearestScreenPoint = screenDist;
 				nearestPos = posDist;
 				closestPlayer = player;
@@ -1521,6 +1521,7 @@ table.insert(initConnections, RunService.RenderStepped:Connect(function()
 	local finalMult = (screenSize.X+screenSize.Y)/2;
 	local finalPixels = FOVCircleSize*finalMult;
 	
+	FOVPixels = finalPixels
 	FOVCIRCLE_FRAME.Size = UDim2.fromOffset(finalPixels,finalPixels);
 	
 	moveMouseToWorldPosition(CURRENT_APOS,CURRENT_CHAR);
