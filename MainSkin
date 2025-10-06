@@ -81,6 +81,15 @@ local __GETURL = function(URL)
 	}}).Body
 end
 
+local __BULKLOADSTRING = function(strings:{})
+	local _stringToLoad = 'return {';
+	for name, str in strings do
+		_stringToLoad ..= `['{name}'] = function()\n{str}\nend;`;
+	end;
+	warn(_stringToLoad..'}')
+	return loadstring(_stringToLoad..'}')()::{};
+end;
+
 ----------- [ Services ] -----------
 
 local httpserv = game:GetService'HttpService'
@@ -198,26 +207,23 @@ end
 
 -- // Loading
 
-local RELOAD = {}
 local UTILS = {}
+local TOLOAD = {}
 local TOTAL_UTILS = 0
 
 local __REQUIRE = function(name, URL)
 	TOTAL_UTILS += 1
+	TOLOAD[name] = __GETURL(URL)
+end
 
+__REQUIRE('SKIN_MOD','Skin'); __REQUIRE('RIVALS_UTILS','UtilityFake'); __REQUIRE('SKIN_INFO','SkinInfo');
+__REQUIRE('SKIN_SOUND_CODE','AnimSound'); __REQUIRE('WEAPON_TYPES','WeaponTypes'); __REQUIRE('ID_CHANGER','IDChanger');
+__REQUIRE('WRAPPER_MOD','Wrapper'); __REQUIRE('ECON_UI','Econ%20UI.txt'); __REQUIRE('VISUALS_UI','VisualsUI'); __REQUIRE('ANIM_LIB','Anim')
+
+local _loaded = __BULKLOADSTRING(TOLOAD);
+for name, REQUIRED_URL in _loaded do
 	task.spawn(function()
-		local REQUIRED_URL = not table.find(RELOAD,name) and _G[name]
-		if not REQUIRED_URL then
-			local response = __GETURL(URL)
-			local suc, res = pcall(function()
-				return loadstring(response)()
-			end)
-
-			REQUIRED_URL = res
-		end
-
-		if not REQUIRED_URL then return end
-
+		REQUIRED_URL = REQUIRED_URL();
 		UTILS[name] = REQUIRED_URL;
 		_G[name] = REQUIRED_URL;
 
@@ -246,7 +252,7 @@ local __REQUIRE = function(name, URL)
 						_newText.Parent = _newFolder
 					end
 				end
-				
+
 				if not REQUIRED_URL.add_wrap then
 					repeat run.Stepped:Wait() until REQUIRED_URL.add_wrap
 				end
@@ -287,10 +293,6 @@ local __REQUIRE = function(name, URL)
 		TOTAL_UTILS -= 1
 	end)
 end
-
-__REQUIRE('SKIN_MOD','Skin'); __REQUIRE('RIVALS_UTILS','UtilityFake'); __REQUIRE('SKIN_INFO','SkinInfo');
-__REQUIRE('SKIN_SOUND_CODE','AnimSound'); __REQUIRE('WEAPON_TYPES','WeaponTypes'); __REQUIRE('ID_CHANGER','IDChanger');
-__REQUIRE('WRAPPER_MOD','Wrapper'); __REQUIRE('ECON_UI','Econ%20UI.txt'); __REQUIRE('VISUALS_UI','VisualsUI'); __REQUIRE('ANIM_LIB','Anim')
 
 -- // Extra Vars
 
@@ -1184,6 +1186,8 @@ function applySkin(skinName, cs)
 
 					local _ogidtoinf = {}
 					local _ogprentoid = {}
+					
+					local TO_LOAD = {}
 
 					for prename, name in pairs(UTILS.SKIN_MOD.viewmodels[ig].anims) do
 						local vmi = UTILS.SKIN_MOD.viewmodels[ig]
@@ -1205,27 +1209,27 @@ function applySkin(skinName, cs)
 						if nowid then
 							table.insert(inz, prename)
 
-							local SOUND_CODE = UTILS.SKIN_SOUND_CODE[typeToReal]
-							local SOUND_MOD = SOUND_CODE and loadstring(SOUND_CODE)
-
 							local LOADED_ANIM = Instance.new('Animation')
 							LOADED_ANIM.AnimationId = nowid.AnimationID
-							--LOADED_ANIM.Parent = econAnim
 							LOADED_ANIM = animator:LoadAnimation(LOADED_ANIM)
 
 							table.insert(evars.ECON_ANIMS, LOADED_ANIM)
 
 							toname[nowid.AnimationID] = name
-
-							animtbl[id] = {
+							
+							local tb = {
 								anim = LOADED_ANIM,
 								name = typeToReal,
 								prename = prename,
 								type = animType,
 								relinfo = nowid,
-								soundcall = SOUND_MOD and SOUND_MOD()
+								soundcall = function()
+									-- // Waiting for bulk loading
+								end;
 							}
-
+							
+							TO_LOAD[tb] = UTILS.SKIN_SOUND_CODE[typeToReal]
+							animtbl[id] = tb
 							_precontr:add(prename, animtbl[id])
 						end
 					end
@@ -1235,29 +1239,47 @@ function applySkin(skinName, cs)
 							local nowid = UTILS.ANIM_LIB.Info[name]
 
 							if nowid.AnimationID then
-								local SOUND_CODE = UTILS.SKIN_SOUND_CODE[name]
-								local SOUND_MOD = SOUND_CODE and loadstring(SOUND_CODE)
-
 								local LOADED_ANIM = Instance.new('Animation')
 								LOADED_ANIM.AnimationId = nowid.AnimationID
-								LOADED_ANIM.Parent = econAnim
 								LOADED_ANIM = animator:LoadAnimation(LOADED_ANIM)
 
 								table.insert(evars.ECON_ANIMS, LOADED_ANIM)
 
 								toname[nowid.AnimationID] = name
-
-								_precontr:add(prename, {
+								
+								local tb = {
 									anim = LOADED_ANIM,
 									name = prename,
 									prename = prename,
 									type = prename,
 									relinfo = nowid,
-									soundcall = SOUND_MOD and SOUND_MOD()
-								})
+									soundcall = function()
+										-- // Waiting for bulk loading
+									end;
+								}
+								
+								TO_LOAD[tb] = UTILS.SKIN_SOUND_CODE[name]
+
+								_precontr:add(prename, tb)
 							end
 						end
 					end
+					
+					local loadtbl = {};
+					local indextbl = {};
+					local currentIndex = 0;
+					for tb, code in TO_LOAD do
+						if code then
+							table.insert(loadtbl,code);
+							table.insert(indextbl,tb);
+							currentIndex += 1;
+						end
+					end;
+					
+					for ind, func in __BULKLOADSTRING(loadtbl) do
+						local tb = indextbl[tonumber(ind)];
+						tb.soundcall = func();
+					end;
 
 					-- // Rest
 
