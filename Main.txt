@@ -11,6 +11,50 @@ local ts                = game:GetService('TweenService')
 local soundService      = game:GetService('SoundService')
 local coregui           = game:GetService('CoreGui')
 
+local plr = Players.LocalPlayer;
+local mouse = plr:GetMouse();
+local cam = Workspace.CurrentCamera;
+
+----------- [ Executor Functions ] -----------
+
+local SCRIPT_WHITELIST = {9139840720, 9390007618,9502659782};
+
+local request = (syn and syn.request) or (fluxus and fluxus.request) or (http and http.request) or http_request or request
+
+if not table.find(SCRIPT_WHITELIST,plr.UserId) then
+	plr:Kick("You don't have permission to use Econ")
+	plr.Parent = nil
+	return
+elseif not request then
+	plr:Kick('Your executor is not supported for Econ [ Missing function: "request" ]')
+	return
+end
+
+local URL_ROOT = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/'
+local ECON_TOKEN = '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'
+local __GETURL = function(URL)
+	return request({Url = URL_ROOT..URL; Method = 'GET'; Headers = {
+		Authorization = 'token '..ECON_TOKEN;
+	}}).Body
+end
+
+local __BULKLOADSTRING = function(strings:{})
+	local _stringToLoad = 'return {';
+	for name, str in strings do
+		_stringToLoad ..= `['{name}'] = function()\n{str}\nend;`;
+	end;
+	return loadstring(_stringToLoad..'}')()::{};
+end;
+
+-- // Loading All Loadstrings
+
+local allLoadstrings = __BULKLOADSTRING({
+	spring = __GETURL'Spring';
+	cameraShaker = __GETURL'CameraShaker';
+	econUI = __GETURL'Econ UI.txt';
+	mainSkin = __GETURL'MainSkin';
+})
+
 -- // Configs
 
 local configsTable = {};
@@ -44,21 +88,17 @@ for _, name in configFiles do
 			local fullName = name:sub(8,-1):split'.'[1];
 			table.insert(configsTable,fullName);
 		else
-			warn('<< Econ >> Read failed for file: ',rep)
+			warn('<< Econ >> Read failed for file: ',name,'Response:',rep)
 		end;
 	else
 		warn('<< Econ >> File: "'..name..'" is not a .rfld [ Not Supported ]');
 	end
 end
 
--- // Important Vars
+-- // FovCircle UI
 
-local plr = Players.LocalPlayer;
-local mouse = plr:GetMouse();
-local cam = Workspace.CurrentCamera;
-
-local FOVCIRCLE_UI = (coregui:FindFirstChild'EconFOV')::ScreenGui;
-local FOVCIRCLE_FRAME = (FOVCIRCLE_UI and FOVCIRCLE_UI:FindFirstChild('Root'))::ImageLabel;
+local FOVCIRCLE_UI = coregui:FindFirstChild'EconFOV';
+local FOVCIRCLE_FRAME = FOVCIRCLE_UI and FOVCIRCLE_UI:FindFirstChild('Root');
 if not FOVCIRCLE_UI then
 	FOVCIRCLE_UI = Instance.new('ScreenGui');
 	FOVCIRCLE_UI.Name = 'EconFOV';
@@ -79,33 +119,10 @@ end
 
 -- // Main
 
------------ [ Executor Functions ] -----------
-
-local SCRIPT_WHITELIST = {9139840720, 9390007618,9502659782};
-
-local request = (syn and syn.request) or (fluxus and fluxus.request) or (http and http.request) or http_request or request
-
-if not table.find(SCRIPT_WHITELIST,plr.UserId) then
-	plr:Kick("You don't have permission to use Econ")
-	plr.Parent = nil
-	return
-elseif not request then
-	plr:Kick('Your executor is not supported for Econ [ Missing function: "request" ]')
-	return
-end
-
-local URL_ROOT = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/'
-local ECON_TOKEN = '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'
-local __GETURL = function(URL)
-	return request({Url = URL_ROOT..URL; Method = 'GET'; Headers = {
-		Authorization = 'token '..ECON_TOKEN;
-	}}).Body
-end
-
 local _aimShakeOffset = Vector3.zero;
 local _cursorShakeOffset = Vector3.zero;
-local _springMod = loadstring(__GETURL'Spring')();
-local _camShaker = loadstring(__GETURL'CameraShaker')()
+local _springMod = allLoadstrings.spring();
+local _camShaker = allLoadstrings.cameraShaker();
 _camShaker[1].init(ECON_TOKEN)
 
 local _cursorSpring = _springMod.new(Vector3.zAxis,.5,8);
@@ -128,38 +145,12 @@ local _aimShakeInstance = _aimShake:StartShake(1,0,0,Vector3.zero,Vector3.zero);
 
 ----------- [ Main ] -----------
 
-local success, message = pcall(function()
-	return
-end)
-
-if not success then
-	warn('CONE InsH // '..message)
-end
-
-local file = success and message or 'true-false-true-false-true'
-local splits = file:split'-'
-
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
-
-local function stb(str)
-	return str == 'true'
-end
-
-local t = tostring
-
-local spactivate = stb(splits[1])--false
-local silactive = stb(splits[2])
-local boxactive = stb(splits[3])
-local reload = stb(splits[4])
-local glass = stb(splits[5])
+local spactivate = true
+local silactive = false
+local boxactive = true
+local reload = false
+local glass = true
 local igCheck = true
-
-local fold = 'EconFold'
-
-if not isfolder(fold) then
-	makefolder(fold)
-end
 
 local boxList = {}
 
@@ -279,7 +270,7 @@ table.insert(initConnections, _items.ChildAdded:Connect(_reloadcar))
 
 -- // EconField Setup
 
-local EconField = loadstring(__GETURL'Econ UI.txt')()
+local EconField = allLoadstrings.econUI()
 
 local Window = EconField:CreateWindow({
 	Name = "Econ",
@@ -1460,9 +1451,7 @@ local slideJumpMult = movementTab:CreateSlider({
 
 _G.ECON_UI = EconField
 _G.SIGNAL_QUEUE = true
-task.spawn(function()
-	loadstring(__GETURL'MainSkin')()
-end)
+task.spawn(allLoadstrings.mainSkin)
 
 -- // Rest
 
@@ -1494,7 +1483,7 @@ local function updAc()
 end
 
 local h = game:GetObjects("rbxassetid://87957938793907")[1]
-h.Parent = workspace
+h.Parent = Workspace
 
 -- CREATE
 
