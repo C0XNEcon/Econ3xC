@@ -71,6 +71,8 @@ if not FOVCIRCLE_UI then
 	FOVCIRCLE_FRAME.ResampleMode = Enum.ResamplerMode.Pixelated;
 	FOVCIRCLE_FRAME.Image = 'rbxassetid://10131954007';
 	FOVCIRCLE_FRAME.Name = 'Root';
+	
+	FOVCIRCLE_UI.Parent = coregui
 end
 
 -- // Main
