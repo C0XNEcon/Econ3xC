@@ -63,6 +63,8 @@ if not FOVCIRCLE_UI then
 	FOVCIRCLE_UI = Instance.new('ScreenGui');
 	FOVCIRCLE_UI.Name = 'EconFOV';
 	FOVCIRCLE_UI.Enabled = false;
+	FOVCIRCLE_UI.IgnoreGuiInset = true;
+	FOVCIRCLE_UI.ResetOnSpawn = false;
 	FOVCIRCLE_FRAME = Instance.new('ImageLabel',FOVCIRCLE_UI);
 	FOVCIRCLE_FRAME.Position = UDim2.fromScale(.5,.5);
 	FOVCIRCLE_FRAME.AnchorPoint = Vector2.new(.5,.5);
