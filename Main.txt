@@ -817,6 +817,7 @@ local lockFOVEnabled = legitTab:CreateToggle({
 	CurrentValue = false,
 	Flag = 'lockfovenabled',
 	Callback = function(Value, nosound)
+		FOVCIRCLE_UI.Enabled = Value;
 		FOVCircleEnabled = Value;
 	end,
 })
@@ -826,7 +827,7 @@ local lockFOVCircleVisible = legitTab:CreateToggle({
 	CurrentValue = false,
 	Flag = 'lockfovcirclevisible',
 	Callback = function(Value, nosound)
-		FOVCIRCLE_UI.Enabled = Value;
+		FOVCIRCLE_FRAME.Visible = Value;
 	end,
 })
 
