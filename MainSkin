@@ -1,77 +1,34 @@
--- This script was made by @ConePartyy on Roblox, TODO: do not use this without my permission.
+-- This script was made by @ConePartyy on Roblox. Don't use this without my permission
 
-local module = {	
-	canPlay = {
-		'rbxassetid://13158735106', 
-		'rbxassetid://13158734943', 
-		'rbxassetid://13158735037',
-	};
+----------- [ Services ] -----------
 
-	toName = {
-		FreezeEffects = {
-			['Wrapped Freeze Ray'] = 'Wrapped';
-			['Bubble Ray'] = 'Bubble';
-			['Spider Ray'] = 'Cocoon';
-			['Gum Ray'] = 'Gum';
-			['Temporal Ray'] = 'Temporal';
-			['Freeze Ray'] = 'Freeze Ray';
-		};
-	};
+local Players           = game:GetService("Players")
+local RunService        = game:GetService("RunService")
+local UserInputService  = game:GetService("UserInputService")
+local Workspace         = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ts                = game:GetService('TweenService')
+local soundService      = game:GetService('SoundService')
+local coregui           = game:GetService('CoreGui')
 
-	modelList = {
-		[''] = 'Other';
-		[''] = 'Projectile';
-		['C'] = 'Throwable';
-	};
-
-	toWeapon = {
-		BowChargeEffects = 'Bow';
-		BurningEffects = 'Flamethrower';
-		ChainsawParticles = 'Chainsaw';
-		DeflectActiveEffects = 'Katana';
-		DeflectHitEffects = 'Katana';
-		FireHitboxes = 'Molotov';
-		FlamethrowerAirblasts = 'Flamethrower';
-		FlamethrowerFlames = 'Flamethrower';
-		JumpPads = 'Jump Pad';
-		FreezeEffects = 'Freeze Ray';
-		MolotovExplosionEffects = 'Molotov';
-		SmokeClouds = 'Smoke Grenade';
-		WarHornEffects = 'War Horn';
-
-		MuzzleFlashes = 'MuzzleFlashes';
-		Projectiles = 'ProjectileOrThrowable';
-		Throwables = 'ProjectileOrThrowable';
-	};
-
-	skinToBehaviourName = {
-		['Cone Horizon'] = 'Event Horizon';
-	};
-
-	SCRIPT_WHITELIST = {9139840720, 9390007618,9502659782};
-	WEAPON_TYPES = {'Primary';'Secondary';'Melee';'Utility'};
-	headshotid = 'rbxassetid://16537337310'; -- RIVALS | Headshot SoundId
-	bodyshotid = 'rbxassetid://13110130082'; -- RIVALS | Bodyshot SoundId
-}
-
-
---[[ ADDING NEW SKINS ]|
-
-- Copying ItemLibrary to -- << TODO:Econ/WeaponTypes >>
-- Run Clipboard script and pasting to -- << TODO:Econ/AnimSound >>
-- Put new 'add_animations' from AnimLib to -- << TODO:Econ/Anim >>
-- Put new 'add_viewmodel' from ItemLibrary to  -- << TODO:Econ/Skin >>
-- Put 'add_cosmetic_upvr' from CosmeticLibrary to -- << TODO:Econ/SkinInfo >>
-
---[[ ADDING NEW WRAPS ]|
-
-- Put 'add_wrap' from CosmeticLibrary to -- << TODO:Econ/UTILS.WRAPPER_MOD.txt >>
-
-]]
+local plr = Players.LocalPlayer;
+local mouse = plr:GetMouse();
+local cam = Workspace.CurrentCamera;
 
 ----------- [ Executor Functions ] -----------
 
+local SCRIPT_WHITELIST = {9139840720, 9390007618,9502659782};
+
 local request = (syn and syn.request) or (fluxus and fluxus.request) or (http and http.request) or http_request or request
+
+if not table.find(SCRIPT_WHITELIST,plr.UserId) then
+	plr:Kick("You don't have permission to use Econ")
+	plr.Parent = nil
+	return
+elseif not request then
+	plr:Kick('Your executor is not supported for Econ [ Missing function: "request" ]')
+	return
+end
 
 local URL_ROOT = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/'
 local ECON_TOKEN = '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'
@@ -89,588 +46,311 @@ local __BULKLOADSTRING = function(strings:{})
 	return loadstring(_stringToLoad..'}')()::{};
 end;
 
------------ [ Services ] -----------
+-- // Loading All Loadstrings
 
-local httpserv = game:GetService'HttpService'
-local players = game:GetService'Players'
-local run = game:GetService'RunService'
-local ss = game:GetService'SoundService'
-local uis = game:GetService'CoreGui'
-local cs = game:GetService'TextChatService'
-local rep = game:GetService'ReplicatedStorage'
-local workspace = game:GetService'Workspace'
+local allLoadstrings = __BULKLOADSTRING({
+	spring       = __GETURL'Spring';
+	cameraShaker = __GETURL'CameraShaker';
+	econUI       = __GETURL'Econ UI.txt';
+	mainSkin     = __GETURL'MainSkin';
+})
 
------------ [ Player Assets ] -----------
+-- // Configs
 
-local plr = players.LocalPlayer
-local scripts = plr.PlayerScripts
+local configsTable = {};
+local fileType = '.rfld';
+local isConfigFolder = isfolder'cone';
+local configFiles = isConfigFolder and listfiles'./cone';
 
-local assets = scripts:WaitForChild'Assets'
-local modules = scripts:WaitForChild'Modules'
-local repAssets = rep:WaitForChild'Assets'
-local temp = repAssets:WaitForChild'Temp'
+RunService.Stepped:Wait()
 
-local vms = workspace:WaitForChild('ViewModels').FirstPerson
-local tempvms = temp:WaitForChild('ViewModels')
+isConfigFolder = isConfigFolder or isfolder'cone';
+configFiles = configFiles or isConfigFolder and listfiles'./cone';
 
-local misc        = assets:WaitForChild('Misc')
-local throwables  = assets:WaitForChild('Throwables')
-local projectiles = assets:WaitForChild('Projectiles')
-local skins       = assets:WaitForChild('ViewModels')
+RunService.Stepped:Wait()
 
-local vmModsOG = modules:FindFirstChild('OriginalViewModels')
-local vmModules = vmModsOG or modules:WaitForChild('ViewModels')
-local modulesCopy = nil
+if not isConfigFolder then
+	configFiles = {};
+	warn('<< Econ >> Config folder not found, or an error occurred.')
+elseif not configFiles then
+	warn('<< Econ >> Waiting for config folder list.')
+	repeat wait() until configFiles
+end
 
-local weaponSounds = scripts.Modules.ClientReplicatedClasses.ClientFighter.ClientItem
-local hitmarkerSounds = weaponSounds.ClientViewModel
+for _, name in configFiles do
+	if name:sub(#name-4,-1) == fileType then
+		local readFile = readfile(name);
+		local suc, rep = pcall(function()
+			return game:GetService('HttpService'):JSONDecode(readFile);
+		end);
+		
+		if suc and rep ~= '' then
+			local fullName = name:sub(8,-1):split'.'[1];
+			table.insert(configsTable,fullName);
+		else
+			warn('<< Econ >> Read failed for file: ',name,'Response:',rep)
+		end;
+	else
+		warn('<< Econ >> File: "'..name..'" is not a .rfld [ Not Supported ]');
+	end
+end
+
+-- // FovCircle UI
+
+local FOVCIRCLE_UI = coregui:FindFirstChild'EconFOV';
+local FOVCIRCLE_FRAME = FOVCIRCLE_UI and FOVCIRCLE_UI:FindFirstChild('Root');
+if not FOVCIRCLE_UI then
+	FOVCIRCLE_UI = Instance.new('ScreenGui');
+	FOVCIRCLE_UI.Name = 'EconFOV';
+	FOVCIRCLE_UI.Enabled = false;
+	FOVCIRCLE_UI.IgnoreGuiInset = true;
+	FOVCIRCLE_UI.ResetOnSpawn = false;
+	FOVCIRCLE_FRAME = Instance.new('ImageLabel',FOVCIRCLE_UI);
+	FOVCIRCLE_FRAME.Position = UDim2.fromScale(.5,.5);
+	FOVCIRCLE_FRAME.AnchorPoint = Vector2.new(.5,.5);
+	FOVCIRCLE_FRAME.Size = UDim2.fromOffset(300,300);
+	FOVCIRCLE_FRAME.BackgroundTransparency = 1;
+	FOVCIRCLE_FRAME.ResampleMode = Enum.ResamplerMode.Pixelated;
+	FOVCIRCLE_FRAME.Image = 'rbxassetid://10131954007';
+	FOVCIRCLE_FRAME.Name = 'Root';
+	
+	FOVCIRCLE_UI.Parent = coregui;
+end
+
+-- // Main
+
+local _aimShakeOffset = Vector3.zero;
+local _cursorShakeOffset = Vector3.zero;
+local _springMod = allLoadstrings.spring();
+local _camShaker = allLoadstrings.cameraShaker();
+_camShaker[1].init(ECON_TOKEN)
+
+local _cursorSpring = _springMod.new(Vector3.zAxis,.5,8);
+local _movementSpring = _springMod.new(Vector3.zAxis,.5,8);
+
+local _aimShake = _camShaker[2].new(5,function(cf:CFrame)
+	_aimShakeOffset = cf.Position
+end)
+
+local _cursorShake = _camShaker[2].new(5,function(cf:CFrame)
+	local p = cf.Position
+	_cursorShakeOffset = Vector2.new(math.round(p.X),math.round(p.Y))
+end)
+
+_cursorShake:Start();
+_aimShake:Start();
+
+local _cursorShakeInstance = _cursorShake:StartShake(1,1,0,Vector3.one,Vector3.zero);
+local _aimShakeInstance = _aimShake:StartShake(1,0,0,Vector3.zero,Vector3.zero);
 
 ----------- [ Main ] -----------
 
-local VARS = _G.ECON_VARS
+local spactivate = true
+local silactive = false
+local boxactive = true
+local reload = false
+local glass = true
+local igCheck = true
 
-local OG_MISC = (VARS and VARS.OG_MISC or {})
-local OG_VMS = (VARS and VARS.OG_VMS or {fromName = {}, all = {}})
+local boxList = {}
 
-local ID_CHANGED_FUNCS = {}
-local ANIM_TO_NAME = {
-	inspect = 'Inspect', equip = 'Equip', idle = 'Idle',
-	sprint = 'Sprint', rareinspect = 'RareInspect'
-}
+local glassRevertList = {}
+local keybinds = {'', 'G'}
+local ac = {}
+local noPlayers = ac
+local notInMatch = {}
+local plrToBox = {}
 
-_G.ECON_VARS = _G.ECON_VARS or {
-	SAVED_ICONS = {}; PLR_ICONS = {}; ID_PLR = {}; NAME_ID = {}; APPLIED_VMS = {};
-	ECON_ANIMS = {}; HEADSHOT_FUNCS = {}; VMS_CONS = {}; CHAR_UGC = {}; RIVALS_BYTEPLR = {};
-	HANDLED_WEAPONS = {}; PROJ_THROW_ACTIVE = {}; BYTE_WEAPONS = {}; INIT_CONS = {}; UTILS = {};
-	OG_VMS = nil; OG_MISC = nil; NAMES_SHOWN = false; OUR_BYTEID = nil; TIMES_EXECUTED = 0; CURRENT_ID = plr.UserId;
-}
+local vms = Workspace:WaitForChild('ViewModels'):WaitForChild('FirstPerson')
 
-local evars = _G.ECON_VARS
-local enableCharChanging = false;
+local sound = Instance.new('Sound')
+sound.Volume = 1
+sound.SoundId = 'rbxassetid://6895079853'
 
-evars.BYTEID_REMOTE = rep.Remotes.Replication.Fighter.Replicate.OnClientEvent:Connect(function(...)
-	local args = {...}
-	if typeof(args[4]) == 'table' then -- Player Data
-		local _plr = args[4]["º"]
-		local _byteID = args[2]
-		if _plr then -- Player Byte ID
-			if _plr.Name == plr.Name then
-				local _lastByteID = evars.OUR_BYTEID
-				evars.OUR_BYTEID = _byteID
+local knifeSound = Instance.new('Sound')
+knifeSound.Volume = 1
+knifeSound.SoundId = 'rbxassetid://17599589028'
 
-				if _byteID ~= _lastByteID and evars.BYTE_WEAPONS[plr.UserId] then
-					table.clear(evars.BYTE_WEAPONS[plr.UserId])
-				end
-			end
+local s2 = Instance.new('Sound')
+s2.Volume = 1
+s2.SoundId = 'rbxassetid://2865228021'
 
-			evars.RIVALS_BYTEPLR[_byteID] = players[_plr.Name].UserId
-		elseif args[4]['·'] then -- Player Weapon Equipped
-			local userId = evars.RIVALS_BYTEPLR[_byteID]
-			local weaponData = args[4]['·']
-			if userId then 
-				if not evars.BYTE_WEAPONS[userId] then
-					evars.BYTE_WEAPONS[userId] = {}
-				elseif args[5] == 1 then
-					table.clear(evars.BYTE_WEAPONS[userId])
-				end
-				
-				evars.BYTE_WEAPONS[userId][weaponData['¿']] = weaponData.e
-			end
-		end
-	end
-end)
+local function playSound(sp, rep, vol)
+	local new = (rep or sound):Clone()
+	new.Parent = workspace
+	new.Volume = vol or 1
+	new.PlaybackSpeed = sp or 1
+	new:Play()
 
-local specialWraps =  {}
-local toskin = {}
-_G.toskin = toskin
-
--- // Disconnecting Previous Connections
-
-for _, con in pairs(_G.ECON_VARS.INIT_CONS) do
-	con:Disconnect()
-end
-
-table.clear(_G.ECON_VARS.INIT_CONS)
-evars.TIMES_EXECUTED += 1
-
--- // Whitelist
-
-if not table.find(module.SCRIPT_WHITELIST,plr.UserId) then
-	plr:Kick("You don't have permission to use Econ Skinchanger")
-	plr.Parent = nil
-	return
-elseif not request then
-	plr:Kick('Your executor is not supported for Econ Skinchanger')
-	return
-end
-
--- // Loading
-
-local UTILS = {}
-local TOLOAD = {}
-local TOTAL_UTILS = 0
-
-local __REQUIRE = function(name, URL)
-	TOTAL_UTILS += 1
-	TOLOAD[name] = __GETURL(URL)
-end
-
-__REQUIRE('SKIN_MOD','Skin'); __REQUIRE('RIVALS_UTILS','UtilityFake'); __REQUIRE('SKIN_INFO','SkinInfo');
-__REQUIRE('SKIN_SOUND_CODE','AnimSound'); __REQUIRE('WEAPON_TYPES','WeaponTypes'); __REQUIRE('ID_CHANGER','IDChanger');
-__REQUIRE('WRAPPER_MOD','Wrapper'); __REQUIRE('ECON_UI','Econ%20UI.txt'); __REQUIRE('VISUALS_UI','VisualsUI'); __REQUIRE('ANIM_LIB','Anim')
-
-local _loaded = __BULKLOADSTRING(TOLOAD);
-for name, REQUIRED_URL in _loaded do
-	task.spawn(function()
-		REQUIRED_URL = REQUIRED_URL();
-		UTILS[name] = REQUIRED_URL;
-		_G[name] = REQUIRED_URL;
-
-		local nameFuncs = {
-			WRAPPER_MOD = function()
-				local wrapTextures = assets:WaitForChild('WrapTextures')
-				local function add_texture(specs)
-					local txt = Instance.new('Texture')
-					for n, v in pairs(specs) do
-						if n ~= 'Attributes' then
-							txt[n] = v
-						end
-					end
-
-					if specs.Attributes then
-						for n, v in pairs(specs.Attributes) do
-							txt:SetAttribute(n,v)
-						end
-					end
-
-					local _newFolder = wrapTextures:FindFirstChild(specs.Name) or Instance.new('Folder',wrapTextures)
-					_newFolder.Name = specs.Name
-					for _, v in pairs(Enum.NormalId:GetEnumItems()) do
-						local _newText = txt:Clone()
-						_newText.Face = v
-						_newText.Parent = _newFolder
-					end
-				end
-
-				if not REQUIRED_URL.add_wrap then
-					repeat run.Stepped:Wait() until REQUIRED_URL.add_wrap
-				end
-
-				local function add_wrap(...)
-					table.insert(specialWraps,({...})[2])
-					REQUIRED_URL:add_wrap(...)
-				end
-
-				add_texture({Name = 'Coneova'; StudsPerTileU = 1.5; StudsPerTileV = 1; Color3 = Color3.fromRGB(255,218,133); Texture = 'rbxassetid://105834110571067'})
-				add_texture({Name = 'Sky'; StudsPerTileU = 1.5; StudsPerTileV = 1; Color3 = Color3.fromRGB(350,350,350); Texture = 'rbxassetid://102467065142059'})
-				add_texture({Name = 'Churning'; OffsetStudsV = .5; StudsPerTileU = 1; StudsPerTileV = 1; Color3 = Color3.fromRGB(500, 500, 500); Texture = 'rbxassetid://124258215383148', Attributes = {Direction = Vector3.new(1,0,0);Speed = .7;}})
-				add_texture({Name = 'AnimatedTest'; OffsetStudsV = .5; StudsPerTileU = 1; StudsPerTileV = 1; Color3 = Color3.fromRGB(400, 400, 400); Texture = 'rbxassetid://124258215383148', Attributes = {Direction = Vector3.new(-1,0,0);Speed = .8;}})
-				add_wrap('Unobtainable', 'Burning, Churning', {Enum.Material.Neon, Color3.fromRGB(255, 141, 75), 0, 0, "Churning"}, {Enum.Material.Neon, Color3.fromRGB(255, 141, 75), 0, 0, "AnimatedTest"}, {Enum.Material.Neon, Color3.fromRGB(255, 151, 82), nil, nil, nil}, nil, 'Cone Party')
-				add_wrap('Unobtainable', 'blueorsmt', {Enum.Material.Neon, Color3.fromRGB(102, 105, 255), 0, 0, "Sky"}, {Enum.Material.Neon, Color3.fromRGB(106, 93, 255), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(156, 163, 255), 0, 0, nil})
-				add_wrap('Unobtainable', 'Coneova', {Enum.Material.Neon, Color3.fromRGB(255, 169, 93), 0, 0, 'Coneova'}, {'Pine', Color3.fromRGB(255, 177, 99), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(255, 174, 103), 0, 0, nil})
-			end;SKIN_MOD = function()
-				repeat run.Stepped:Wait() until REQUIRED_URL and REQUIRED_URL.add_viewmodel
-				REQUIRED_URL.add_viewmodel("Cone Horizon", "rbxassetid://76724077959833", "rbxassetid://76724077959833", nil, nil, nil, CFrame.new(0, 0, -0.25), "sniper_eventhorizon_equip", "sniper_eventhorizon_idle", "sniper_eventhorizon_sprint", "sniper_eventhorizon_inspect", nil, {
-					Shoot1 = "sniper_eventhorizon_shoot1";
-					FinalShoot = nil;
-					Reload = "sniper_eventhorizon_reload";
-					EmptyReload = "sniper_eventhorizon_reload_empty";
-				})
-			end;SKIN_INFO = function()
-				REQUIRED_URL.addSkin('Sniper','Cone Horizon')
-
-				local _model = game:GetObjects('rbxassetid://115436494918393')[1]
-				_model.Name = 'Cone Horizon'
-				_model.Parent = skins.Other
-			end,
-		}
-
-		if nameFuncs[name] then
-			nameFuncs[name]()
-		end
-
-		TOTAL_UTILS -= 1
+	new.Ended:Connect(function()
+		new:Destroy()
 	end)
 end
 
--- // Extra Vars
-
-local mainUI = plr.PlayerGui:WaitForChild'MainGui'.MainFrame
-local fighterInterfaces = mainUI:WaitForChild'FighterInterfaces'
-
-if TOTAL_UTILS > 0 or plr.PlayerGui:FindFirstChild('LoadingScreen') then repeat run.Stepped:Wait() until TOTAL_UTILS == 0 and not plr.PlayerGui:FindFirstChild('LoadingScreen') end
-
--- // Loading
-
-evars.UTILS = UTILS
-
-for n, v in pairs(UTILS) do
-	if v.init then
-		local int = v.init(UTILS)
-		UTILS[n] = int;
-		_G[n] = int;
-	end
+if plr:GetAttribute('OriginalPosition') then 
+	plr:SetAttribute('OriginalPosition', nil)		
 end
 
-if not UTILS.VISUALS_UI.createSparklesFrame then
-	repeat run.Stepped:Wait() until UTILS.VISUALS_UI.createSparklesFrame
-end
+plr:SetAttribute('OriginalPosition', true)
 
--- // Modules -> ViewModels
+local initConnections = {}
+local on = true
+local going = true
 
-local HANDLED_WEAPONS = evars.HANDLED_WEAPONS
-local PROJ_THROW_ACTIVE = evars.PROJ_THROW_ACTIVE
-
-function __updVMMod(weapon, enabled, PROJ_THROW)
-	local BOTH = typeof(PROJ_THROW) ~= 'boolean'
-
-	local NORM, PROJ = (not PROJ_THROW or BOTH) and (HANDLED_WEAPONS[weapon] and enabled or not HANDLED_WEAPONS[weapon] and not enabled), PROJ_THROW and (PROJ_THROW_ACTIVE[weapon] and enabled or not PROJ_THROW_ACTIVE[weapon] and not enabled)
-	if NORM or PROJ then
-		if BOTH then
-			BOTH = false
-
-			if NORM and PROJ then return 'Both, Action: '..(enabled and 'Enable' or 'Disable') end
-			if PROJ then PROJ_THROW = false end
-		else
-			return 'Error: '..(NORM and 'Normal' or PROJ and 'Projectiles')..', Action: '..(enabled and 'Enable' or 'Disable')
-		end
+table.insert(initConnections, plr:GetAttributeChangedSignal('OriginalPosition'):Connect(function()
+	for _, v in pairs(initConnections) do
+		v:Disconnect()
 	end
 
-	local selected = _G.toskin[weapon]
-	selected = selected == 'Dont Change' and weapon or selected or weapon
+	going = false
+	on = false
 
-	local all = UTILS.SKIN_INFO.skinInfo[weapon]
-	table.insert(all,weapon)
-
-	if BOTH then
-		HANDLED_WEAPONS[weapon] = enabled
-		PROJ_THROW_ACTIVE[weapon] = enabled
-	elseif not PROJ_THROW then
-		HANDLED_WEAPONS[weapon] = enabled
-	else
-		PROJ_THROW_ACTIVE[weapon] = enabled
+	for _, v in pairs(boxList) do
+		v.Visible = false
+		v:Remove()
 	end
 
-	-- // Funcs
+	playSound(1.5, knifeSound)
+	return
+end))
 
-	local bn = module.skinToBehaviourName[selected]
-	local oselected = bn or selected
+playSound(f and .2 or 1.5)
+f = true
 
-	local function __handleMultiWeaponFolder(foldName)
-		for _, d in pairs(OG_MISC.fromWeapon[foldName]) do
-			for _, skin in pairs(all) do
-				local obj = d.toReal[skin]
-				if obj then
-					obj.Name = not enabled and skin
-						or oselected == skin and weapon
-						or skin == weapon and oselected ~= weapon and '_econ.'..(skin:lower())..'/rawrr>w<'
-						or skin
+local prms = RaycastParams.new()
+prms.RespectCanCollide = true
+
+-- // CARRELOAD
+
+local _main = plr.PlayerGui:WaitForChild('MainGui').MainFrame
+local _items = _main.FighterInterfaces:WaitForChild(plr.Name).Items:WaitForChild('Container')
+local _connis = {}
+
+if not on then return end
+
+local NOCARRELOAD = {'Molotov', 'Grenade', 'Bow', 'Daggers'}
+local ACCEPTEDCOOLDOWN = 'rbxassetid://17156089790'
+
+local function _reloadcar(itemSlot)
+	if itemSlot:IsA('Frame') and itemSlot.Name ~= 'AmmoContainers' and not table.find(NOCARRELOAD, itemSlot.Name) then
+		local i = itemSlot.Name
+
+		local con = _connis[i]
+		if con then con:Disconnect() end
+
+		pcall(function()
+			local conni = nil
+			conni = itemSlot.Cooldowns.ChildAdded:Connect(function(v)
+				if v:IsA('Frame') and v.Icon.Image == ACCEPTEDCOOLDOWN and reload then
+					conni:Disconnect()
+					task.delay(.1, function()
+						for i = 1, 4 do
+							mousescroll(2345)
+							RunService.RenderStepped:Wait()
+						end
+					end)
+				elseif v:IsA('Frame') then
+					table.insert(NOCARRELOAD, v.Name)
+					conni:Disconnect()
 				end
-			end
-		end
+			end)
+
+			table.insert(initConnections, conni)
+
+			_connis[i] = conni
+		end)
 	end
-
-	-- // Main
-
-	if PROJ_THROW or BOTH then
-		__handleMultiWeaponFolder'ProjectileOrThrowable'
-	end
-
-	if not PROJ_THROW or BOTH then
-		evars.NAMES_SHOWN = enabled
-
-		for _, skin in pairs(all) do
-			local vm = OG_VMS.fromName[skin]
-			local n = not enabled and skin or selected == skin and weapon or skin == weapon and selected ~= weapon and '_econ.'..(skin:lower())..'/owo' or skin
-			if n == weapon then
-				vm.model:AddTag'EconTag'
-			else
-				vm.model:RemoveTag'EconTag'
-			end
-
-			vm.model.Name = n
-
-			local _module = vm.mod
-			if _module then
-				_module.Name = not enabled and skin 
-					or oselected == skin and weapon 
-					or skin == weapon and oselected ~= weapon and '_econ.'..(skin:lower())..'/>w<'
-					or skin
-			end
-		end
-
-		if OG_MISC.fromWeapon[weapon] then
-			for _, d in pairs(OG_MISC.fromWeapon[weapon]) do
-				local fromName = {}
-				local tn = module.toName[d.fold.Name]
-
-				for _, v in pairs(d.fold:GetChildren()) do
-					local skin = d.toClone[v].Name
-					local __selected = tn and tn[oselected] or oselected
-
-					v.Name = not enabled and skin 
-						or __selected == skin and 'Default' 
-						or skin == 'Default' and __selected ~= weapon and d.toReal[__selected] and '_econ.'..(skin:lower())..'/^w^'
-						or skin
-				end
-			end
-		end
-
-		__handleMultiWeaponFolder'MuzzleFlashes'
-	end
-
-	return 'Succesfuly '..(enabled and 'Enabled' or 'Disabled')..' '..(BOTH and 'Both' or PROJ_THROW and 'Projectiles' or 'Skin')
 end
 
--- // ViewModels
-
-modulesCopy = vmModsOG and modules.ViewModels or vmModules:Clone()
-
-vmModules.Name = 'OriginalViewModels'
-modulesCopy.Parent = modules
-
-vmModsOG = vmModsOG or vmModules
-
-local NAME_FINISHER = {}
-
-if not evars.OG_VMS then
-	for _, v in pairs(rep.Modules.Finishers:GetChildren()) do
-		NAME_FINISHER[v.Name] = v
-	end
-	
-	for _, v in pairs(skins:GetDescendants()) do
-		if v:IsA('Model') then
-			local FINAL_TB = {
-				model  = v;
-				mod = vmModsOG:FindFirstChild(v.Name,true);
-			}
-
-			OG_VMS.fromName[v.Name] = FINAL_TB
-			table.insert(OG_VMS.all, FINAL_TB)
-		end
-	end
-
-	evars.OG_VMS = OG_VMS
-
-	local __RET = {all={};fromWeapon={}}
-	local function __clone(fold)
-		local weapon = module.toWeapon[fold.Name]
-		if weapon then
-			local _clones = {}
-			local _toClone = {}
-			local _toReal = {}
-			for _, v in pairs(fold:GetChildren()) do
-				local cl = v:Clone();
-				table.insert(_clones,cl);
-				_toClone[v] = cl;
-				_toReal[v.Name] = v;
-			end
-
-			__RET[fold] = {
-				weapon = weapon; all = _clones; fromSkin = _toClone;
-			}
-
-			if not __RET.fromWeapon[weapon] then
-				__RET.fromWeapon[weapon] = {}
-			end
-
-			table.insert(__RET.fromWeapon[weapon],{
-				fold = fold; all = _clones; toClone = _toClone; toReal = _toReal;
-			})
-		end
-	end
-
-	for _, v in pairs(misc:GetChildren()) do
-		__clone(v)
-	end
-
-	__clone(throwables);
-	__clone(projectiles);
-
-	evars.OG_MISC = __RET
-	OG_MISC = __RET
+for _, v in pairs(_items:GetChildren()) do
+	_reloadcar(v)
 end
 
--- // UI
+table.insert(initConnections, _items.ChildAdded:Connect(_reloadcar))
 
-if not UTILS.ECON_UI.CreateWindow then
-	repeat run.Stepped:Wait() until UTILS.ECON_UI.CreateWindow
-end
+-- // EconField Setup
 
-local UI_WINDOW = _G.WINDOW_REPLACEMENT or UTILS.ECON_UI:CreateWindow({
-	Name = 'Econ',
-	Theme = 'AmberGlow', 
+local EconField = allLoadstrings.econUI()
+
+local Window = EconField:CreateWindow({
+	Name = "Econ",
+	Icon = 'radar',
+	LoadingTitle = '',
+	LoadingSubtitle = "by ConePartyy",
+	Theme = "AmberGlow", 
 
 	DisableEconFieldPrompts = true,
 	DisableBuildWarnings = true,
 
 	ConfigurationSaving = {
+		Enabled = true,
+		FolderName = 'cone',
+		FileName = 'Default'
+	},
+
+	Discord = {
 		Enabled = false,
-		FolderName = '!coneskins.nosave',
-		FileName = '!nosave'
+		Invite = "acv8tdb8",
+		RememberJoins = true
 	},
 })
 
--- // Wrap File Work
+_G.WINDOW_REPLACEMENT = Window
 
-local ERR_NSC = 'Econ was not saved correctly last session'
-local ECON_FILE = 'EconContainer'
-local READ_FILE = false
+-- // Settings
 
-local finisherSkinInfo = {}
-local wrapSkinInfo = {}
-local weaponToButton = {}
-local charapb = {}
+local UGS = UserSettings():GetService('UserGameSettings')
 
-function readFile()
-	READ_FILE = true
-
-	local rf = isfile(ECON_FILE)
-	if rf then
-		local splits = readfile(ECON_FILE):split''
-		for i, v in pairs(splits) do
-			local f = {
-				function()
-					if v ~= ERR_NSC then
-						evars.CURRENT_ID = tonumber(v)
-					end
-				end; function()
-					enableCharChanging = v == string.char(3)
-				end,
-			}
-			
-			if f[i] then
-				f[i]()
-			else
-				local inf = v:split(string.char(1))
-				local b = weaponToButton[inf[1]]
-				if b then
-					_G.toskin[inf[1]] = inf[2]
-					b:Set({inf[2]}, true)
-
-					local finisherSplits = v:split(string.char(3))
-					local inf = finisherSplits[1]:split''
-
-					if finisherSplits[2] then
-						finisherSkinInfo[inf[1]] = finisherSplits[2]
-					end
-
-					wrapSkinInfo[inf[1]] = {
-						wrap = inf[3] or 'None',
-						inverted = inf[4]
-					}
-				end
-			end
-		end
-	else
-		writefile(ECON_FILE, ERR_NSC)
-	end
+local function mousesens()
+	return UGS.MouseSensitivity
 end
 
-function writeFile()
-	local str = evars.CURRENT_ID..''..(enableCharChanging and string.char(3) or '')..''
-	for weapon, skin in pairs(_G.toskin) do
-		local wrap = wrapSkinInfo[weapon]
-		local finisher = finisherSkinInfo[weapon]
-		str ..= weapon..''
-			..skin
-			..(wrap and wrap.wrap ~= 'None' and (''..wrap.wrap..(wrap.inverted and '' or '')) or '')
-			..(finisher and finisher ~= 'Ragdoll' and (''..finisher) or '')
-			..''
-	end
+-- // Rest
 
-	writefile(ECON_FILE, str)
-end
-
--- // Main Events
-
-if _G.hd then
-	for _, v in pairs(_G.hd) do
-		v:Disconnect()
-	end
-end
-
-local function __removeSkins()
-	for weapon, val in pairs(HANDLED_WEAPONS) do
-		if val then
-			__updVMMod(weapon,false,1)
+local function getWeapon()
+	for _, v in pairs(vms:GetChildren()) do
+		if v.Name:split' - '[1] == plr.Name then
+			local rest = v.Name:split' - '
+			return rest[2]
 		end
 	end
 end
 
--- // Connections
+local cw = nil
+local handToo = {'Handgun', 'Fists'}
 
-_G.hd = {
-	hs = hitmarkerSounds.ChildAdded:Connect(function(v)
-		if v:IsA('Sound') and v.SoundId == module.headshotid then
-			for _, v in pairs(evars.HEADSHOT_FUNCS) do
-				v()
-			end
+local function plrHasLoadout(plr)
+	for _, v in pairs(ReplicatedStorage.Assets.Temp.ViewModels:GetChildren()) do
+		if v.Name:split' - '[1] == plr.Name then
+			return true
 		end
-	end);
 
-	weaponReceiver = rep.Remotes.Replication.Fighter.Replicate.OnClientEvent:Connect(function(...)
-		local args = {...}
-		if typeof(args[4]) == 'table' then -- Player Data
-			local _plr = args[4]["¸"]
-			local _byteID = args[2]
-			if args[4]['·'] then -- Player Weapon Equipped
-				local userId = evars.RIVALS_BYTEPLR[_byteID]
-				if _plr then
-					local weaponData = _plr['·']
-					if weaponData then
-						if userId == plr.UserId then
-							__updVMMod(weaponData.e,true)
-						else
-							__removeSkins()
-						end
-					end
-				end
-			end
-		elseif args[3] == '' then -- Throwable / Projectile
-			local _byteID = args[2]
-
-			local userId = evars.RIVALS_BYTEPLR[_byteID]
-			local isOurs = plr.UserId == userId
-			
-			if not evars.BYTE_WEAPONS[userId] then return end
-
-			local _weapon = evars.BYTE_WEAPONS[userId][args[4]]
-			local _isValidProjectile = module.modelList[_weapon == 'Slingshot' and '' or args[5]] and (typeof(args[6]) == 'Instance' or _weapon and table.find({'Slingshot'},_weapon))
-
-			if not _weapon or not isOurs and _isValidProjectile then
-				if _weapon and PROJ_THROW_ACTIVE[_weapon] then
-					__updVMMod(_weapon,false,true)
-				elseif not _weapon then
-					for weapon, val in pairs(PROJ_THROW_ACTIVE) do
-						if val then
-							__updVMMod(weapon,false,true)
-						end
-					end
-				end
-				return
-			end
-
-			if _isValidProjectile and isOurs and not PROJ_THROW_ACTIVE[_weapon] then
-				__updVMMod(_weapon,true,true)
-			end
-		elseif args[5] == 'GameOver' then
-			__removeSkins()
-		end
-	end); UI_Imgs = fighterInterfaces.ChildAdded:Connect(UTILS.VISUALS_UI.__handleFighterInterface)
-}
-
--- // Wrapper
-
-local function gt()
-	local inf = wrapSkinInfo[string.split(cw.Name, ' - ')[2]]
-	UTILS.WRAPPER_MOD:wrapThis(cw, (inf and inf.wrap or 'None'), (inf and inf.inverted), assets.ViewModels, assets.WrapTextures)
+		RunService.Stepped:Wait()
+	end
 end
+
+local function getLoadout()
+	local t = {}
+	for i, v in ipairs(_items:GetChildren()) do
+		if v.Name ~= 'AmmoContainers' and v:IsA('Frame') then
+			table.insert(t, v.Name)
+		end
+	end
+
+	for i = 1, math.floor(#t/2) do
+		local j = #t - i + 1
+		t[i], t[j] = t[j], t[i]
+	end
+
+	return t
+end
+
+local ps = plr.PlayerScripts:WaitForChild('Assets')
 
 local function check(v)
-	if v.Name:find(plr.Name) then
+	if v.Name:split' - '[1] == plr.Name then
+		local rest = v.Name:split(' - ')
 		cw = v
-		gt()
 	end
 end
 
@@ -678,840 +358,1400 @@ if vms:GetChildren()[1] then
 	check(vms:GetChildren()[1])
 end
 
-local ltagcon = nil
-local lll = nil
+local shra = true
+local igam = true
 
--- // UI Functioning
+local function id()
+	return plr:GetAttribute('EnvironmentID')
+end
 
-for t, weapons in pairs(UTILS.WEAPON_TYPES.typeToWeapons) do
-	local gameplayTab = UI_WINDOW:CreateTab(module.WEAPON_TYPES[t])
+-- // Aimbot Adjusters
 
-	if t == 1 then
-		local sec = gameplayTab:CreateSection'Character Changer'
-		local getAll_result = UTILS.WRAPPER_MOD:getAll()
-		
-		local charToggle = gameplayTab:CreateToggle({
-			Name = 'Enable Character Change',
-			CurrentValue = false,
-			Ext = true,
-			Flag = 'cchtoggle',
-			Callback = function(Value, nosound)
-				enableCharChanging = Value;
-			end,
-		})
-		
-		charToggle:Set(enableCharChanging)
-		
-		local charchanger = gameplayTab:CreateInput({
-			Name = 'Player ID / Name',
-			CurrentValue = tostring(evars.CURRENT_ID),
-			PlaceholderText = 'ConePartyy',
-			RemoveTextAfterFocusLost = false,
-			Ext = true;
-			Flag = 'appearancechangerid',
-			Callback = function(t)
-				local suc, z = false, 'Lid Exists'
-				if not (tonumber(t) or tonumber(evars.NAME_ID[t])) then
-					suc, z = pcall(function()
-						return players:GetUserIdFromNameAsync(t)
-					end)
-				end
+local aimPredictionXZ, aimPredictionY = 1, 1;
+local aimPredEnabled = true;
+local shakeEnabled = true;
+local cursorShakeEnabled = true;
 
-				local id = tonumber(t) or tonumber(evars.NAME_ID[t] or suc and z)
+local softLockEnabled = true;
+local softLockLerp = 0;
 
-				if not id then --[[Name To ID Error]] return end
+local cursorSpringEnabled = true;
+local cursorSpringDivider = 1;
 
-				if id then
-					evars.NAME_ID[t] = id
-					evars.CURRENT_ID = id
-					
-					if enableCharChanging then
-						UTILS.ID_CHANGER.cchar(id)
-					end
+local movementSpringEnabled = true;
+local movementSpringXZ, movementSpringY = 1, 1;
 
-					if READ_FILE then
-						writeFile()
-					end
-				end
-			end,
-		})
+local FOVCircleEnabled = true;
+local FOVCircleSize = 10;
+local FOVPixels = 10000;
 
-		charapb = charchanger
+local CURRENT_CHAR = nil;
+local CURRENT_APOS = nil;
 
-		local visualSection = gameplayTab:CreateSection('Wraps - Hold a weapon')
+local targetPriority = 'Center of Screen'
 
-		local selectedWrap = 'None'
-		local selectedFinisher = 'Ragdoll'
-		local selectedWeapon = 'Assault Rifle'
-		local wrapsX = {}
-		local inverted = false
+-- // Get Head
 
-		for wrap, v in pairs(getAll_result) do
-			table.insert(wrapsX, v)
-		end
+local function getNearestHead()
+	local closestPlayer = nil;
+	local nearestPos = math.huge;
+	local nearestScreenPoint = math.huge;
+	
+	-- // Main
+	
+	local ourChar = plr.Character;
+	local ourPos = ourChar and ourChar:GetPivot().Position or cam.CFrame.Position;
+	
+	local COF = targetPriority == 'Center of Screen'
 
-		table.insert(wrapsX, 'None')
-
-		function updateSkin()
-			local name = cw.Name:split' - '[2]
-			wrapSkinInfo[name] = {
-				wrap = selectedWrap,
-				inverted = inverted,
-			};
+	for _, player in pairs(Players:GetPlayers()) do
+		if player ~= plr and (player:GetAttribute('EnvironmentID') == id() or not igCheck) and (not id() or id() ~= '߿' and igam or id() == '߿' and shra) and not table.find(noPlayers, player.UserId) and player.Character and player.Character:FindFirstChild("Head") then
+			local char = player.Character;
+			local hum = char and char:FindFirstChild('Humanoid');
+			local head = char.Head;
 			
-			finisherSkinInfo[name] = selectedFinisher
+			local screenSize = cam.ViewportSize;
+			local headPos, headVisible = cam:WorldToViewportPoint(head.Position);
+			if headPos.Z <= 0 then
+				headPos *= -1;
+			end;
 
-			writeFile()
-			gt()
-		end
-
-		local typeWrap
-		local wrapDropdown = gameplayTab:CreateDropdown({
-			Name = 'Wrap',
-			Options = wrapsX,
-			CurrentOption = {selectedWrap},
-			SpecialOptions = specialWraps,
-			MultipleOptions = false,
-			Ext = true,
-			Flag = 'wcwcdropdown',
-			Callback = function(Options, nosound)
-				selectedWrap = Options[1]
-
-				if not nosound and not (not vms or #vms:GetChildren() == 0) then
-					updateSkin()
-				elseif not nosound then
-					UTILS.ECON_UI:Notify({
-						Title = 'Error',
-						Content = 'Hold a weapon to change your wrap', 
-						Image = 6026568210,
-						Duration = 2,
-					})
-				end
-			end,
-		})
-
-		for _, v in pairs(specialWraps) do
-			local frame = wrapDropdown.Frames[v]
-			if frame then
-				frame.Title.FontFace = Font.fromName('Montserrat',Enum.FontWeight.ExtraBold,Enum.FontStyle.Normal)
-
-				local sparkles = UTILS.VISUALS_UI.createSparklesFrame(frame)
-				local c
-				c = run.RenderStepped:Connect(function()
-					if frame.Parent then
-						sparkles.Update()
-					else
-						c:Disconnect()
-					end
-				end)
-			end
-		end
-
-		local wrapz = {'none'}
-		for wrap, v in pairs(getAll_result) do
-			table.insert(wrapz, v:lower())
-		end
-
-		typeWrap = gameplayTab:CreateInput({
-			Name = 'Type Wrap',
-			CurrentValue = selectedWrap,
-			PlaceholderText = selectedWrap,
-			RemoveTextAfterFocusLost = true,
-			Ext = true,
-			Flag = 'wcwcinput',
-			Callback = function(txt, nosound)
-				if table.find(wrapz, txt:lower()) then
-					local realWrap = 'None'
-					for w, v in pairs(getAll_result) do
-						if v:lower() == txt:lower() then
-							realWrap = v
-							break
-						end
-					end
-
-					if not (not vms or #vms:GetChildren() == 0) then
-						wrapDropdown:Set({realWrap}, nosound)
-					end
-
-					selectedWrap = realWrap
-
-					if not nosound and not (not vms or #vms:GetChildren() == 0) then
-					elseif not nosound then
-						UTILS.ECON_UI:Notify({
-							Title = 'Error',
-							Content = 'Hold a weapon to change your wrap', 
-							Image = 6026568210,
-							Duration = 2,
-						})
-					end
-				end
-			end,
-		})
-
-		local invertedToggle = gameplayTab:CreateToggle({
-			Name = 'Inverted',
-			CurrentValue = false,
-			Ext = true,
-			Flag = "invtoggle",
-			Callback = function(Value, nosound)
-				inverted = Value
-
-				if not nosound and not (not vms or #vms:GetChildren() == 0) then
-					updateSkin()
-				elseif not nosound then
-					UTILS.ECON_UI:Notify({
-						Title = 'Error',
-						Content = 'Hold a weapon to change their wrap', 
-						Image = 6026568210,
-						Duration = 2,
-					})
-				end
-			end,
-		})
-		
-		-- // Rest
-
-		local function _vmAdded(v)
-			if not v:HasTag('Changed') and v.Name:find(plr.Name) then
-				for _, v in pairs(_G.toskin) do
-					applySkin(v)
-				end
-			end
-		end
-
-		table.insert(evars.INIT_CONS, vms.ChildAdded:Connect(function(v)
-			_vmAdded(v)
-			check(v)
-
-			local n = cw.Name:split' - '[2]
-			local inf = wrapSkinInfo[n]
-			local finisher = finisherSkinInfo[n]
+			headPos = Vector2.new(math.clamp(headPos.X, 0, screenSize.X),math.clamp(headPos.Y, 0, screenSize.Y));
 			
-			visualSection:Set(n and 'Wraps - '..n or 'Wraps - Hold a weapon')
+			local posDist = (head.Position-ourPos).Magnitude;
+			local screenDist = (screenSize/2-headPos).Magnitude;
+			if (not FOVCircleEnabled or screenDist < FOVPixels) (COF and screenDist < nearestScreenPoint or not COF and posDist < nearestPos) and hum.Health > 0 and headVisible then
+				nearestScreenPoint = screenDist;
+				nearestPos = posDist;
+				closestPlayer = player;
+			end;
+		end;
+	end;
 
-			task.spawn(function()
-				typeWrap:Set(inf and inf.wrap or 'None', 1)
-			end)
+	if closestPlayer and closestPlayer.Character and closestPlayer.Character:FindFirstChild('Head') then
+		return closestPlayer.Character.Head, closestPlayer, closestPlayer.Character, closestPlayer.Character.PrimaryPart;
+	end;
 
-			task.spawn(function()
-				invertedToggle:Set(inf and inf.inverted, 1)	
-			end)
-		end))
+	return nil;
+end
 
-		table.insert(evars.INIT_CONS, tempvms.ChildAdded:Connect(_vmAdded))
+local cons = {}
+local carRight = {'Knife', 'Grenade', 'Medkit', 'Smoke Grenade', 'Flashbang', 'Molotov', 'Fists'}
 
-		table.insert(evars.INIT_CONS, vms.ChildRemoved:Connect(function(v)
-			if not vms or #vms:GetChildren() == 0 then
-				visualSection:Set('Wrap Changer - Hold a weapon')
-				task.spawn(function()
-					typeWrap:Set('None', 1)
-				end)
+local katana = true
+local carshoot = false
 
-				task.spawn(function()
-					invertedToggle:Set(false, 1)	
-				end)
-			end
-		end))
+local f = nil
+local lelCam = nil
+
+local function char()
+	return plr.Character, plr.Character.HumanoidRootPart
+end
+
+local ltick = tick()
+local down2 = false
+
+-- // Move Mouse Function
+
+local lerp = 1
+local sens = 1
+local ads = 1
+
+local function moveMouseToWorldPosition(targetVector3,tchar)
+	if tchar and not tchar.Parent then
+		tchar = nil;
+	end;
+	
+	local pos2,isOnScreen = Vector2.zero, true;
+	local screenCenter = Vector2.zero;
+	if targetVector3 then
+		local screenSize = cam.ViewportSize
+		
+		screenCenter = Vector2.new(screenSize.X / 2, screenSize.Y / 2)
+		pos2, isOnScreen = cam:WorldToViewportPoint(targetVector3)
+		
+		if pos2.Z <= 0 then
+			pos2 *= -1
+		end
+
+		pos2 = Vector2.new(math.clamp(pos2.X, 0, screenSize.X),math.clamp(pos2.Y, 0, screenSize.Y))
 	end
 
-	local visualSection = gameplayTab:CreateSection'Weapons'
+	if isOnScreen then
+		-- // Delta Adders
+		
+		local extraDeltaMult = 1;
 
-	for skin, v in pairs(weapons) do
-		skin = v
-		v = UTILS.SKIN_INFO.skinInfo[v]
+		if softLockEnabled and tchar then
+			local params = RaycastParams.new();
+			params.CollisionGroup = 'CollideWithPlayersOnly';
+			params.RespectCanCollide = false;
+			params.FilterType = Enum.RaycastFilterType.Include;
+			params.FilterDescendantsInstances = {tchar};
 
-		if v then
-			local ov = table.clone(v)
-			v = {'Dont Change'}
-			for _, v2 in pairs(ov) do
-				table.insert(v, v2)
+			local cf = cam.CFrame;
+			local ray = Workspace:Raycast(cf.Position,cf.LookVector*1e5,params);
+			extraDeltaMult = ray and (softLockLerp or .025) or 1;
+		end
+		
+		local delta = (pos2 - screenCenter)*lerp*extraDeltaMult;
+		
+		local function assertPos(val:boolean,pos)
+			local oldDelta = delta;
+			if val then
+				delta += pos;
+			end;
+			return oldDelta
+		end;
+		
+		local _deltaPriorCursorAdders = assertPos(tchar and cursorShakeEnabled,_cursorShakeOffset);
+		local _deltaPriorCursorSpring = assertPos(tchar and cursorSpringEnabled,Vector2.new(_cursorSpring.p.X/cursorSpringDivider,_cursorSpring.p.Y/cursorSpringDivider));
+		
+		-- // MoveMouse
+		
+		mousemoverel(delta.X, delta.Y);
+		_cursorSpring:Impulse(Vector3.new(_deltaPriorCursorAdders.X,_deltaPriorCursorAdders.Y,1));
+	end;
+end
+
+local last = false
+local clickType = 'Head'
+local trackType = 'Head'
+
+local homeTab = Window:CreateTab('Home', 'crosshair') -- Title, Image
+local aymSection = homeTab:CreateSection('Tracking')
+local CoreGui = game:GetService('CoreGui')
+
+local changeVal = Instance.new('Vector3Value', CoreGui:FindFirstChild("RobloxGui"))
+local switch = false
+local aymmode = 'MouseMoveRel'
+changeVal.Name = 'ChangeVal'
+
+task.spawn(function()
+	while task.wait(2) do
+		if going then
+			switch = not switch
+			ts:Create(changeVal, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Value = switch and Vector3.zero or Vector3.new(0, -1.5, 0)}):Play()
+		else
+			break
+		end
+	end
+end)
+
+function __auto(right, needs, head)
+	local weapon = getWeapon()
+	local char = plr.Character;
+	local root = char and char.PrimaryPart;
+	if (spactivate or silactive or needs) and weapon and (not table.find(carRight, weapon) or needs) then
+		local targetHead = head or f or getNearestHead()
+		local targetChar = targetHead and targetHead.Parent
+		local targetHum = targetChar and targetChar:FindFirstChild('Humanoid')
+		local targetRoot = targetChar and targetChar.PrimaryPart
+		if targetHead then
+			f = nil
+
+			local pos = targetHead.Position
+
+			local typ = right and trackType or clickType
+			if typ ~= 'Head' then
+				pos = typ == 'Changing [ Outdated ]' and targetHead.Position+changeVal.Value or targetHead.Parent.HumanoidRootPart.Position
 			end
 
-			local selectedSkin = [[Dont Change]]
-			local specials = {'Cone Horizon'}
-			local drop = gameplayTab:CreateDropdown({
-				Name = skin,
-				Options = v,
-				CurrentOption = {[[Dont Change]]},
-				SpecialOptions = specials,
-				MultipleOptions = false,
-				Flag = skin,
-				Ext = true;
-				Callback = function(Options, nosound, nowrite)
-					selectedSkin = Options[1]
+			local apos = pos
+			local l = cam.CFrame
 
-					_G.toskin[skin] = Options[1]
+			if weapon == 'Daggers' or weapon == 'Bow' then
+				apos += Vector3.new(0, 1, 0);
+			end;
+			
+			-- // Movement Based Legit Settings
+			
+			local vel = (targetRoot and targetRoot.Velocity or Vector3.zero)::Vector3;
+			local vel2 = (root and root.Velocity or Vector3.zero)::Vector3;
 
-					if applySkin then
-						applySkin(selectedSkin)
-					else
-						local skins = ov
-						table.insert(skins,skin)
-					end
+			if movementSpringEnabled and targetRoot then
+				local max = 20;
 
-					if not nosound and READ_FILE then
-						writeFile()
-					end
-				end,
-			})
-
-			for _, v in pairs(specials) do
-				local frame = drop.Frames[v]
-				if frame then
-					frame.Title.FontFace = Font.fromName('Montserrat',Enum.FontWeight.ExtraBold,Enum.FontStyle.Normal)
-
-					local sparkles = UTILS.VISUALS_UI.createSparklesFrame(frame)
-					local c
-					c = run.RenderStepped:Connect(function()
-						if frame.Parent then
-							sparkles.Update()
-						else
-							c:Disconnect()
-						end
-					end)
-				end
+				local xz = max/movementSpringXZ;
+				local y = max/movementSpringY;
+				_movementSpring:Impulse(Vector3.new((vel.X-vel2.X)/xz,(vel.Y-vel2.Y)/y,(vel.Z-vel2.Z)/xz));
+				apos += _movementSpring.p
+			end;
+			
+			if targetRoot and aimPredEnabled then
+				local max = 20;
+				
+				local xz = max/aimPredictionXZ;
+				local y = max/aimPredictionY;
+				apos += Vector3.new(vel.X/xz,vel.Y/y,vel.Z/xz) - Vector3.new(vel2.X/xz,vel2.Y/y,vel2.Z/xz);
+			end;
+			
+			-- // Other
+			
+			if shakeEnabled then
+				apos += _aimShakeOffset
 			end
 
-			weaponToButton[skin] = drop
+			local x, y, z = targetHead.CFrame:ToOrientation()
+			local cf = lelCam or right and weapon == 'Knife' and CFrame.new(cam.CFrame.Position)*CFrame.Angles(x,y,z) or CFrame.new(cam.CFrame.Position, apos)
+			if iswindowactive() then
+				CURRENT_APOS = apos;
+				--moveMouseToWorldPosition(apos,targetChar)
+
+				--if carshoot then
+				--	local ray = workspace:Raycast(cam.CFrame.Position, cam.CFrame.LookVector*1e5)
+				--	if ray then
+				--		if ray.Instance and ray.Instance.Parent:FindFirstChild('Humanoid') then
+				--			mouse1press()
+				--			last = true
+				--		elseif last then
+				--			last = false
+				--			mouse1release()
+				--		end
+				--	end
+				--end
+			end
+
+			lelCam = nil
+			if right and weapon == 'Knife' then lelCam = cf end
+			if not right then
+				ReplicatedStorage.Remotes.Attack:FireServer(targetHead)
+			end
 		end
 	end
 end
 
-local going = true
+local curr = false
 
-plr:SetAttribute('OriginalPositionb', nil)
-plr:SetAttribute('OriginalPositionb', true)
+local keytrack = nil
+local isTrackbotKeyEnabled = false
 
-table.insert(evars.INIT_CONS, plr:GetAttributeChangedSignal('OriginalPositionb'):Once(function()
-	going = false
-	return
-end))
+table.insert(initConnections, mouse.Button2Down:Connect(function()
+	down2 = true;
+	if spactivate then
+		curr = true;
 
-local relAnim = rep.Modules.AnimationLibrary
+		local lhead = nil;
+		local lchar = nil;
+		local a = RunService.RenderStepped:Connect(function()
+			if not isTrackbotKeyEnabled then
+				local hum = lhead and lhead.Parent and lhead.Parent:FindFirstChild('Humanoid');
+				if lhead and (not hum or hum.Health <= 0) then
+					lhead = nil;
+					aimbotUp();
+					return;
+				end;
 
-local soundGroup = ss:FindFirstChild('Zero') or Instance.new('SoundGroup', ss)
-local animStorage = uis:FindFirstChild('AnimsEcon') or Instance.new('Folder', uis)
-animStorage.Name = 'AnimsEcon'
-soundGroup.Name = 'Zero'
+				if not lhead then
+					local head,plr,char,root = getNearestHead();
+					lhead = head;
+					lchar = char;
+				end;
 
-local soundOn = true
+				CURRENT_CHAR = lchar;
+				if lhead then
+					__auto(true,false,lhead);
+				else
+					CURRENT_APOS = nil;
+				end;
+			end
+		end);
 
--- // Global
+		table.insert(cons, a);
+	end;
+end));
 
-table.insert(evars.INIT_CONS,ss.Other:GetPropertyChangedSignal('Volume'):Connect(function()
-	if soundOn then
-		soundGroup.Volume = ss.Other.Volume
+function aimbotUp()
+	down2 = false;
+	curr = false;
+	CURRENT_CHAR = nil;
+	CURRENT_APOS = nil;
+	for _, v in pairs(cons) do
+		v:Disconnect();
+	end;
+end;
+
+table.insert(initConnections, mouse.Button2Up:Connect(aimbotUp))
+
+local gui = plr.PlayerGui
+
+local last = true
+
+local legtrek = homeTab:CreateToggle({
+	Name = 'Trackbot',
+	CurrentValue = true,
+	Flag = 'aimtracktogglekey',
+	Callback = function(Value, nosound)
+		spactivate = Value
+
+		if not nosound then
+			playSound(spactivate and 1 or .8)
+		end
+	end,
+})
+
+local Keybind = homeTab:CreateKeybind({
+	Name = 'Trackbot Hold Keybind',
+	CurrentKeybind = 'Backquote',
+	HoldToInteract = false,
+	Flag = 'trackforcekey',
+	Callback = function(x, nosound)
+		isTrackbotKeyEnabled = not isTrackbotKeyEnabled
+		if isTrackbotKeyEnabled then
+			local a = RunService.RenderStepped:Connect(function()
+				local lhead = nil;
+				local lchar = nil;
+				if not curr then
+					local hum = lhead and lhead.Parent and lhead.Parent:FindFirstChild('Humanoid');
+					if lhead and (not hum or hum.Health <= 0) then
+						lhead = nil;
+						aimbotUp();
+						return;
+					end;
+
+					if not lhead then
+						local head,plr,char,root = getNearestHead();
+						lhead = head;
+						lchar = char;
+					end;
+
+					CURRENT_CHAR = lchar;
+					if lhead then
+						__auto(true,true,lhead);
+					else
+						CURRENT_APOS = nil;
+					end;
+				end;
+			end);
+
+			keytrack = a;
+		elseif keytrack then
+			keytrack:Disconnect();
+			aimbotUp();
+		end
+	end,
+})
+
+local trackTypeDropdown = homeTab:CreateDropdown({
+	Name = 'Track Aim Part',
+	Options = {'Head', 'Torso', 'Changing [ Outdated ]'},
+	CurrentOption = {'Head'},
+	MultipleOptions = false,
+	Flag = 'trackaimpart',
+	Callback = function(Options)
+		trackType = Options[1]
+	end,
+})
+
+local targetPriority = homeTab:CreateDropdown({
+	Name = 'Target Priority',
+	Options = {'Closest to Player','Center of Screen'},
+	CurrentOption = {'Center of Screen'},
+	MultipleOptions = false,
+	Flag = 'targetpriority',
+	Callback = function(Options)
+		targetPriority = Options[1]
+	end,
+})
+
+local aymLerping = homeTab:CreateSlider({
+	Name = 'Aim Lerping Alpha',
+	Range = {5, 100},
+	Increment = .5,
+	Suffix = '',
+	CurrentValue = 8.5,
+	Flag = 'lerpSlider',
+	Callback = function(Value)
+		lerp = Value/100
+	end,
+})
+
+homeTab:CreateSection('Aim Prediction')
+
+local aimPredToggle = homeTab:CreateToggle({
+	Name = 'Aim Prediction Enabled',
+	CurrentValue = true,
+	Flag = "aptggl",
+	Callback = function(Value, nosound)
+		aimPredEnabled = Value;
+	end,
+})
+
+local aimPredXZ = homeTab:CreateSlider({
+	Name = 'Aim Prediction Multiplication X-Z',
+	Range = {.1, 100},
+	Increment = .1,
+	Suffix = '',
+	CurrentValue = .2,
+	Flag = 'apXZ',
+	Callback = function(Value)
+		aimPredictionXZ = Value/85
+	end,
+})
+
+local aimPredY = homeTab:CreateSlider({
+	Name = 'Aim Prediction Multiplication Y',
+	Range = {.1, 100},
+	Increment = .1,
+	Suffix = '',
+	CurrentValue = .3,
+	Flag = 'apY',
+	Callback = function(Value)
+		aimPredictionY = Value/85
+	end,
+})
+
+local legitTab = Window:CreateTab('Legit', 'search-check') -- Title, Image
+
+legitTab:CreateSection('Legit Basic')
+
+local softlockEnabled = legitTab:CreateToggle({
+	Name = 'SoftLock Enabled',
+	CurrentValue = true,
+	Flag = "sfle",
+	Callback = function(Value, nosound)
+		softLockEnabled = Value;
+	end,
+})
+
+local softlockLerp = legitTab:CreateSlider({
+	Name = 'In Hitbox Aim Lerp Multiplication',
+	Range = {0, 2},
+	Increment = .025,
+	Suffix = '',
+	CurrentValue = .125,
+	Flag = 'softlockhitboxlerpmult',
+	Callback = function(Value)
+		softLockLerp = Value
+	end,
+})
+
+legitTab:CreateSection('Lock FOV')
+
+local lockFOVEnabled = legitTab:CreateToggle({
+	Name = 'Lock FOV Enabled',
+	CurrentValue = false,
+	Flag = 'lockfovenabled',
+	Callback = function(Value, nosound)
+		FOVCIRCLE_UI.Enabled = Value;
+		FOVCircleEnabled = Value;
+	end,
+})
+
+local lockFOVCircleVisible = legitTab:CreateToggle({
+	Name = 'Lock FOV Circle Visible',
+	CurrentValue = false,
+	Flag = 'lockfovcirclevisible',
+	Callback = function(Value, nosound)
+		FOVCIRCLE_FRAME.Visible = Value;
+	end,
+})
+
+local lockFOVSize = legitTab:CreateSlider({
+	Name = 'Lock FOV Size',
+	Range = {10, 100},
+	Increment = .25,
+	Suffix = '',
+	CurrentValue = 25,
+	Flag = 'lockfovsize',
+	Callback = function(Value)
+		FOVCircleSize = (Value/100)*1200;
+	end,
+})
+
+legitTab:CreateSection'Cursor Movement Spring'
+
+local mouseSpringEnabled = legitTab:CreateToggle({
+	Name = 'Cursor Spring Enabled',
+	CurrentValue = true,
+	Flag = "mspre",
+	Callback = function(Value, nosound)
+		cursorSpringEnabled = Value;
+	end,
+})
+
+local mouseSpringDivider = legitTab:CreateSlider({
+	Name = 'Cursor Spring Divider',
+	Range = {.3, 10},
+	Increment = .05,
+	Suffix = '',
+	CurrentValue = 1.65,
+	Flag = 'mousespringdivider',
+	Callback = function(Value)
+		cursorSpringDivider = Value
+	end,
+})
+
+local mouseSpringDamper = legitTab:CreateSlider({
+	Name = 'Cursor Spring Damper',
+	Range = {.3, 20},
+	Increment = .05,
+	Suffix = '',
+	CurrentValue = .5,
+	Flag = 'mousespringdamper',
+	Callback = function(Value)
+		_cursorSpring.Speed = Value
+	end,
+})
+
+local mouseSpringDamper = legitTab:CreateSlider({
+	Name = 'Cursor Spring Speed',
+	Range = {1, 20},
+	Increment = .05,
+	Suffix = '',
+	CurrentValue = 8,
+	Flag = 'mousespringspeed',
+	Callback = function(Value)
+		_cursorSpring.Damping = Value
+	end,
+})
+
+legitTab:CreateDivider()
+
+local charShakeEnabled = legitTab:CreateToggle({
+	Name = 'Cursor Shake Enabled',
+	CurrentValue = true,
+	Flag = "mse",
+	Callback = function(Value, nosound)
+		cursorShakeEnabled = Value;
+	end,
+})
+
+local cursorShakeOffset = legitTab:CreateSlider({
+	Name = 'Cursor Shake Roughness',
+	Range = {0, 40},
+	Increment = .1,
+	Suffix = '',
+	CurrentValue = 15.3,
+	Flag = 'mouseshakeroughness',
+	Callback = function(Value)
+		_cursorShakeInstance.Roughness = Value
+	end,
+})
+
+local cursorShakeOffset = legitTab:CreateSlider({
+	Name = 'Cursor Shake Magnitude',
+	Range = {0, 100},
+	Increment = 1,
+	Suffix = '',
+	CurrentValue = 14,
+	Flag = 'mouseshakemagnitude',
+	Callback = function(Value)
+		_cursorShakeInstance.Magnitude = Value
+	end,
+})
+
+legitTab:CreateSection('Target Spring')
+
+local movementSpringEnabled = legitTab:CreateToggle({
+	Name = 'Movement Spring Enabled',
+	CurrentValue = true,
+	Flag = "movementspringenabled",
+	Callback = function(Value, nosound)
+		movementSpringEnabled = Value;
+	end,
+})
+
+local movementSpringXZ = legitTab:CreateSlider({
+	Name = 'Movement Spring X-Z',
+	Range = {1, 200},
+	Increment = .5,
+	Suffix = '',
+	CurrentValue = 89.5,
+	Flag = 'msXZ',
+	Callback = function(Value)
+		movementSpringXZ = Value/85
+	end,
+})
+
+local movementSpringY = legitTab:CreateSlider({
+	Name = 'Movement Spring Y',
+	Range = {1, 200},
+	Increment = .5,
+	Suffix = '',
+	CurrentValue = 75,
+	Flag = 'msY',
+	Callback = function(Value)
+		movementSpringY = Value/85
+	end,
+})
+
+legitTab:CreateDivider()
+
+local shakeInfluenceXZ = 0;
+local shakeInfluenceY = 0;
+
+local charShakeEnabled = legitTab:CreateToggle({
+	Name = 'Target Shake Enabled',
+	CurrentValue = true,
+	Flag = "tse",
+	Callback = function(Value, nosound)
+		shakeEnabled = Value;
+	end,
+})
+
+local charShakeRoughness = legitTab:CreateSlider({
+	Name = 'Target Shake Roughness',
+	Range = {0, 15},
+	Increment = .1,
+	Suffix = '',
+	CurrentValue = 1.5,
+	Flag = 'soRHN',
+	Callback = function(Value)
+		_aimShakeInstance.Roughness = Value
+	end,
+})
+
+local charShakeOffsetXZ = legitTab:CreateSlider({
+	Name = 'Target Shake X-Z',
+	Range = {0, 30},
+	Increment = .1,
+	Suffix = '',
+	CurrentValue = 2.1,
+	Flag = 'soXZ',
+	Callback = function(Value)
+		shakeInfluenceXZ = Value
+	end,
+})
+
+local charShakeOffsetY = legitTab:CreateSlider({
+	Name = 'Target Shake Y',
+	Range = {0, 30},
+	Increment = .1,
+	Suffix = '',
+	CurrentValue = 3.3,
+	Flag = 'soY',
+	Callback = function(Value)
+		shakeInfluenceY = Value
+	end,
+})
+
+homeTab:CreateSection('Sensitivity [ Copy ur Rivals settings ]')
+
+local sens = homeTab:CreateSlider({
+	Name = 'Sensitivity',
+	Range = {.05, 4},
+	Increment = .05,
+	Suffix = '',
+	CurrentValue = 1,
+	Flag = 'senslider',
+	Callback = function(Value)
+		sens = Value
+	end,
+})
+
+local sens = homeTab:CreateSlider({
+	Name = 'ADS Sensitivity Multiplier',
+	Range = {.05, 2},
+	Increment = .05,
+	Suffix = '',
+	CurrentValue = 1,
+	Flag = 'adsenseslider',
+	Callback = function(Value)
+		ads = Value
+	end,
+})
+
+homeTab:CreateSection('Misc')
+
+-- // Satisfying Sounds
+
+local equalizerEffect = Instance.new('EqualizerSoundEffect');
+equalizerEffect.Enabled = false;
+equalizerEffect.LowGain = 5;
+equalizerEffect.MidGain = -10;
+equalizerEffect.HighGain = 4;
+equalizerEffect.Parent = soundService:WaitForChild('Other');
+
+local equalizerEnabled = homeTab:CreateToggle({
+	Name = 'Audio Equalizer Enabled',
+	CurrentValue = false,
+	Flag = 'soundequalizer',
+	Callback = function(Value, nosound)
+		equalizerEffect.Enabled = Value;
+	end,
+});
+
+-- // Configs
+
+homeTab:CreateSection('Configs')
+
+if not isfile'EconConfig' then
+	writefile('EconConfig','ConeLegitDefault')
+end
+
+local infoLabel = homeTab:CreateLabel('Adding a new config clones the current', 6026568210, Color3.fromRGB(220, 130, 60), false)
+local currentConfig = readfile'EconConfig' or configsTable[1] or 'ConeLegitDefault';
+local newConfigName = 'Unnamed Config';
+
+local configDropdown = homeTab:CreateDropdown({
+	Name = 'Select Config',
+	Options = configsTable,
+	CurrentOption = {currentConfig},
+	MultipleOptions = false,
+	Ext = true; -- // Were not saving the save config :sob: wait what did i just say
+	Flag = 'sconfigdd',
+	Callback = function(Options,noPrev)
+		if noPrev ~= true then
+			currentConfig = Options[1];
+
+			writefile('EconConfig',currentConfig)
+			EconField.CONE_FILE_NAME = './cone/'..currentConfig;
+			
+			local _fullFilePath = `./cone/{currentConfig}{fileType}`;
+			if not isfile(_fullFilePath) then
+				repeat RunService.Stepped:Wait() until isfile(_fullFilePath);
+			end;
+			
+			EconField:LoadConfiguration();
+		end
+	end,
+})
+
+function updConfigDropdown(noPreviousSave,noLoad,noSet)
+	configDropdown:Refresh(configsTable);
+	if not noLoad then
+		task.spawn(function()
+			configDropdown:Close()
+		end)
+		
+		configDropdown:Set({currentConfig},noPreviousSave and 'NoPrevSave' or noSet);
 	end
-end))
+end
 
-table.insert(evars.INIT_CONS,weaponSounds.ChildAdded:Connect(function(s)
-	if (not table.find(module.canPlay, s.SoundId) or s.PlaybackSpeed == .5) and not s:HasTag('IsOurs') then
-		s.SoundGroup = soundGroup
+local configName = homeTab:CreateInput({
+	Name = 'Config Name',
+	CurrentValue = '',
+	PlaceholderText = 'Unnamed Config',
+	Ext = true,
+	Flag = 'cfninput',
+	Callback = function(txt, nosound)
+		newConfigName = txt:gsub('/',''):gsub('%.',''):gsub(':','')
+	end,
+})
+
+local configNew = homeTab:CreateButton({
+	Name = 'New Config',
+	Ext = true;
+	Callback = function()
+		if newConfigName == '' then
+			newConfigName = 'Unnamed'
+		end
+
+		local fullPath = './cone/'..newConfigName..fileType;
+		local isFile = table.find(configsTable,newConfigName);
+		
+		local suc, rep = pcall(function()
+			return EconField:SaveConfiguration(nil,fullPath)
+		end)
+		
+		if not table.find(configsTable,newConfigName) then
+			table.insert(configsTable,newConfigName);
+		end;
+		
+		currentConfig = newConfigName
+		updConfigDropdown(true)
+		
+		if suc then
+			EconField:Notify({
+				Title = isFile and 'Updated Config "'..newConfigName..'"' or 'New Config "'..newConfigName..'"',
+				Content = `Succesfully {isFile and 'Updated' or 'Added'} Config "{newConfigName}"`, 
+				Image = 6026568210,
+				Duration = 5,
+			})
+		else
+			EconField:Notify({
+				Title = 'Config Add Fail';
+				Content = `An error occurred adding config: {rep}`, 
+				Image = 6031071057,
+				Duration = 7,
+			})
+		end
+	end,
+})
+
+local delConfig = homeTab:CreateButton({
+	Name = 'Remove Selected Config',
+	Ext = true;
+	Callback = function()
+		local fullPath = './cone/'..currentConfig..fileType;
+		local suc, rep = pcall(function()
+			if #configsTable > 1 then
+				return delfile(fullPath)
+			else
+				error("This is your only config!")
+			end
+		end)
+
+		if suc then
+			local i = table.find(configsTable,currentConfig);
+			if i then
+				table.remove(configsTable,i);
+			end;
+
+			EconField:Notify({
+				Title = 'Config Removed',
+				Content = `Succesfully Removed Config "{currentConfig}"`, 
+				Image = 6022668939,
+				Duration = 5,
+			})
+			
+			currentConfig = configsTable[1];
+			updConfigDropdown(true);
+		else
+			EconField:Notify({
+				Title = 'Config Remove Fail';
+				Content = rep, 
+				Image = 6031071057,
+				Duration = 7,
+			})
+		end
+	end,
+})
+
+local gameplayTab = Window:CreateTab('Gameplay', 'swords') -- Title, Image
+local boxSection = gameplayTab:CreateSection'ESP'
+
+local evtype = 'Off'
+local gui = {}
+local shooting_range = '߿'
+
+local function canPopup()
+	return evtype == 'Always' or evtype == 'With ESP' and boxactive
+end
+
+local plrToG = {}
+local function popUpd()
+	local cp = canPopup()
+	for _, v in pairs(gui) do
+		v.Enabled = cp
 	end
-end))
+end
+
+local boxEnabled = gameplayTab:CreateToggle({
+	Name = 'Enabled',
+	CurrentValue = false,
+	Flag = "boxetoggle",
+	Callback = function(Value, nosound)
+		boxactive = Value
+
+		popUpd()
+
+		if not nosound then
+			playSound(boxactive and 1 or .8)
+		end
+	end,
+})
+
+local espType = 'Boxes'
+local espop = gameplayTab:CreateDropdown({
+	Name = 'ESP Type',
+	Options = {'Boxes', 'Highlights', 'Both'},
+	CurrentOption = {'Boxes'},
+	MultipleOptions = false,
+	Flag = 'esptdropdown',
+	Callback = function(Options, nosound)
+		espType = Options[1]
+		if not nosound then
+			playSound(1)
+		end
+	end,
+})
+
+local boxNAC = Color3.fromRGB(70, 53, 44)
+local boxCOL = Color3.fromRGB(255, 143, 52)
+
+local boxColor = gameplayTab:CreateColorPicker({
+	Name = 'ESP Color',
+	Color = Color3.fromRGB(255, 143, 52),
+	Flag = 'ESPColor',
+	Callback = function(Value)
+		boxCOL = Value
+	end
+})
+
+local boxNoaymbotColor = gameplayTab:CreateColorPicker({
+	Name = 'ESP No aimbot Color',
+	Color = Color3.fromRGB(70, 53, 44),
+	Flag = 'NAColor',
+	Callback = function(Value)
+		boxNAC = Value
+	end
+})
+
+local visualSection = gameplayTab:CreateSection('Enemy Visuals')
+
+local evpop = gameplayTab:CreateDropdown({
+	Name = 'Enemy Health',
+	Options = {'Off', 'With ESP', 'Always'},
+	CurrentOption = {'Off'},
+	MultipleOptions = false,
+	Flag = 'evpopdropdown',
+	Callback = function(Options, nosound)
+		evtype = Options[1]
+		popUpd()
+		if not nosound then
+			playSound(1)
+		end
+	end,
+})
+
+-- // HEALTH
+
+local nl = plr.PlayerScripts.UserInterface:WaitForChild('TeammateLabel')
+
+-- // REST
+
+local deviceSection = gameplayTab:CreateSection('Device')
+local deviceDropdown = gameplayTab:CreateDropdown({
+	Name = 'Change Device',
+	Options = {'VR', 'Touch', 'Gamepad', 'MouseKeyboard'},
+	CurrentOption = {'MouseKeyboard'},
+	MultipleOptions = false,
+	Flag = 'devicedrop',
+	Callback = function(Options)
+		ReplicatedStorage.Remotes.Replication.Fighter.SetControls:FireServer(Options[1])
+	end,
+})
+
+local gameplaySection = gameplayTab:CreateSection('Gameplay')
+
+local CARRELOAD = gameplayTab:CreateToggle({
+	Name = 'Auto Reload',
+	CurrentValue = false,
+	Flag = "artoggle",
+	Callback = function(Value, nosound)
+		reload = Value
+
+		if not nosound then
+			playSound(reload and 1 or .8)
+		end
+	end,
+})
+
+local carshoot = gameplayTab:CreateToggle({
+	Name = 'Auto Shoot [ Buggy ]',
+	CurrentValue = false,
+	Flag = "astoggle",
+	Callback = function(Value, nosound)
+		carshoot = Value
+
+		if not nosound then
+			playSound(carshoot and 1 or .8)
+		end
+	end,
+})
+
+local carKatana = gameplayTab:CreateToggle({
+	Name = 'Auto Katana [ Unreliable ]',
+	CurrentValue = true,
+	Flag = "aktoggle",
+	Callback = function(Value, nosound)
+		katana = Value
+
+		if not nosound then
+			playSound(katana and 1 or .8)
+		end
+	end,
+})
+
+local teamCheck = gameplayTab:CreateToggle({
+	Name = 'Team Check [ Recommended ]',
+	CurrentValue = true,
+	Flag = "tctoggle",
+	Callback = function(Value, nosound)
+		if Value then
+			noPlayers = ac 
+		else
+			noPlayers = {}
+		end
+
+		if not nosound then
+			playSound(Value and 1 or .8)
+		end 
+	end,
+})
+
+local ingameCheck = gameplayTab:CreateToggle({
+	Name = 'Match Check [ Recommended ]',
+	CurrentValue = true,
+	Flag = "ictoggle",
+	Callback = function(Value, nosound)
+		igCheck = Value
+
+		if not nosound then
+			playSound(Value and 1 or .8)
+		end
+	end,
+})
+
+local environmentsTab = Window:CreateTab('Places', 'map-pin')
+local environmentsSection = environmentsTab:CreateSection('Enabled Places')
+
+local shootingRange = environmentsTab:CreateToggle({
+	Name = 'Shooting Range',
+	CurrentValue = true,
+	Flag = "srtoggle",
+	Callback = function(Value, nosound)
+		shra = Value
+
+		if not nosound then
+			playSound(shra and 1 or .8)
+		end
+	end,
+})
+
+local ingame_ = environmentsTab:CreateToggle({
+	Name = 'Ingame',
+	CurrentValue = true,
+	Flag = "ingtoggle",
+	Callback = function(Value, nosound)
+		igam = Value
+
+		if not nosound then
+			playSound(igam and 1 or .8)
+		end
+	end,
+})
+
+local movementTab = Window:CreateTab('Movement', 'move')
+
+movementTab:CreateSection('Basic Movement')
+
+local function lerpz(start, goal, alpha)
+	return start + (goal - start) * alpha
+end
+
+local slide = .7
+function setJumpHack()
+	local char = plr.Character
+	if char then
+		local fm2 = char:FindFirstChild'FakeMass'
+		local root = char.PrimaryPart
+		if fm2 then
+			local c = fm2.CurrentPhysicalProperties
+			local z = PhysicalProperties.new(slide, c.Friction, c.Elasticity, c.FrictionWeight, c.ElasticityWeight)
+			fm2.CustomPhysicalProperties = z
+		end
+	end
+end
+
+local slideJumpMult = movementTab:CreateSlider({
+	Name = 'Slide Jump Hack',
+	Range = {0, 100},
+	Increment = 1,
+	Suffix = '',
+	CurrentValue = 6,
+	Flag = 'slideSlider',
+	Callback = function(Value)
+		slide = lerpz(.7, 0, Value/100)
+	end,
+})
+
+-- // Skin
+
+_G.ECON_UI = EconField
+_G.SIGNAL_QUEUE = true
+task.spawn(allLoadstrings.mainSkin)
 
 -- // Rest
 
-function special(name)
-	if name then 
-		local keywords = {'sprint', 'idle', 'reload'}
-		for _, v in pairs(keywords) do
-			if name:find(v) then
-				return true
+table.insert(initConnections, RunService.RenderStepped:Connect(setJumpHack))
+table.insert(initConnections, UserInputService.InputBegan:Connect(function(input, processed)
+	local b = table.find(keybinds, input.KeyCode.Name)
+	local ld = getLoadout()
+
+	if input.KeyCode.Name == 'F' and ld[3] == 'Katana' and not processed then
+		if katana then
+			for i = 1, 10 do
+				mouse2click(1)
+				RunService.Stepped:Wait()
 			end
 		end
-	end
-end
-
-local _lastLoadErrNotif = tick()
-
-function applySkin(skinName, cs)
-	task.spawn(function()
-		if skinName == 'Dont Change' then return end
-		if not UTILS.SKIN_INFO.skinToOg[skinName] then skinName = UTILS.SKIN_INFO.lowerToOg[skinName:lower()] end
-
-		local ogitem = UTILS.SKIN_INFO.skinToOg[skinName]
-		if not ogitem then return end
-
-		local char = plr.Character		
-		local hum = char and char:FindFirstChild('Humanoid')
-
-		-- // Main Changer
-
-		local function apl(vm)
-			task.spawn(function()
-				local skin =  OG_VMS.fromName[skinName].model
-				local vm = vm or vms:GetChildren()[1]
-
-				if not vm.ItemVisual:HasTag'EconTag' and not vm:HasTag'EconLoadNotif' and tick()-_lastLoadErrNotif > 2 then
-					_lastLoadErrNotif = tick()
-					UTILS.ECON_UI:Notify({
-						Title = 'Skin Loading Fail',
-						Content = 'Loaded in match/range, try re-entering the area.', 
-						Image = 6031302917,
-						Duration = 5,
-					})
-
-					vm:AddTag'EconLoadNotif'
-				end
-
-				if skin and not vm:HasTag'Changed' and vm.ItemVisual:HasTag'EconTag' then
-					vm:AddTag'Changed'
-
-					local last = vm.Name
-					local spl = vm.Name:split' - '
-					local ogWeapon = skins:FindFirstChild(spl[2], true)
-
-					if not vm:GetAttribute('OGItem') then
-						vm:SetAttribute('OGItem', spl[2])
-					end
-
-					local ig = vm:GetAttribute('OGItem')
-
-					vm.Name = spl[1]..' - '..spl[2].. ' - '..skinName
-
-					local name = vm.name
-
-					local clean = evars.VMS_CONS[name] or evars.VMS_CONS[last]
-					if clean then
-						for _, v in pairs(clean) do
-							v:Disconnect()
-						end
-					end
-
-					-- // ANIMATIONS TABLE
-
-					local econAnim = vm:FindFirstChild('Anims') or Instance.new('Folder', vm)
-					econAnim:ClearAllChildren()
-					econAnim.Name = 'Anims'
-
-					local animator = vm.AnimationController.Animator
-
-					local animtbl = {}
-					local toname = {}
-					local prs = {}
-
-					local sn = evars.ECON_ANIMS[name] or evars.ECON_ANIMS[last]
-					if sn then
-						for _, v in pairs(sn) do
-							if v.anim then
-								v.anim:Stop(0)
-							end
-						end
-					end
-
-					local inz = {}
-
-					-- // ANIMATIONS
-
-					local _precontr = {anims = {}}
-
-					function _precontr:add(pre, b)
-						local x = {tbl = b}
-
-						function x:stop()
-							b.anim:Stop()
-						end
-
-						function x:play(args)
-							args = args or {}
-
-							local ref = args.reference
-							if ref and not ref.IsPlaying then return end
-
-							if not special(b.name) and not args.isSpecial then
-								for _, v in pairs(animator:GetPlayingAnimationTracks()) do
-									if table.find(evars.ECON_ANIMS, v) and not special(toname[v.Animation.AnimationId]) then
-										v:Stop()
-									end
-								end
-							end
-
-							local loaded = b.anim
-							loaded.Priority = args.priority or prs[loaded] or Enum.AnimationPriority.Action2
-							loaded.TimePosition = args.pos or 0			
-							loaded:Play()
-							loaded:AdjustWeight(1)
-							loaded:AdjustSpeed(b.relinfo.Speed)
-
-							local norm = loaded.Speed
-							prs[loaded] = loaded.Priority
-
-							if b then
-								if args.silenceReference and ref then
-									table.insert(_G.silenced, ref)
-								end
-
-								if b.soundcall then
-									task.spawn(b.soundcall,UTILS.RIVALS_UTILS, b.name, loaded.Speed, loaded, vm)
-								end
-
-								if ref then
-									table.insert(evars.VMS_CONS[name], ref.Stopped:Once(function()
-										if args.unsilenceAfter then
-											table.remove(_G.silenced, table.find(_G.silenced, ref))
-										end
-
-										loaded:Stop()
-									end))
-								end
-
-								local function upd()
-									if b.name:find'sprint' then
-										loaded:AdjustSpeed(table.find({'Water', 'Air'}, hum.FloorMaterial.Name) and .15 or norm)
-									end
-								end
-
-								if args.stopref and ref then
-									ref.Priority = Enum.AnimationPriority.Core
-									ref:AdjustSpeed(0)
-									ref:AdjustWeight(.001, 0)
-								end
-
-								if b.name:find'sprint' and hum then
-									local con = hum:GetPropertyChangedSignal('FloorMaterial'):Connect(upd)
-									upd()
-
-									table.insert(evars.VMS_CONS[name], con)
-									loaded.Stopped:Once(function()
-										con:Disconnect()
-									end)
-								end
-							end
-						end
-
-						_precontr.anims[pre] = x
-					end
-
-					local _ogidtoinf = {}
-					local _ogprentoid = {}
-					
-					local TO_LOAD = {}
-
-					for prename, name in pairs(UTILS.SKIN_MOD.viewmodels[ig].anims) do
-						local vmi = UTILS.SKIN_MOD.viewmodels[ig]
-
-						local id = UTILS.ANIM_LIB.Info[name].AnimationID
-						local animType = vmi.animsReverse[name]
-
-						_ogprentoid[prename] = id
-						_ogidtoinf[id] = {
-							name = name,
-							prename = prename,
-						}
-
-						local new = UTILS.SKIN_MOD.viewmodels[skinName]
-						local typeToReal = new.anims[animType]
-
-						local nowid = UTILS.ANIM_LIB.Info[typeToReal]
-
-						if nowid then
-							table.insert(inz, prename)
-
-							local LOADED_ANIM = Instance.new('Animation')
-							LOADED_ANIM.AnimationId = nowid.AnimationID
-							LOADED_ANIM = animator:LoadAnimation(LOADED_ANIM)
-
-							table.insert(evars.ECON_ANIMS, LOADED_ANIM)
-
-							toname[nowid.AnimationID] = name
-							
-							local tb = {
-								anim = LOADED_ANIM,
-								name = typeToReal,
-								prename = prename,
-								type = animType,
-								relinfo = nowid,
-								soundcall = function()
-									-- // Waiting for bulk loading
-								end;
-							}
-							
-							TO_LOAD[tb] = UTILS.SKIN_SOUND_CODE[typeToReal]
-							animtbl[id] = tb
-							_precontr:add(prename, animtbl[id])
-						end
-					end
-
-					for prename, name in pairs(UTILS.SKIN_MOD.viewmodels[skinName].anims) do
-						if not table.find(inz, prename) then
-							local nowid = UTILS.ANIM_LIB.Info[name]
-
-							if nowid.AnimationID then
-								local LOADED_ANIM = Instance.new('Animation')
-								LOADED_ANIM.AnimationId = nowid.AnimationID
-								LOADED_ANIM = animator:LoadAnimation(LOADED_ANIM)
-
-								table.insert(evars.ECON_ANIMS, LOADED_ANIM)
-
-								toname[nowid.AnimationID] = name
-								
-								local tb = {
-									anim = LOADED_ANIM,
-									name = prename,
-									prename = prename,
-									type = prename,
-									relinfo = nowid,
-									soundcall = function()
-										-- // Waiting for bulk loading
-									end;
-								}
-								
-								TO_LOAD[tb] = UTILS.SKIN_SOUND_CODE[name]
-
-								_precontr:add(prename, tb)
-							end
-						end
-					end
-					
-					local loadtbl = {};
-					local indextbl = {};
-					local currentIndex = 0;
-					for tb, code in TO_LOAD do
-						if code then
-							table.insert(loadtbl,code);
-							table.insert(indextbl,tb);
-							currentIndex += 1;
-						end
-					end;
-					
-					for ind, func in __BULKLOADSTRING(loadtbl) do
-						local tb = indextbl[tonumber(ind)];
-						tb.soundcall = func();
-					end;
-
-					-- // Rest
-
-					local playing = {}
-
-					local function ct(track)
-						if not table.find(evars.ECON_ANIMS, track) then
-							local pr = track.Priority
-							track:AdjustWeight(0.0001, 0)
-							track:AdjustSpeed(0)
-							track.Priority = Enum.AnimationPriority.Core
-
-							local bg = _ogidtoinf[track.Animation.AnimationId]
-							local b = animtbl[track.Animation.AnimationId]
-
-							local z
-
-							if bg and bg.prename == 'rareinspect' then
-								z = _precontr.anims.inspect
-							end
-
-							local ri = _precontr.anims.rareinspect
-							local inspects = {'inspect', 'rareinspect'}
-							local rare = false
-							if ri and math.random(1, (_G.rarechance or 6)) == 1 and table.find(inspects, bg.prename) then
-								z = _precontr.anims.inspect
-								rare = true
-
-								local s = 1 + 0.25*math.random()
-								UTILS.RIVALS_UTILS:CreateSound('rbxassetid://13159969353', .25, s, nil, true)
-							end
-
-							if b or z then
-								local z = z or _precontr.anims[b.prename]
-								if z then
-									local tbl = {
-										pos = track.TimePosition,
-										priority = prs[z.tbl.anim] or pr,
-										reference = track
-									}
-
-									if ri and rare then
-										ri:play({
-											reference = track,
-											isSpecial = 1,
-											priority = tbl.priority,
-										})
-									else
-										z:play(tbl)
-									end
-								end
-							end
-						end
-					end
-
-					table.insert(evars.APPLIED_VMS, vm)
-
-					local function pt(p)
-						local c = vms:GetChildren()[1]
-
-						if p ~= vms then
-							for _, v in pairs(weaponSounds:GetChildren()) do
-								if (not v:GetAttribute('DontClearSound') and _G.soundToWeapon[v] == vm) then
-									v:Destroy()
-								end
-							end
-						end
-
-						if not c or c == vm or not table.find(evars.APPLIED_VMS, c) then
-							soundOn = p ~= vms
-							soundGroup.Volume = soundOn and ss.Other.Volume or 0
-
-							if soundOn then
-								for _, v in pairs(animtbl) do
-									v.anim:Stop()
-								end
-							end
-						end
-					end
-
-					evars.VMS_CONS[name] = {}
-					evars.VMS_CONS[name][1] = animator.AnimationPlayed:Connect(ct)
-					for _, v in pairs(animator:GetPlayingAnimationTracks()) do
-						ct(v)
-					end
-
-					evars.VMS_CONS[name][3] = vm:GetPropertyChangedSignal('Parent'):Connect(function()
-						pt(vm.Parent)
-					end)
-
-					pt(vm.Parent)
-
-					evars.VMS_CONS[name][2] = vm:GetPropertyChangedSignal('Parent'):Once(function()
-						if not vm.Parent then
-							pt()
-							for _, v in pairs(evars.VMS_CONS[name]) do
-								v:Disconnect()
-							end
-							evars.VMS_CONS[name] = nil
-						end
-					end)
-
-					-- // Unimportant [ Effects ]
-
-					task.spawn(function()
-						local knifeHeavyHit = _precontr.anims.HeavyAttackAnimationHit
-						if knifeHeavyHit then
-							table.insert(evars.HEADSHOT_FUNCS, function()
-								if vms:GetChildren()[1] == vm then
-									knifeHeavyHit:play({
-										reference = _precontr.anims.HeavyAttack1.tbl.anim,
-										isSpecial = 1,
-										silenceReference = 1,
-										unsilenceAfter = 1,
-									})
-								end
-							end)
-						end
-
-						local itemint = plr.PlayerGui.MainGui.MainFrame.ItemInterfaces:WaitForChild(plr.Name.. ' - '..spl[2])
-
-						local function set(arg1)
-							local scope = itemint.Mouse.Scope
-							local tbl = {
-								BlurImage = scope.Blur.ImageLabel,
-								CircleImage = scope.Circle.ImageLabel,
-								ReticleDotUICorner = scope.Reticle.Container.Dot.UICorner,
-								_dont_rotate_scope_while_sliding = false
-							}
-
-							arg1 = tbl
-
-							-- // Scopes
-
-							local scopes = {
-								['Pixel Sniper'] = function()
-									arg1.BlurImage.Image = "rbxassetid://18171031143"
-									arg1.BlurImage.ResampleMode = Enum.ResamplerMode.Pixelated
-									arg1.CircleImage.Image = "rbxassetid://18171045114"
-									arg1.CircleImage.ResampleMode = Enum.ResamplerMode.Pixelated
-									arg1.ReticleDotUICorner:Destroy()
-								end, Keyper = function()
-									arg1.BlurImage.Image = "rbxassetid://129335242148588"
-									arg1.BlurImage.Size = UDim2.new(1.25, 0, 1.25, 0)
-									arg1.CircleImage.Image = "rbxassetid://81498448678518"
-									arg1.CircleImage.Size = UDim2.new(1.25, 0, 1.25, 0)
-									arg1._dont_rotate_scope_while_sliding = true
-								end, ['Pixel Crossbow'] = function()
-									arg1.CircleImage.Image = "rbxassetid://97622703342015"
-									arg1.CircleImage.ResampleMode = Enum.ResamplerMode.Pixelated
-									arg1.ReticleDotUICorner:Destroy()
-								end, ['Cone Horizon'] = function()
-									arg1.BlurImage.Image = 'rbxassetid://75612006049629'
-									arg1.BlurImage.Size = UDim2.new(1.25, 0, 1.25, 0)
-									arg1.CircleImage.Image = 'rbxassetid://75612006049629'
-									arg1.CircleImage.Size = UDim2.new(1.25, 0, 1.25, 0)
-									arg1._dont_rotate_scope_while_sliding = true
-								end,
-							}
-
-							if scopes[skinName] then
-								scopes[skinName]()
-							end
-						end
-
-						set()
-
-						local vig = itemint.AimingVignette
-						local last = vig.ImageTransparency
-						local aiming = false
-
-						local function aimingCallback(v)
-							local funcs = {
-								['AKEY-47'] = function()
-									local var5 = v and .1 or 0
-									UTILS.RIVALS_UTILS:CreateSound("rbxassetid://96253147006478", 0.375, 2 + var5, true, var5)
-								end,
-							}
-
-							if funcs[skinName] then
-								funcs[skinName]()
-							end
-						end
-
-						-- // Aiming Connection
-
-						evars.VMS_CONS[name][4] = vig:GetPropertyChangedSignal('ImageTransparency'):Connect(function()
-							local _c = aiming
-							if vig.ImageTransparency > last and aiming then
-								aiming = false
-							elseif vig.ImageTransparency < last and not aiming then
-								aiming = true
-							end
-
-							if aiming ~= _c and math.abs(last-vig.ImageTransparency) < .8 then aimingCallback(aiming) end
-
-							last = vig.ImageTransparency
-						end)
-					end)
-				end
-			end)
-		end
-
-		local function check(v)
-			local z = v and v.Name:split' - '
-			if z and z[1] == plr.Name and z[2] == ogitem then
-				apl(v)
-			end
-		end
-
-		check(vms:GetChildren()[1])
-		for _, v in pairs(rep.Assets.Temp.ViewModels:GetChildren()) do
-			check(v)
-		end
-	end)
-end
-
------------ [ Execute ] -----------
-
-readFile()
-
-if enableCharChanging then
-	UTILS.ID_CHANGER.cchar()
-end
-
-table.insert(evars.INIT_CONS, plr.CharacterAdded:Connect(function()
-	if enableCharChanging then
-		UTILS.ID_CHANGER.cchar()
+	elseif input.UserInputType == Enum.UserInputType.MouseButton1 and silactive then
+		car()
+	elseif input.KeyCode == Enum.KeyCode.T and not processed then
+		boxEnabled:Set(not boxactive)
+	elseif input.KeyCode.Name == 'Y' and not processed then
+		legtrek:Set(not spactivate)
 	end
 end))
 
--- //
-
-if not _G.SIGNAL_QUEUE then
-	queue_on_teleport(__GETURL'MainSkin')
+local function updAc()
+	if #noPlayers > 0 then
+		noPlayers = ac
+	end
 end
+
+local h = game:GetObjects("rbxassetid://87957938793907")[1]
+h.Parent = Workspace
+
+-- CREATE
+
+local e = Instance.new('Highlight', h.Enemy)
+e.FillColor = Color3.new(0, 0, 1)
+e.FillTransparency = .8
+e.OutlineColor = Color3.new(0, 0, 1)
+
+local t = Instance.new('Highlight', h.Team)
+t.FillColor = Color3.fromRGB(0, 191, 191)
+t.FillTransparency = .8
+t.OutlineColor = Color3.fromRGB(0, 229, 255)
+
+local o = Instance.new('Highlight', h)
+o.FillColor = Color3.fromRGB(150, 100, 100)
+o.FillTransparency = .9
+o.OutlineColor = Color3.fromRGB(150, 100, 100)
+o.Name = 'Off'
+
+-- REST
+
+local hs = {} -- HIGHLIGHTS
+for _, v in pairs(h:GetDescendants()) do
+	if v:IsA('Highlight') and v.Name ~= 'Off' then
+		hs[v] = {
+			FillColor = v.FillColor,
+			OutlineColor = v.OutlineColor,
+			FillTransparency = v.FillTransparency,
+		}
+	end
+end
+
+table.insert(initConnections, RunService.RenderStepped:Connect(function()
+	local screenSize = cam.ViewportSize/Vector2.new(1536,864);
+	local finalMult = (screenSize.X+screenSize.Y)/2;
+	local finalPixels = FOVCircleSize*finalMult;
+	
+	FOVPixels = finalPixels
+	FOVCIRCLE_FRAME.Size = UDim2.fromOffset(finalPixels,finalPixels);
+	
+	moveMouseToWorldPosition(CURRENT_APOS,CURRENT_CHAR);
+	
+	-- // ESP And Shake
+	
+	_aimShakeInstance.PositionInfluence = Vector3.new(shakeInfluenceXZ,shakeInfluenceY,shakeInfluenceXZ);
+	for he, set in pairs(hs) do
+		he.Enabled = espType ~= 'Boxes' and boxactive;
+		if he.Enabled then
+			if not (silactive or spactivate) then
+				he.FillColor = h.Off.FillColor;
+				he.FillTransparency = h.Off.FillTransparency;
+				he.OutlineColor = h.Off.OutlineColor;
+			else
+				for name, og in pairs(set) do
+					he[name] = og;
+				end;
+			end;
+		end;
+	end;
+end));
+
+local c = 4;
+local function createbox(player)
+	if player ~= plr then
+		local boxBox = Drawing.new("Quad");
+		boxBox.Thickness = 2;
+		boxBox.Transparency = 1;
+		boxBox.Visible = true;
+
+		local function col()
+			boxBox.Color = (silactive or spactivate) and (table.find(ac, player.UserId) and Color3.fromRGB(0, 255, 255) or boxCOL) or boxNAC
+		end;
+
+		col();
+
+		boxList[player.Name] = boxBox;
+
+		local added = false;
+		local addedNoMatch = false;
+		local func = nil;
+
+		local label = nil;
+		local hum = nil;
+
+		local function upz()
+			if hum and label then
+				local alpha = hum.Health / hum.MaxHealth;
+				local lerp = Color3.fromRGB(255, 50, 50):Lerp(Color3.fromRGB(255, 215, 0):Lerp(Color3.fromRGB(100, 255, 50), alpha), alpha)
+
+				local h = label:FindFirstChild('Health');
+				if h then
+					label.Health.Bar.Size = UDim2.new(alpha, 0, 1, 0);
+					label.Health.BackgroundColor3 = Color3.new(lerp.R / 2, lerp.G / 2, lerp.B / 2);
+					label.Health.UIStroke.Color = Color3.new(lerp.R * 0.25, lerp.G * 0.25, lerp.B * 0.25);
+					label.Health.Bar.BackgroundColor3 = lerp;
+					label.Health.Bar.UIStroke.Color = lerp;
+				end;
+
+				if hum.Health <= 0 then
+					label:Destroy();
+				end;
+			end;
+		end;
+
+		local function x(char)
+			local root = char:WaitForChild('HumanoidRootPart');
+			local hum2 = char:WaitForChild('Humanoid');
+
+			hum = hum2;
+			label = nl:Clone();
+			label.MaxDistance = 350;
+			label.Name = 'EnemyLabel';
+			label.Parent = root;
+			label.Player.Visible = false;
+			label.Enabled = canPopup();
+			plrToG[label] = player;
+			table.insert(gui, label);
+
+			spawn(function()
+				while char and char.Parent and label and label:FindFirstChild('Health') do
+					label.Health.Visible = plrHasLoadout(player);
+					wait();
+				end;
+			end);
+
+			local function check()
+				local l = root:FindFirstChild('TeammateLabel')
+				if l and l.Enabled then
+					if not added then
+						added = true
+						table.insert(ac, player.UserId)
+						player:SetAttribute('IsTeam', true)
+						label.MaxDistance = 0
+						updAc()
+					end
+				elseif added then
+					added = false
+					player:SetAttribute('IsTeam', false)
+					label.MaxDistance = 350
+					table.remove(ac, table.find(ac, player.UserId))
+					updAc()
+				end
+
+				col()
+			end
+
+			func = check
+
+			check()
+
+			table.insert(initConnections, root.ChildAdded:Connect(check))
+		end
+
+		table.insert(initConnections, player.CharacterAdded:Connect(x))
+		if player.Character then
+			x(player.Character)
+		end
+
+		local function invis()
+			boxBox.PointA = Vector2.new(-math.huge, -math.huge)
+			boxBox.PointB = Vector2.new(-math.huge, -math.huge)
+			boxBox.PointC = Vector2.new(-math.huge, -math.huge)
+			boxBox.PointD = Vector2.new(-math.huge, -math.huge)
+		end
+
+		table.insert(initConnections, RunService.RenderStepped:Connect(function()
+			local char = player.Character
+			local hum = char and char:FindFirstChild('Humanoid')
+			local root = char and char:FindFirstChild('HumanoidRootPart')
+
+			if boxactive and not table.find(noPlayers, player.UserId) and (player:GetAttribute('EnvironmentID') == plr:GetAttribute('EnvironmentID') or not igCheck) and (not id() or id() ~= '߿' and igam or id() == '߿' and shra) and root and hum and hum.Health > 0 and player.Character:FindFirstChild("HumanoidRootPart") and getWeapon() then
+				local head = player.Character:FindFirstChild("Head")
+
+				if root and head then
+					local rootPos, rootVisible = cam:WorldToViewportPoint(root.Position)
+					local headPos, headVisible = cam:WorldToViewportPoint(head.Position + Vector3.new(0, 0.5, 0))
+
+					if rootVisible and headVisible then
+						if espType == 'Both' then
+							boxBox.PointA = Vector2.new(rootPos.X - 15, rootPos.Y + 30)
+							boxBox.PointB = Vector2.new(rootPos.X + 15, rootPos.Y + 30)
+							boxBox.PointC = Vector2.new(headPos.X + 15, headPos.Y)
+							boxBox.PointD = Vector2.new(headPos.X - 15, headPos.Y)
+
+							if char then
+								char.Parent = player:GetAttribute('IsTeam') and h.Team or h.Enemy
+							end
+
+							boxBox.Transparency = 0
+							boxBox.Visible = true
+						else
+							if espType == 'Boxes' then
+								boxBox.PointA = Vector2.new(rootPos.X - 15, rootPos.Y + 30)
+								boxBox.PointB = Vector2.new(rootPos.X + 15, rootPos.Y + 30)
+								boxBox.PointC = Vector2.new(headPos.X + 15, headPos.Y)
+								boxBox.PointD = Vector2.new(headPos.X - 15, headPos.Y)
+
+								if char then
+									char.Parent = workspace
+								end
+
+								boxBox.Transparency = 0
+								boxBox.Visible = true
+							else
+								if char then
+									char.Parent = player:GetAttribute('IsTeam') and h.Team or h.Enemy
+								end
+
+								invis()
+								boxBox.Transparency = 1
+								boxBox.Visible = false
+							end
+						end
+					else
+						invis()
+						if char then
+							char.Parent = workspace
+						end
+						boxBox.Transparency = 1
+						boxBox.Visible = false
+					end
+				else
+					invis()
+					if char then
+						char.Parent = workspace
+					end
+					boxBox.Transparency = 1
+					boxBox.Visible = false
+				end
+			else
+				invis()
+				if char and char.Parent then
+					char.Parent = workspace
+				end
+				
+				boxBox.Transparency = 1
+				boxBox.Visible = false
+			end
+
+			if label and label.Enabled then
+				upz()
+			end
+
+			if func then
+				func()
+			end
+		end))
+	end
+end
+
+for _, player in pairs(Players:GetPlayers()) do
+	createbox(player)
+end
+
+table.insert(initConnections, Players.PlayerAdded:Connect(function(player)
+	createbox(player)
+end))
+
+table.insert(initConnections, Players.PlayerRemoving:Connect(function(player)
+	if boxList[player.Name] then
+		boxList[player.Name]:Remove()
+		boxList[player.Name] = nil
+	end
+end))
+
+EconField.CONE_FILE_NAME = './cone/'..currentConfig
+EconField:LoadConfiguration(true)
+updConfigDropdown(nil,nil,true)
+
+queue_on_teleport(__GETURL'Main.txt')
