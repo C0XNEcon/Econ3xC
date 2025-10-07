@@ -301,10 +301,6 @@ _G.WINDOW_REPLACEMENT = Window
 
 local UGS = UserSettings():GetService('UserGameSettings')
 
-local function mousesens()
-	return UGS.MouseSensitivity
-end
-
 -- // Rest
 
 local function getWeapon()
@@ -526,7 +522,8 @@ function moveMouseToWorldPosition(targetVector3,tchar)
 			disableTrigger();
 		end;
 		
-		local delta = (pos2 - screenCenter)*lerp*extraDeltaMult;
+		local mysens = .36000001430511475;
+		local delta = (pos2 - screenCenter)/(UGS.MouseSensitivity/mysens)*lerp*extraDeltaMult;
 		
 		local function assertPos(val:boolean,pos)
 			local oldDelta = delta;
