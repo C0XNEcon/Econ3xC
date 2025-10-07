@@ -370,6 +370,7 @@ end
 local aimPredictionXZ, aimPredictionY = 1, 1;
 local aimPredEnabled = true;
 local shakeEnabled = true;
+local triggerbotEnabled = false;
 local cursorShakeEnabled = true;
 
 local softLockEnabled = true;
@@ -431,7 +432,7 @@ local function getNearestHead()
 		return closestPlayer.Character.Head, closestPlayer, closestPlayer.Character, closestPlayer.Character.PrimaryPart;
 	end;
 
-	return nil;
+	return;
 end
 
 local cons = {}
@@ -456,7 +457,13 @@ local lerp = 1
 local sens = 1
 local ads = 1
 
-local function moveMouseToWorldPosition(targetVector3,tchar)
+local LAST_MOUSEDOWN = true
+
+function isTypeDown(arg)
+	return UserInputService:IsMouseButtonPressed(Enum.UserInputType[arg or 'MouseButton1'])
+end
+
+function moveMouseToWorldPosition(targetVector3,tchar)
 	if tchar and not tchar.Parent then
 		tchar = nil;
 	end;
@@ -475,6 +482,13 @@ local function moveMouseToWorldPosition(targetVector3,tchar)
 
 		pos2 = Vector2.new(math.clamp(pos2.X, 0, screenSize.X),math.clamp(pos2.Y, 0, screenSize.Y))
 	end
+	
+	local function disableTrigger()
+		if LAST_MOUSEDOWN and isTypeDown() then
+			mouse1release();
+		end;
+		LAST_MOUSEDOWN = false;
+	end;
 
 	if isOnScreen then
 		-- // Delta Adders
@@ -493,6 +507,25 @@ local function moveMouseToWorldPosition(targetVector3,tchar)
 			extraDeltaMult = ray and (softLockLerp or .025) or 1;
 		end
 		
+		if tchar and triggerbotEnabled then
+			local params = RaycastParams.new();
+			params.CollisionGroup = 'CollideWithPlayersOnly';
+			params.RespectCanCollide = false;
+			
+			local cf = cam.CFrame;
+			local ray = Workspace:Raycast(cf.Position,cf.LookVector*1e5,params);
+			if ray and ray.Instance:IsDescendantOf(tchar) then
+				if not isTypeDown() then
+					mouse1press();
+				end;
+				LAST_MOUSEDOWN = true;
+			else
+				disableTrigger();
+			end;
+		else
+			disableTrigger();
+		end;
+		
 		local delta = (pos2 - screenCenter)*lerp*extraDeltaMult;
 		
 		local function assertPos(val:boolean,pos)
@@ -510,6 +543,8 @@ local function moveMouseToWorldPosition(targetVector3,tchar)
 		
 		mousemoverel(delta.X, delta.Y);
 		_cursorSpring:Impulse(Vector3.new(_deltaPriorCursorAdders.X,_deltaPriorCursorAdders.Y,1));
+	else
+		disableTrigger()
 	end;
 end
 
@@ -595,26 +630,12 @@ function __auto(right, needs, head)
 			local cf = lelCam or right and weapon == 'Knife' and CFrame.new(cam.CFrame.Position)*CFrame.Angles(x,y,z) or CFrame.new(cam.CFrame.Position, apos)
 			if iswindowactive() then
 				CURRENT_APOS = apos;
-				--moveMouseToWorldPosition(apos,targetChar)
-
-				--if carshoot then
-				--	local ray = workspace:Raycast(cam.CFrame.Position, cam.CFrame.LookVector*1e5)
-				--	if ray then
-				--		if ray.Instance and ray.Instance.Parent:FindFirstChild('Humanoid') then
-				--			mouse1press()
-				--			last = true
-				--		elseif last then
-				--			last = false
-				--			mouse1release()
-				--		end
-				--	end
-				--end
 			end
 
 			lelCam = nil
 			if right and weapon == 'Knife' then lelCam = cf end
 			if not right then
-				ReplicatedStorage.Remotes.Attack:FireServer(targetHead)
+				--ReplicatedStorage.Remotes.Attack:FireServer(targetHead)
 			end
 		end
 	end
@@ -797,6 +818,17 @@ local aimPredY = homeTab:CreateSlider({
 	Flag = 'apY',
 	Callback = function(Value)
 		aimPredictionY = Value/85
+	end,
+})
+
+homeTab:CreateDivider()
+
+local triggerEnabled = homeTab:CreateToggle({
+	Name = 'Triggerbot Enabled [ Blatant ]',
+	CurrentValue = false,
+	Flag = 'triggerbotenabled',
+	Callback = function(Value, nosound)
+		triggerbotEnabled = Value;
 	end,
 })
 
