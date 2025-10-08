@@ -17,7 +17,16 @@ local cam = Workspace.CurrentCamera;
 
 ----------- [ Executor Functions ] -----------
 
-local SCRIPT_WHITELIST = {9139840720, 9390007618,9502659782};
+local SCRIPT_WHITELIST = {
+	9390007618; -- // Ylian
+	9502659782; -- // ConePalt
+};
+
+local SKINCHANGER_WHITELIST = {
+	2318573471; -- // Reno
+	9390007618; -- // Ylian
+	9502659782; -- // ConePalt
+};
 
 local request = (syn and syn.request) or (fluxus and fluxus.request) or (http and http.request) or http_request or request
 
@@ -1478,9 +1487,11 @@ local slideJumpMult = movementTab:CreateSlider({
 
 -- // Skin
 
-_G.ECON_UI = EconField
-_G.SIGNAL_QUEUE = true
-task.spawn(allLoadstrings.mainSkin)
+if table.find(SKINCHANGER_WHITELIST,plr.UserId) then
+	_G.ECON_UI = EconField
+	_G.SIGNAL_QUEUE = true
+	task.spawn(allLoadstrings.mainSkin)	
+end
 
 -- // Rest
 
