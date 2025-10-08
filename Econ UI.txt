@@ -3457,7 +3457,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 		Topbar.Settings.ImageTransparency = 1
 	end
 	Topbar.ChangeSize.ImageTransparency = 1
-	Topbar.Off.ImageTransparency = 1
+	Topbar.Power.ImageTransparency = 1
 
 
 	--task.wait(0.5)
@@ -3476,7 +3476,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 	end
 	TweenService:Create(Topbar.ChangeSize, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {ImageTransparency = 0.8}):Play()
 	task.wait(0.05)
-	TweenService:Create(Topbar.Off, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {ImageTransparency = 0.8}):Play()
+	TweenService:Create(Topbar.Power, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {ImageTransparency = 0.8}):Play()
 	--task.wait(0.3)
 
 	if dragBar then
