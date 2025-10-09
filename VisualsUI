@@ -144,7 +144,7 @@ return {
 
 							local function handle(v)
 								task.spawn(function()
-									local b = v.Name:find('PickWeapon') and v:WaitForChild('Button')
+									local b = v.Name:find('WeaponSlot') and v:WaitForChild('Button')
 									if b and b:FindFirstChild('Icon') and b.Icon:FindFirstChild('Picture') then
 										b = b.Icon.Picture
 										b.Name = 'OPic'
