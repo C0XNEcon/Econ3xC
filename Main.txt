@@ -19,13 +19,15 @@ local cam = Workspace.CurrentCamera;
 
 local SCRIPT_WHITELIST = {
 	9390007618; -- // Ylian
-	9502659782; -- // ConePalt
+	9502659782; -- // ConePAlt
+	9405913287; -- // CPartyAltB
 };
 
 local SKINCHANGER_WHITELIST = {
 	2318573471; -- // Reno
 	9390007618; -- // Ylian
-	9502659782; -- // ConePalt
+	9502659782; -- // ConePAlt
+	--9405913287; -- // CPartyAltB
 };
 
 local request = (syn and syn.request) or (fluxus and fluxus.request) or (http and http.request) or http_request or request
@@ -206,6 +208,8 @@ local initConnections = {}
 local on = true
 local going = true
 
+local Window = nil::{};
+
 table.insert(initConnections, plr:GetAttributeChangedSignal('OriginalPosition'):Connect(function()
 	for _, v in pairs(initConnections) do
 		v:Disconnect()
@@ -218,8 +222,12 @@ table.insert(initConnections, plr:GetAttributeChangedSignal('OriginalPosition'):
 		v.Visible = false
 		v:Remove()
 	end
-
-	playSound(1.5, knifeSound)
+	
+	if Window then
+		Window:Destroy();
+	end;
+	
+	playSound(1.5, knifeSound);
 	return
 end))
 
@@ -281,7 +289,7 @@ table.insert(initConnections, _items.ChildAdded:Connect(_reloadcar))
 
 local EconField = allLoadstrings.econUI()
 
-local Window = EconField:CreateWindow({
+Window = EconField:CreateWindow({
 	Name = "Econ",
 	Icon = 'radar',
 	LoadingTitle = '',
@@ -377,6 +385,9 @@ local aimPredEnabled = true;
 local shakeEnabled = true;
 local triggerbotEnabled = false;
 local cursorShakeEnabled = true;
+
+local silentAimEnabled = false;
+local silentAimPart = 'Head';
 
 local softLockEnabled = true;
 local softLockLerp = 0;
@@ -830,11 +841,31 @@ local aimPredY = homeTab:CreateSlider({
 homeTab:CreateDivider()
 
 local triggerEnabled = homeTab:CreateToggle({
-	Name = 'Triggerbot Enabled [ Blatant ]',
+	Name = 'Triggerbot Enabled [!]',
 	CurrentValue = false,
 	Flag = 'triggerbotenabled',
 	Callback = function(Value, nosound)
 		triggerbotEnabled = Value;
+	end,
+})
+
+local silentAim = homeTab:CreateToggle({
+	Name = 'Silent Aim [!]',
+	CurrentValue = false,
+	Flag = 'silentaimenabled',
+	Callback = function(Value, nosound)
+		silentAimEnabled = Value;
+	end,
+})
+
+local silentAimPartDrop = homeTab:CreateDropdown({
+	Name = 'Silent Aim Part',
+	Options = {'Head','Torso','Mixed'},
+	CurrentOption = {'Head'},
+	MultipleOptions = false,
+	Flag = 'silentaimpart',
+	Callback = function(Options)
+		silentAimPart = Options[1]
 	end,
 })
 
@@ -1246,7 +1277,7 @@ local delConfig = homeTab:CreateButton({
 	end,
 })
 
-local gameplayTab = Window:CreateTab('Gameplay', 'swords') -- Title, Image
+local gameplayTab = Window:CreateTab('Gameplay', 'gamepad-2') -- Title, Image
 local boxSection = gameplayTab:CreateSection'ESP'
 
 local evtype = 'Off'
@@ -1280,15 +1311,15 @@ local boxEnabled = gameplayTab:CreateToggle({
 	end,
 })
 
-local espType = 'Boxes'
+local espType = {}
 local espop = gameplayTab:CreateDropdown({
-	Name = 'ESP Type',
-	Options = {'Boxes', 'Highlights', 'Both'},
-	CurrentOption = {'Boxes'},
-	MultipleOptions = false,
+	Name = 'Enabled ESPs',
+	Options = {'Boxes', 'Highlights', 'Tracers'},
+	CurrentOption = {'Boxes','Tracers'},
+	MultipleOptions = true,
 	Flag = 'esptdropdown',
 	Callback = function(Options, nosound)
-		espType = Options[1]
+		espType = Options
 		if not nosound then
 			playSound(1)
 		end
@@ -1316,12 +1347,12 @@ local boxNoaymbotColor = gameplayTab:CreateColorPicker({
 	end
 })
 
-local visualSection = gameplayTab:CreateSection('Enemy Visuals')
+local visualSection = gameplayTab:CreateSection('Rival Visuals')
 
 local evpop = gameplayTab:CreateDropdown({
-	Name = 'Enemy Health',
+	Name = 'Rival Health',
 	Options = {'Off', 'With ESP', 'Always'},
-	CurrentOption = {'Off'},
+	CurrentOption = {'Always'},
 	MultipleOptions = false,
 	Flag = 'evpopdropdown',
 	Callback = function(Options, nosound)
@@ -1333,13 +1364,12 @@ local evpop = gameplayTab:CreateDropdown({
 	end,
 })
 
--- // HEALTH
+-- // Teammate
 
 local nl = plr.PlayerScripts.UserInterface:WaitForChild('TeammateLabel')
 
--- // REST
+-- // Device
 
-local deviceSection = gameplayTab:CreateSection('Device')
 local deviceDropdown = gameplayTab:CreateDropdown({
 	Name = 'Change Device',
 	Options = {'VR', 'Touch', 'Gamepad', 'MouseKeyboard'},
@@ -1351,12 +1381,74 @@ local deviceDropdown = gameplayTab:CreateDropdown({
 	end,
 })
 
-local gameplaySection = gameplayTab:CreateSection('Gameplay')
+-- // Movement
 
-local CARRELOAD = gameplayTab:CreateToggle({
+local movement = gameplayTab:CreateSection'Movement'
+
+local function lerpz(start, goal, alpha)
+	return start + (goal - start) * alpha
+end
+
+local slide = .7
+function setJumpPhysics()
+	local char = plr.Character
+	local fakeMass = char and char:FindFirstChild'FakeMass'
+	if fakeMass then
+		local c = fakeMass.CurrentPhysicalProperties
+		fakeMass.CustomPhysicalProperties = PhysicalProperties.new(math.clamp(slide,.001,100), c.Friction, c.Elasticity, c.FrictionWeight, c.ElasticityWeight)
+	end
+end
+
+local slideJumpMult = gameplayTab:CreateSlider({
+	Name = 'Slide Jump Boost',
+	Range = {0, 100},
+	Increment = 1,
+	Suffix = '',
+	CurrentValue = 6,
+	Flag = 'slideSlider',
+	Callback = function(Value)
+		slide = lerpz(.7, 0, Value/100)
+	end,
+})
+
+-- // Areas
+
+local areas = gameplayTab:CreateSection'Areas'
+
+local shootingRange = gameplayTab:CreateToggle({
+	Name = 'Shooting Range',
+	CurrentValue = true,
+	Flag = 'srtoggle',
+	Callback = function(Value, nosound)
+		shra = Value
+
+		if not nosound then
+			playSound(shra and 1 or .8)
+		end
+	end,
+})
+
+local ingame_ = gameplayTab:CreateToggle({
+	Name = 'Ingame',
+	CurrentValue = true,
+	Flag = 'ingtoggle',
+	Callback = function(Value, nosound)
+		igam = Value
+
+		if not nosound then
+			playSound(igam and 1 or .8)
+		end
+	end,
+})
+
+-- // Gameplay
+
+local gameplaySection = gameplayTab:CreateSection('Gameplay','swords')
+
+local autoReload = gameplayTab:CreateToggle({
 	Name = 'Auto Reload',
 	CurrentValue = false,
-	Flag = "artoggle",
+	Flag = 'artoggle',
 	Callback = function(Value, nosound)
 		reload = Value
 
@@ -1366,23 +1458,10 @@ local CARRELOAD = gameplayTab:CreateToggle({
 	end,
 })
 
-local carshoot = gameplayTab:CreateToggle({
-	Name = 'Auto Shoot [ Buggy ]',
-	CurrentValue = false,
-	Flag = "astoggle",
-	Callback = function(Value, nosound)
-		carshoot = Value
-
-		if not nosound then
-			playSound(carshoot and 1 or .8)
-		end
-	end,
-})
-
-local carKatana = gameplayTab:CreateToggle({
+local autoKatana = gameplayTab:CreateToggle({
 	Name = 'Auto Katana [ Unreliable ]',
 	CurrentValue = true,
-	Flag = "aktoggle",
+	Flag = 'aktoggle',
 	Callback = function(Value, nosound)
 		katana = Value
 
@@ -1395,7 +1474,7 @@ local carKatana = gameplayTab:CreateToggle({
 local teamCheck = gameplayTab:CreateToggle({
 	Name = 'Team Check [ Recommended ]',
 	CurrentValue = true,
-	Flag = "tctoggle",
+	Flag = 'tctoggle',
 	Callback = function(Value, nosound)
 		if Value then
 			noPlayers = ac 
@@ -1409,79 +1488,16 @@ local teamCheck = gameplayTab:CreateToggle({
 	end,
 })
 
-local ingameCheck = gameplayTab:CreateToggle({
+local matchCheck = gameplayTab:CreateToggle({
 	Name = 'Match Check [ Recommended ]',
 	CurrentValue = true,
-	Flag = "ictoggle",
+	Flag = 'ictoggle',
 	Callback = function(Value, nosound)
 		igCheck = Value
 
 		if not nosound then
 			playSound(Value and 1 or .8)
 		end
-	end,
-})
-
-local environmentsTab = Window:CreateTab('Places', 'map-pin')
-local environmentsSection = environmentsTab:CreateSection('Enabled Places')
-
-local shootingRange = environmentsTab:CreateToggle({
-	Name = 'Shooting Range',
-	CurrentValue = true,
-	Flag = "srtoggle",
-	Callback = function(Value, nosound)
-		shra = Value
-
-		if not nosound then
-			playSound(shra and 1 or .8)
-		end
-	end,
-})
-
-local ingame_ = environmentsTab:CreateToggle({
-	Name = 'Ingame',
-	CurrentValue = true,
-	Flag = "ingtoggle",
-	Callback = function(Value, nosound)
-		igam = Value
-
-		if not nosound then
-			playSound(igam and 1 or .8)
-		end
-	end,
-})
-
-local movementTab = Window:CreateTab('Movement', 'move')
-
-movementTab:CreateSection('Basic Movement')
-
-local function lerpz(start, goal, alpha)
-	return start + (goal - start) * alpha
-end
-
-local slide = .7
-function setJumpHack()
-	local char = plr.Character
-	if char then
-		local fm2 = char:FindFirstChild'FakeMass'
-		local root = char.PrimaryPart
-		if fm2 then
-			local c = fm2.CurrentPhysicalProperties
-			local z = PhysicalProperties.new(slide, c.Friction, c.Elasticity, c.FrictionWeight, c.ElasticityWeight)
-			fm2.CustomPhysicalProperties = z
-		end
-	end
-end
-
-local slideJumpMult = movementTab:CreateSlider({
-	Name = 'Slide Jump Hack',
-	Range = {0, 100},
-	Increment = 1,
-	Suffix = '',
-	CurrentValue = 6,
-	Flag = 'slideSlider',
-	Callback = function(Value)
-		slide = lerpz(.7, 0, Value/100)
 	end,
 })
 
@@ -1495,7 +1511,6 @@ end
 
 -- // Rest
 
-table.insert(initConnections, RunService.RenderStepped:Connect(setJumpHack))
 table.insert(initConnections, UserInputService.InputBegan:Connect(function(input, processed)
 	local b = table.find(keybinds, input.KeyCode.Name)
 	local ld = getLoadout()
@@ -1509,7 +1524,7 @@ table.insert(initConnections, UserInputService.InputBegan:Connect(function(input
 		end
 	elseif input.UserInputType == Enum.UserInputType.MouseButton1 and silactive then
 		car()
-	elseif input.KeyCode == Enum.KeyCode.T and not processed then
+	elseif input.KeyCode == Enum.KeyCode.H and not processed then
 		boxEnabled:Set(not boxactive)
 	elseif input.KeyCode.Name == 'Y' and not processed then
 		legtrek:Set(not spactivate)
@@ -1522,39 +1537,34 @@ local function updAc()
 	end
 end
 
-local h = game:GetObjects("rbxassetid://87957938793907")[1]
+local h = Instance.new('Folder');
+local h_enemy = Instance.new('Model',h);
+local h_team = Instance.new('Model',h);
+local h_off = Instance.new('Model',h);
 h.Parent = Workspace
 
 -- CREATE
 
-local e = Instance.new('Highlight', h.Enemy)
+local e = Instance.new('Highlight', h_enemy)
 e.FillColor = Color3.new(0, 0, 1)
 e.FillTransparency = .8
 e.OutlineColor = Color3.new(0, 0, 1)
 
-local t = Instance.new('Highlight', h.Team)
+local t = Instance.new('Highlight', h_team)
 t.FillColor = Color3.fromRGB(0, 191, 191)
 t.FillTransparency = .8
 t.OutlineColor = Color3.fromRGB(0, 229, 255)
 
-local o = Instance.new('Highlight', h)
+local o = Instance.new('Highlight', h_off)
 o.FillColor = Color3.fromRGB(150, 100, 100)
 o.FillTransparency = .9
 o.OutlineColor = Color3.fromRGB(150, 100, 100)
-o.Name = 'Off'
 
--- REST
+-- // Main Step
 
-local hs = {} -- HIGHLIGHTS
-for _, v in pairs(h:GetDescendants()) do
-	if v:IsA('Highlight') and v.Name ~= 'Off' then
-		hs[v] = {
-			FillColor = v.FillColor,
-			OutlineColor = v.OutlineColor,
-			FillTransparency = v.FillTransparency,
-		}
-	end
-end
+local permVars = {
+	lastSilentAim = nil;
+};
 
 table.insert(initConnections, RunService.RenderStepped:Connect(function()
 	local screenSize = cam.ViewportSize/Vector2.new(1536,864);
@@ -1564,42 +1574,81 @@ table.insert(initConnections, RunService.RenderStepped:Connect(function()
 	FOVPixels = finalPixels
 	FOVCIRCLE_FRAME.Size = UDim2.fromOffset(finalPixels,finalPixels);
 	
-	moveMouseToWorldPosition(CURRENT_APOS,CURRENT_CHAR);
+	-- // Silent Aim
 	
-	-- // ESP And Shake
+	local iH,iT,iM = silentAimPart == 'Head', silentAimPart == 'Torso', silentAimPart == 'Mixed'
+	local hitboxPos = {
+		HitboxBody = iH and 6 or iT and 5 or iM and Random.new():NextNumber(5,6);
+		HitboxHead = iH and 5 or iT and 6 or iM and Random.new():NextNumber(5,6);
+	};
 	
-	_aimShakeInstance.PositionInfluence = Vector3.new(shakeInfluenceXZ,shakeInfluenceY,shakeInfluenceXZ);
-	for he, set in pairs(hs) do
-		he.Enabled = espType ~= 'Boxes' and boxactive;
-		if he.Enabled then
-			if not (silactive or spactivate) then
-				he.FillColor = h.Off.FillColor;
-				he.FillTransparency = h.Off.FillTransparency;
-				he.OutlineColor = h.Off.OutlineColor;
-			else
-				for name, og in pairs(set) do
-					he[name] = og;
+	local selectedChar = CURRENT_CHAR
+	if not selectedChar then
+		local get = getNearestHead();
+		selectedChar = get and get.Parent;
+	end
+	
+	if permVars.lastSilentAim ~= selectedChar and typeof(permVars.lastSilentAim) == 'Instance' then
+		local piv = permVars.lastSilentAim:GetPivot();
+		for _, v:Instance in permVars.lastSilentAim:GetChildren() do
+			if hitboxPos[v.Name] then
+				local weld = v:FindFirstChildWhichIsA('WeldConstraint');
+				if weld then
+					v.CFrame = piv;
+					weld.Enabled = true;
 				end;
 			end;
 		end;
 	end;
+	
+	if typeof(selectedChar) == 'Instance' and silentAimEnabled then
+		for _, v in selectedChar:GetChildren() do
+			local p = hitboxPos[v.Name]
+			if p then
+				local weld = v:FindFirstChildWhichIsA('WeldConstraint');
+				if weld then
+					weld.Enabled = false;
+				end;
+				v.CFrame = cam.CFrame*CFrame.new(0,0,-p);
+			end;
+		end;
+	end;
+	
+	permVars.lastSilentAim = selectedChar;
+	
+	-- // Main Mouse
+	
+	moveMouseToWorldPosition(CURRENT_APOS,CURRENT_CHAR);
+	setJumpPhysics();
+	
+	e.FillColor = boxCOL;
+	e.OutlineColor = boxCOL;
+	o.FillColor = boxNAC;
+	o.OutlineColor = boxNAC;
+	
+	_aimShakeInstance.PositionInfluence = Vector3.new(shakeInfluenceXZ,shakeInfluenceY,shakeInfluenceXZ);
 end));
 
 local c = 4;
 local function createbox(player)
 	if player ~= plr then
-		local boxBox = Drawing.new("Quad");
-		boxBox.Thickness = 2;
-		boxBox.Transparency = 1;
-		boxBox.Visible = true;
+		local espBox = Drawing.new'Quad';
+		espBox.Thickness = 1;
+		espBox.Transparency = 1;
+		espBox.Visible = true;
+		
+		local espLine = Drawing.new'Line';
+		espLine.Thickness = 1;
+		espLine.Transparency = 1;
+		espLine.Visible = true;
 
 		local function col()
-			boxBox.Color = (silactive or spactivate) and (table.find(ac, player.UserId) and Color3.fromRGB(0, 255, 255) or boxCOL) or boxNAC
+			local fcol = (silactive or spactivate) and (table.find(ac, player.UserId) and Color3.fromRGB(0, 255, 255) or boxCOL) or boxNAC
+			espBox.Color = fcol
+			espLine.Color = fcol
 		end;
 
 		col();
-
-		boxList[player.Name] = boxBox;
 
 		local added = false;
 		local addedNoMatch = false;
@@ -1629,8 +1678,8 @@ local function createbox(player)
 		end;
 
 		local function x(char)
-			local root = char:WaitForChild('HumanoidRootPart');
-			local hum2 = char:WaitForChild('Humanoid');
+			local root = char:WaitForChild'HumanoidRootPart';
+			local hum2 = char:WaitForChild'Humanoid';
 
 			hum = hum2;
 			label = nl:Clone();
@@ -1650,7 +1699,7 @@ local function createbox(player)
 			end);
 
 			local function check()
-				local l = root:FindFirstChild('TeammateLabel')
+				local l = root:FindFirstChild'TeammateLabel'
 				if l and l.Enabled then
 					if not added then
 						added = true
@@ -1681,18 +1730,48 @@ local function createbox(player)
 		if player.Character then
 			x(player.Character)
 		end
-
-		local function invis()
-			boxBox.PointA = Vector2.new(-math.huge, -math.huge)
-			boxBox.PointB = Vector2.new(-math.huge, -math.huge)
-			boxBox.PointC = Vector2.new(-math.huge, -math.huge)
-			boxBox.PointD = Vector2.new(-math.huge, -math.huge)
-		end
-
-		table.insert(initConnections, RunService.RenderStepped:Connect(function()
+		
+		local mainCon
+		mainCon = RunService.RenderStepped:Connect(function()
 			local char = player.Character
 			local hum = char and char:FindFirstChild('Humanoid')
 			local root = char and char:FindFirstChild('HumanoidRootPart')
+
+			local noF = {
+				Highlights = function()
+					if char and char.Parent then
+						char.Parent = workspace;
+					end;
+				end; Tracers = function()
+					espLine.From = Vector2.new(-math.huge,-math.huge);
+					espLine.To = Vector2.new(-math.huge,-math.huge);
+					espLine.Transparency = 0;
+					espLine.Visible = false;
+				end; Boxes = function()
+					espBox.PointA = Vector2.new(-math.huge, -math.huge);
+					espBox.PointB = Vector2.new(-math.huge, -math.huge);
+					espBox.PointC = Vector2.new(-math.huge, -math.huge);
+					espBox.PointD = Vector2.new(-math.huge, -math.huge);
+					espBox.Transparency = 0;
+					espBox.Visible = false;
+				end
+			}
+
+			local function deactivate()
+				for _, v in noF do
+					task.spawn(v);
+				end;
+			end;
+			
+			if not plr or not plr.Parent then 
+				deactivate();
+				espBox:Remove();
+				espLine:Remove();
+				mainCon:Disconnect();
+				return 
+			end;
+			
+			if not char or not char.Parent then deactivate() return end;
 
 			if boxactive and not table.find(noPlayers, player.UserId) and (player:GetAttribute('EnvironmentID') == plr:GetAttribute('EnvironmentID') or not igCheck) and (not id() or id() ~= '߿' and igam or id() == '߿' and shra) and root and hum and hum.Health > 0 and player.Character:FindFirstChild("HumanoidRootPart") and getWeapon() then
 				local head = player.Character:FindFirstChild("Head")
@@ -1701,66 +1780,45 @@ local function createbox(player)
 					local rootPos, rootVisible = cam:WorldToViewportPoint(root.Position)
 					local headPos, headVisible = cam:WorldToViewportPoint(head.Position + Vector3.new(0, 0.5, 0))
 
+					local fcol = silactive or spactivate
+
 					if rootVisible and headVisible then
-						if espType == 'Both' then
-							boxBox.PointA = Vector2.new(rootPos.X - 15, rootPos.Y + 30)
-							boxBox.PointB = Vector2.new(rootPos.X + 15, rootPos.Y + 30)
-							boxBox.PointC = Vector2.new(headPos.X + 15, headPos.Y)
-							boxBox.PointD = Vector2.new(headPos.X - 15, headPos.Y)
+						local f = {
+							Boxes = function()
+								-- TODO: Make these add to real position [ not pixels ]
+								espBox.PointA = Vector2.new(rootPos.X - 15, rootPos.Y + 30)
+								espBox.PointB = Vector2.new(rootPos.X + 15, rootPos.Y + 30)
+								espBox.PointC = Vector2.new(headPos.X + 15, headPos.Y)
+								espBox.PointD = Vector2.new(headPos.X - 15, headPos.Y)
+								espBox.Transparency = 1
+								espBox.Visible = true
+							end; Highlights = function()
+								if char and char.Parent then
+									char.Parent = fcol and (player:GetAttribute('IsTeam') and h_team or h_enemy) or h_off;
+								end;
+							end; Tracers = function()
+								espLine.From = cam.ViewportSize/2;
+								espLine.To = Vector2.new(rootPos.X,rootPos.Y);
+								espLine.Transparency = 1;
+								espLine.Visible = true;
+							end;
+						}
 
-							if char then
-								char.Parent = player:GetAttribute('IsTeam') and h.Team or h.Enemy
-							end
-
-							boxBox.Transparency = 0
-							boxBox.Visible = true
-						else
-							if espType == 'Boxes' then
-								boxBox.PointA = Vector2.new(rootPos.X - 15, rootPos.Y + 30)
-								boxBox.PointB = Vector2.new(rootPos.X + 15, rootPos.Y + 30)
-								boxBox.PointC = Vector2.new(headPos.X + 15, headPos.Y)
-								boxBox.PointD = Vector2.new(headPos.X - 15, headPos.Y)
-
-								if char then
-									char.Parent = workspace
-								end
-
-								boxBox.Transparency = 0
-								boxBox.Visible = true
+						for n, v in f do
+							if table.find(espType,n) then
+								task.spawn(v);
 							else
-								if char then
-									char.Parent = player:GetAttribute('IsTeam') and h.Team or h.Enemy
-								end
-
-								invis()
-								boxBox.Transparency = 1
-								boxBox.Visible = false
-							end
-						end
+								noF[n]();
+							end;
+						end;
 					else
-						invis()
-						if char then
-							char.Parent = workspace
-						end
-						boxBox.Transparency = 1
-						boxBox.Visible = false
+						deactivate()
 					end
 				else
-					invis()
-					if char then
-						char.Parent = workspace
-					end
-					boxBox.Transparency = 1
-					boxBox.Visible = false
+					deactivate()
 				end
 			else
-				invis()
-				if char and char.Parent then
-					char.Parent = workspace
-				end
-				
-				boxBox.Transparency = 1
-				boxBox.Visible = false
+				deactivate()
 			end
 
 			if label and label.Enabled then
@@ -1770,7 +1828,9 @@ local function createbox(player)
 			if func then
 				func()
 			end
-		end))
+		end)
+		
+		table.insert(initConnections, mainCon)
 	end
 end
 
@@ -1780,13 +1840,6 @@ end
 
 table.insert(initConnections, Players.PlayerAdded:Connect(function(player)
 	createbox(player)
-end))
-
-table.insert(initConnections, Players.PlayerRemoving:Connect(function(player)
-	if boxList[player.Name] then
-		boxList[player.Name]:Remove()
-		boxList[player.Name] = nil
-	end
 end))
 
 EconField.CONE_FILE_NAME = './cone/'..currentConfig
