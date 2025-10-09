@@ -1614,7 +1614,7 @@ table.insert(initConnections, RunService.RenderStepped:Connect(function()
 		end;
 	end;
 	
-	permVars.lastSilentAim = selectedChar;
+	permVars.lastSilentAim = silentAimEnabled and selectedChar
 	
 	-- // Main Mouse
 	
