@@ -470,14 +470,12 @@ if not evars.OG_VMS then
 			local _toClone = {}
 			local _toReal = {}
 			for _, v in pairs(fold:GetChildren()) do
-				local cl = v:Clone();
-				table.insert(_clones,cl);
-				_toClone[v] = cl;
+				_toClone[v] = {Name = v.Name};
 				_toReal[v.Name] = v;
 			end
 
 			__RET[fold] = {
-				weapon = weapon; all = _clones; fromSkin = _toClone;
+				weapon = weapon; fromSkin = _toClone;
 			}
 
 			if not __RET.fromWeapon[weapon] then
@@ -485,7 +483,7 @@ if not evars.OG_VMS then
 			end
 
 			table.insert(__RET.fromWeapon[weapon],{
-				fold = fold; all = _clones; toClone = _toClone; toReal = _toReal;
+				fold = fold; toClone = _toClone; toReal = _toReal;
 			})
 		end
 	end
@@ -1226,13 +1224,15 @@ function applySkin(skinName, cs)
 
 							toname[nowid.AnimationID] = name
 							
+							local f = UTILS.SKIN_SOUND_CODE[typeToReal]
+							
 							local tb = {
 								anim = LOADED_ANIM,
 								name = typeToReal,
 								prename = prename,
 								type = animType,
 								relinfo = nowid,
-								soundcall = UTILS.SKIN_SOUND_CODE[typeToReal]();
+								soundcall = f and f();
 							}
 							
 							animtbl[id] = tb
@@ -1253,35 +1253,21 @@ function applySkin(skinName, cs)
 
 								toname[nowid.AnimationID] = name
 								
+								local f = UTILS.SKIN_SOUND_CODE[name]
+								
 								local tb = {
 									anim = LOADED_ANIM,
 									name = prename,
 									prename = prename,
 									type = prename,
 									relinfo = nowid,
-									soundcall = UTILS.SKIN_SOUND_CODE[name]();
+									soundcall = f and f();
 								}
 
 								_precontr:add(prename, tb)
 							end
 						end
 					end
-					
-					--local loadtbl = {};
-					--local indextbl = {};
-					--local currentIndex = 0;
-					--for tb, code in TO_LOAD do
-					--	if code then
-					--		table.insert(loadtbl,code);
-					--		table.insert(indextbl,tb);
-					--		currentIndex += 1;
-					--	end
-					--end;
-					
-					--for ind, func in __BULKLOADSTRING(loadtbl) do
-					--	local tb = indextbl[tonumber(ind)];
-					--	tb.soundcall = func();
-					--end;
 
 					-- // Rest
 
