@@ -1232,12 +1232,9 @@ function applySkin(skinName, cs)
 								prename = prename,
 								type = animType,
 								relinfo = nowid,
-								soundcall = function()
-									-- // Waiting for bulk loading
-								end;
+								soundcall = UTILS.SKIN_SOUND_CODE[typeToReal]();
 							}
 							
-							TO_LOAD[tb] = UTILS.SKIN_SOUND_CODE[typeToReal]
 							animtbl[id] = tb
 							_precontr:add(prename, animtbl[id])
 						end
@@ -1262,33 +1259,29 @@ function applySkin(skinName, cs)
 									prename = prename,
 									type = prename,
 									relinfo = nowid,
-									soundcall = function()
-										-- // Waiting for bulk loading
-									end;
+									soundcall = UTILS.SKIN_SOUND_CODE[name]();
 								}
-								
-								TO_LOAD[tb] = UTILS.SKIN_SOUND_CODE[name]
 
 								_precontr:add(prename, tb)
 							end
 						end
 					end
 					
-					local loadtbl = {};
-					local indextbl = {};
-					local currentIndex = 0;
-					for tb, code in TO_LOAD do
-						if code then
-							table.insert(loadtbl,code);
-							table.insert(indextbl,tb);
-							currentIndex += 1;
-						end
-					end;
+					--local loadtbl = {};
+					--local indextbl = {};
+					--local currentIndex = 0;
+					--for tb, code in TO_LOAD do
+					--	if code then
+					--		table.insert(loadtbl,code);
+					--		table.insert(indextbl,tb);
+					--		currentIndex += 1;
+					--	end
+					--end;
 					
-					for ind, func in __BULKLOADSTRING(loadtbl) do
-						local tb = indextbl[tonumber(ind)];
-						tb.soundcall = func();
-					end;
+					--for ind, func in __BULKLOADSTRING(loadtbl) do
+					--	local tb = indextbl[tonumber(ind)];
+					--	tb.soundcall = func();
+					--end;
 
 					-- // Rest
 
