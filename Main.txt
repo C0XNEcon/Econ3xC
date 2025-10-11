@@ -2,18 +2,19 @@
 
 ----------- [ Services ] -----------
 
-local Players           = game:GetService("Players")
-local RunService        = game:GetService("RunService")
-local UserInputService  = game:GetService("UserInputService")
-local Workspace         = game:GetService("Workspace")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ts                = game:GetService('TweenService')
-local soundService      = game:GetService('SoundService')
-local coregui           = game:GetService('CoreGui')
+local ReplicatedStorage = game:GetService'ReplicatedStorage'
+local UserInputService  = game:GetService'UserInputService'
+local ts                = game:GetService'TweenService'
+local soundService      = game:GetService'SoundService'
+local https             = game:GetService'HttpService'
+local RunService        = game:GetService'RunService'
+local Workspace         = game:GetService'Workspace'
+local Players           = game:GetService'Players'
+local coregui           = game:GetService'CoreGui'
 
-local plr = Players.LocalPlayer;
+local cam   = Workspace.CurrentCamera;
+local plr   = Players.LocalPlayer;
 local mouse = plr:GetMouse();
-local cam = Workspace.CurrentCamera;
 
 ----------- [ Executor Functions ] -----------
 
@@ -54,7 +55,7 @@ local __BULKLOADSTRING = function(strings:{})
 	for name, str in strings do
 		_stringToLoad ..= `['{name}'] = function()\n{str}\nend;`;
 	end;
-	return loadstring(_stringToLoad..'}')()::{};
+	return loadstring(_stringToLoad..'}')();
 end;
 
 -- // Loading All Loadstrings
@@ -92,9 +93,9 @@ for _, name in configFiles do
 	if name:sub(#name-4,-1) == fileType then
 		local readFile = readfile(name);
 		local suc, rep = pcall(function()
-			return game:GetService('HttpService'):JSONDecode(readFile);
+			return https:JSONDecode(readFile);
 		end);
-		
+
 		if suc and rep ~= '' then
 			local fullName = name:sub(8,-1):split'.'[1];
 			table.insert(configsTable,fullName);
@@ -124,7 +125,7 @@ if not FOVCIRCLE_UI then
 	FOVCIRCLE_FRAME.ResampleMode = Enum.ResamplerMode.Pixelated;
 	FOVCIRCLE_FRAME.Image = 'rbxassetid://10131954007';
 	FOVCIRCLE_FRAME.Name = 'Root';
-	
+
 	FOVCIRCLE_UI.Parent = coregui;
 end
 
@@ -156,21 +157,21 @@ local _aimShakeInstance = _aimShake:StartShake(1,0,0,Vector3.zero,Vector3.zero);
 
 ----------- [ Main ] -----------
 
+local reload     = false
+local silactive  = false
 local spactivate = true
-local silactive = false
-local boxactive = true
-local reload = false
-local glass = true
-local igCheck = true
+local boxactive  = true
+local igCheck    = true
+local glass      = true
 
 local boxList = {}
 
 local glassRevertList = {}
 local keybinds = {'', 'G'}
-local ac = {}
-local noPlayers = ac
 local notInMatch = {}
 local plrToBox = {}
+local ac = {}
+local noPlayers = ac
 
 local vms = Workspace:WaitForChild('ViewModels'):WaitForChild('FirstPerson')
 
@@ -208,7 +209,7 @@ local initConnections = {}
 local on = true
 local going = true
 
-local Window = nil::{};
+local Window = nil;
 
 table.insert(initConnections, plr:GetAttributeChangedSignal('OriginalPosition'):Connect(function()
 	for _, v in pairs(initConnections) do
@@ -222,11 +223,11 @@ table.insert(initConnections, plr:GetAttributeChangedSignal('OriginalPosition'):
 		v.Visible = false
 		v:Remove()
 	end
-	
+
 	if Window then
 		Window:Destroy();
 	end;
-	
+
 	playSound(1.5, knifeSound);
 	return
 end))
@@ -239,8 +240,8 @@ prms.RespectCanCollide = true
 
 -- // CARRELOAD
 
-local _main = plr.PlayerGui:WaitForChild('MainGui').MainFrame
-local _items = _main.FighterInterfaces:WaitForChild(plr.Name).Items:WaitForChild('Container')
+local _main = plr.PlayerGui:WaitForChild'MainGui'.MainFrame
+local _items = _main.FighterInterfaces:WaitForChild(plr.Name).Items:WaitForChild'Container'
 local _connis = {}
 
 if not on then return end
@@ -388,6 +389,7 @@ local cursorShakeEnabled = true;
 
 local silentAimEnabled = false;
 local silentAimPart = 'Head';
+local silentAimDistance = 1;
 
 local softLockEnabled = true;
 local softLockLerp = 0;
@@ -413,12 +415,12 @@ local function getNearestHead()
 	local closestPlayer = nil;
 	local nearestPos = math.huge;
 	local nearestScreenPoint = math.huge;
-	
+
 	-- // Main
-	
+
 	local ourChar = plr.Character;
 	local ourPos = ourChar and ourChar:GetPivot().Position or cam.CFrame.Position;
-	
+
 	local COF = targetPriority == 'Center of Screen'
 
 	for _, player in pairs(Players:GetPlayers()) do
@@ -433,7 +435,7 @@ local function getNearestHead()
 			end;
 
 			pos = Vector2.new(math.clamp(pos.X, 0, screenSize.X),math.clamp(pos.Y, 0, screenSize.Y));
-			
+
 			local posDist = (cpos-ourPos).Magnitude;
 			local screenDist = (screenSize/2-pos).Magnitude;
 			if (not FOVCircleEnabled or screenDist < FOVPixels/1.4) and (COF and screenDist < nearestScreenPoint or not COF and posDist < nearestPos) and onscreen then
@@ -483,22 +485,22 @@ function moveMouseToWorldPosition(targetVector3,tchar)
 	if tchar and not tchar.Parent then
 		tchar = nil;
 	end;
-	
+
 	local pos2,isOnScreen = Vector2.zero, true;
 	local screenCenter = Vector2.zero;
 	if targetVector3 then
 		local screenSize = cam.ViewportSize
-		
+
 		screenCenter = Vector2.new(screenSize.X / 2, screenSize.Y / 2)
 		pos2, isOnScreen = cam:WorldToViewportPoint(targetVector3)
-		
+
 		if pos2.Z <= 0 then
 			pos2 *= -1
 		end
 
 		pos2 = Vector2.new(math.clamp(pos2.X, 0, screenSize.X),math.clamp(pos2.Y, 0, screenSize.Y))
 	end
-	
+
 	local function disableTrigger()
 		if LAST_MOUSEDOWN and isTypeDown() then
 			mouse1release();
@@ -508,7 +510,7 @@ function moveMouseToWorldPosition(targetVector3,tchar)
 
 	if isOnScreen then
 		-- // Delta Adders
-		
+
 		local extraDeltaMult = 1;
 
 		if softLockEnabled and tchar then
@@ -522,12 +524,12 @@ function moveMouseToWorldPosition(targetVector3,tchar)
 			local ray = Workspace:Raycast(cf.Position,cf.LookVector*1e5,params);
 			extraDeltaMult = ray and (softLockLerp or .025) or 1;
 		end
-		
+
 		if tchar and triggerbotEnabled then
 			local params = RaycastParams.new();
 			params.CollisionGroup = 'CollideWithPlayersOnly';
 			params.RespectCanCollide = false;
-			
+
 			local cf = cam.CFrame;
 			local ray = Workspace:Raycast(cf.Position,cf.LookVector*1e5,params);
 			if ray and ray.Instance:IsDescendantOf(tchar) then
@@ -541,10 +543,10 @@ function moveMouseToWorldPosition(targetVector3,tchar)
 		else
 			disableTrigger();
 		end;
-		
+
 		local mysens = .36000001430511475;
 		local delta = (pos2 - screenCenter)/(UGS.MouseSensitivity/mysens)*lerp*extraDeltaMult;
-		
+
 		local function assertPos(val:boolean,pos)
 			local oldDelta = delta;
 			if val then
@@ -552,12 +554,12 @@ function moveMouseToWorldPosition(targetVector3,tchar)
 			end;
 			return oldDelta
 		end;
-		
+
 		local _deltaPriorCursorAdders = assertPos(tchar and cursorShakeEnabled,_cursorShakeOffset);
 		local _deltaPriorCursorSpring = assertPos(tchar and cursorSpringEnabled,Vector2.new(_cursorSpring.p.X/cursorSpringDivider,_cursorSpring.p.Y/cursorSpringDivider));
-		
+
 		-- // MoveMouse
-		
+
 		mousemoverel(delta.X, delta.Y);
 		_cursorSpring:Impulse(Vector3.new(_deltaPriorCursorAdders.X,_deltaPriorCursorAdders.Y,1));
 	else
@@ -614,9 +616,9 @@ function __auto(right, needs, head)
 			if weapon == 'Daggers' or weapon == 'Bow' then
 				apos += Vector3.new(0, 1, 0);
 			end;
-			
+
 			-- // Movement Based Legit Settings
-			
+
 			local vel = (targetRoot and targetRoot.Velocity or Vector3.zero)::Vector3;
 			local vel2 = (root and root.Velocity or Vector3.zero)::Vector3;
 
@@ -628,17 +630,17 @@ function __auto(right, needs, head)
 				_movementSpring:Impulse(Vector3.new((vel.X-vel2.X)/xz,(vel.Y-vel2.Y)/y,(vel.Z-vel2.Z)/xz));
 				apos += _movementSpring.p
 			end;
-			
+
 			if targetRoot and aimPredEnabled then
 				local max = 20;
-				
+
 				local xz = max/aimPredictionXZ;
 				local y = max/aimPredictionY;
 				apos += Vector3.new(vel.X/xz,vel.Y/y,vel.Z/xz) - Vector3.new(vel2.X/xz,vel2.Y/y,vel2.Z/xz);
 			end;
-			
+
 			-- // Other
-			
+
 			if shakeEnabled then
 				apos += _aimShakeOffset
 			end
@@ -805,294 +807,327 @@ local aymLerping = homeTab:CreateSlider({
 
 homeTab:CreateSection('Aim Prediction')
 
-local aimPredToggle = homeTab:CreateToggle({
-	Name = 'Aim Prediction Enabled',
-	CurrentValue = true,
-	Flag = "aptggl",
-	Callback = function(Value, nosound)
-		aimPredEnabled = Value;
-	end,
-})
+function ADD_AIMPREDICTION()
+	local aimPredToggle = homeTab:CreateToggle({
+		Name = 'Aim Prediction Enabled',
+		CurrentValue = true,
+		Flag = "aptggl",
+		Callback = function(Value, nosound)
+			aimPredEnabled = Value;
+		end,
+	})
 
-local aimPredXZ = homeTab:CreateSlider({
-	Name = 'Aim Prediction Multiplication X-Z',
-	Range = {.1, 100},
-	Increment = .1,
-	Suffix = '',
-	CurrentValue = .2,
-	Flag = 'apXZ',
-	Callback = function(Value)
-		aimPredictionXZ = Value/85
-	end,
-})
+	local aimPredXZ = homeTab:CreateSlider({
+		Name = 'Aim Prediction Multiplication X-Z',
+		Range = {.1, 100},
+		Increment = .1,
+		Suffix = '',
+		CurrentValue = .2,
+		Flag = 'apXZ',
+		Callback = function(Value)
+			aimPredictionXZ = Value/85
+		end,
+	})
 
-local aimPredY = homeTab:CreateSlider({
-	Name = 'Aim Prediction Multiplication Y',
-	Range = {.1, 100},
-	Increment = .1,
-	Suffix = '',
-	CurrentValue = .3,
-	Flag = 'apY',
-	Callback = function(Value)
-		aimPredictionY = Value/85
-	end,
-})
+	local aimPredY = homeTab:CreateSlider({
+		Name = 'Aim Prediction Multiplication Y',
+		Range = {.1, 100},
+		Increment = .1,
+		Suffix = '',
+		CurrentValue = .3,
+		Flag = 'apY',
+		Callback = function(Value)
+			aimPredictionY = Value/85
+		end,
+	})
+end
+
+ADD_AIMPREDICTION()
 
 homeTab:CreateDivider()
 
-local triggerEnabled = homeTab:CreateToggle({
-	Name = 'Triggerbot Enabled [!]',
-	CurrentValue = false,
-	Flag = 'triggerbotenabled',
-	Callback = function(Value, nosound)
-		triggerbotEnabled = Value;
-	end,
-})
+function ADD_BLATANT()
+	local para = homeTab:CreateParagraph({Title = 'Silent Aim Notice', Content = `If silent aim is on, throwables visual models [ Grenade ] will be incorrect`})
+	local triggerEnabled = homeTab:CreateToggle({
+		Name = 'Triggerbot Enabled [!]',
+		CurrentValue = false,
+		Flag = 'triggerbotenabled',
+		Callback = function(Value, nosound)
+			triggerbotEnabled = Value;
+		end,
+	})
 
-local silentAim = homeTab:CreateToggle({
-	Name = 'Silent Aim [!]',
-	CurrentValue = false,
-	Flag = 'silentaimenabled',
-	Callback = function(Value, nosound)
-		silentAimEnabled = Value;
-	end,
-})
+	local silentAim = homeTab:CreateToggle({
+		Name = 'Silent Aim [!]',
+		CurrentValue = false,
+		Flag = 'silentaimenabled',
+		Callback = function(Value, nosound)
+			silentAimEnabled = Value;
+		end,
+	})
 
-local silentAimPartDrop = homeTab:CreateDropdown({
-	Name = 'Silent Aim Part',
-	Options = {'Head','Torso','Mixed'},
-	CurrentOption = {'Head'},
-	MultipleOptions = false,
-	Flag = 'silentaimpart',
-	Callback = function(Options)
-		silentAimPart = Options[1]
-	end,
-})
+	local silentAimPartDrop = homeTab:CreateDropdown({
+		Name = 'Silent Aim Part',
+		Options = {'Head','Torso','Mixed'},
+		CurrentOption = {'Head'},
+		MultipleOptions = false,
+		Flag = 'silentaimpart',
+		Callback = function(Options)
+			silentAimPart = Options[1]
+		end,
+	})
+end
+
+ADD_BLATANT()
 
 local legitTab = Window:CreateTab('Legit', 'search-check') -- Title, Image
 
 legitTab:CreateSection('Legit Basic')
 
-local softlockEnabled = legitTab:CreateToggle({
-	Name = 'SoftLock Enabled',
-	CurrentValue = true,
-	Flag = "sfle",
-	Callback = function(Value, nosound)
-		softLockEnabled = Value;
-	end,
-})
+function ADD_SOFTLOCK()
+	local softlockEnabled = legitTab:CreateToggle({
+		Name = 'SoftLock Enabled',
+		CurrentValue = true,
+		Flag = "sfle",
+		Callback = function(Value, nosound)
+			softLockEnabled = Value;
+		end,
+	})
 
-local softlockLerp = legitTab:CreateSlider({
-	Name = 'In Hitbox Aim Lerp Multiplication',
-	Range = {0, 2},
-	Increment = .025,
-	Suffix = '',
-	CurrentValue = .125,
-	Flag = 'softlockhitboxlerpmult',
-	Callback = function(Value)
-		softLockLerp = Value
-	end,
-})
+	local softlockLerp = legitTab:CreateSlider({
+		Name = 'In Hitbox Aim Lerp Multiplication',
+		Range = {0, 2},
+		Increment = .025,
+		Suffix = '',
+		CurrentValue = .125,
+		Flag = 'softlockhitboxlerpmult',
+		Callback = function(Value)
+			softLockLerp = Value
+		end,
+	})
+end
+
+ADD_SOFTLOCK()
 
 legitTab:CreateSection('Lock FOV')
 
-local lockFOVEnabled = legitTab:CreateToggle({
-	Name = 'Lock FOV Enabled',
-	CurrentValue = false,
-	Flag = 'lockfovenabled',
-	Callback = function(Value, nosound)
-		FOVCIRCLE_UI.Enabled = Value;
-		FOVCircleEnabled = Value;
-	end,
-})
+function ADD_LOCKFOV()
+	local lockFOVEnabled = legitTab:CreateToggle({
+		Name = 'Lock FOV Enabled',
+		CurrentValue = false,
+		Flag = 'lockfovenabled',
+		Callback = function(Value, nosound)
+			FOVCIRCLE_UI.Enabled = Value;
+			FOVCircleEnabled = Value;
+		end,
+	})
 
-local lockFOVCircleVisible = legitTab:CreateToggle({
-	Name = 'Lock FOV Circle Visible',
-	CurrentValue = false,
-	Flag = 'lockfovcirclevisible',
-	Callback = function(Value, nosound)
-		FOVCIRCLE_FRAME.Visible = Value;
-	end,
-})
+	local lockFOVCircleVisible = legitTab:CreateToggle({
+		Name = 'Lock FOV Circle Visible',
+		CurrentValue = false,
+		Flag = 'lockfovcirclevisible',
+		Callback = function(Value, nosound)
+			FOVCIRCLE_FRAME.Visible = Value;
+		end,
+	})
 
-local lockFOVSize = legitTab:CreateSlider({
-	Name = 'Lock FOV Size',
-	Range = {10, 100},
-	Increment = .25,
-	Suffix = '',
-	CurrentValue = 25,
-	Flag = 'lockfovsize',
-	Callback = function(Value)
-		FOVCircleSize = (Value/100)*1200;
-	end,
-})
+	local lockFOVSize = legitTab:CreateSlider({
+		Name = 'Lock FOV Size',
+		Range = {10, 100},
+		Increment = .25,
+		Suffix = '',
+		CurrentValue = 25,
+		Flag = 'lockfovsize',
+		Callback = function(Value)
+			FOVCircleSize = (Value/100)*1200;
+		end,
+	})
+end
+
+ADD_LOCKFOV()
 
 legitTab:CreateSection'Cursor Movement Spring'
 
-local mouseSpringEnabled = legitTab:CreateToggle({
-	Name = 'Cursor Spring Enabled',
-	CurrentValue = true,
-	Flag = "mspre",
-	Callback = function(Value, nosound)
-		cursorSpringEnabled = Value;
-	end,
-})
+function ADD_CURSORPSRING()
+	local mouseSpringEnabled = legitTab:CreateToggle({
+		Name = 'Cursor Spring Enabled',
+		CurrentValue = true,
+		Flag = "mspre",
+		Callback = function(Value, nosound)
+			cursorSpringEnabled = Value;
+		end,
+	})
 
-local mouseSpringDivider = legitTab:CreateSlider({
-	Name = 'Cursor Spring Divider',
-	Range = {.3, 10},
-	Increment = .05,
-	Suffix = '',
-	CurrentValue = 1.65,
-	Flag = 'mousespringdivider',
-	Callback = function(Value)
-		cursorSpringDivider = Value
-	end,
-})
+	local mouseSpringDivider = legitTab:CreateSlider({
+		Name = 'Cursor Spring Divider',
+		Range = {.3, 10},
+		Increment = .05,
+		Suffix = '',
+		CurrentValue = 1.65,
+		Flag = 'mousespringdivider',
+		Callback = function(Value)
+			cursorSpringDivider = Value
+		end,
+	})
 
-local mouseSpringDamper = legitTab:CreateSlider({
-	Name = 'Cursor Spring Damper',
-	Range = {.3, 20},
-	Increment = .05,
-	Suffix = '',
-	CurrentValue = .5,
-	Flag = 'mousespringdamper',
-	Callback = function(Value)
-		_cursorSpring.Speed = Value
-	end,
-})
+	local mouseSpringDamper = legitTab:CreateSlider({
+		Name = 'Cursor Spring Damper',
+		Range = {.3, 20},
+		Increment = .05,
+		Suffix = '',
+		CurrentValue = .5,
+		Flag = 'mousespringdamper',
+		Callback = function(Value)
+			_cursorSpring.Speed = Value
+		end,
+	})
 
-local mouseSpringDamper = legitTab:CreateSlider({
-	Name = 'Cursor Spring Speed',
-	Range = {1, 20},
-	Increment = .05,
-	Suffix = '',
-	CurrentValue = 8,
-	Flag = 'mousespringspeed',
-	Callback = function(Value)
-		_cursorSpring.Damping = Value
-	end,
-})
+	local mouseSpringDamper = legitTab:CreateSlider({
+		Name = 'Cursor Spring Speed',
+		Range = {1, 20},
+		Increment = .05,
+		Suffix = '',
+		CurrentValue = 8,
+		Flag = 'mousespringspeed',
+		Callback = function(Value)
+			_cursorSpring.Damping = Value
+		end,
+	})
+end
+
+ADD_CURSORPSRING()
 
 legitTab:CreateDivider()
 
-local charShakeEnabled = legitTab:CreateToggle({
-	Name = 'Cursor Shake Enabled',
-	CurrentValue = true,
-	Flag = "mse",
-	Callback = function(Value, nosound)
-		cursorShakeEnabled = Value;
-	end,
-})
+function ADD_CURSORSHAKE()
+	local cursorShake = legitTab:CreateToggle({
+		Name = 'Cursor Shake Enabled',
+		CurrentValue = true,
+		Flag = "mse",
+		Callback = function(Value, nosound)
+			cursorShakeEnabled = Value;
+		end,
+	})
 
-local cursorShakeOffset = legitTab:CreateSlider({
-	Name = 'Cursor Shake Roughness',
-	Range = {0, 40},
-	Increment = .1,
-	Suffix = '',
-	CurrentValue = 15.3,
-	Flag = 'mouseshakeroughness',
-	Callback = function(Value)
-		_cursorShakeInstance.Roughness = Value
-	end,
-})
+	local cursorShakeOffset = legitTab:CreateSlider({
+		Name = 'Cursor Shake Roughness',
+		Range = {0, 40},
+		Increment = .1,
+		Suffix = '',
+		CurrentValue = 15.3,
+		Flag = 'mouseshakeroughness',
+		Callback = function(Value)
+			_cursorShakeInstance.Roughness = Value
+		end,
+	})
 
-local cursorShakeOffset = legitTab:CreateSlider({
-	Name = 'Cursor Shake Magnitude',
-	Range = {0, 100},
-	Increment = 1,
-	Suffix = '',
-	CurrentValue = 14,
-	Flag = 'mouseshakemagnitude',
-	Callback = function(Value)
-		_cursorShakeInstance.Magnitude = Value
-	end,
-})
+	local cursorShakeOffset = legitTab:CreateSlider({
+		Name = 'Cursor Shake Magnitude',
+		Range = {0, 100},
+		Increment = 1,
+		Suffix = '',
+		CurrentValue = 14,
+		Flag = 'mouseshakemagnitude',
+		Callback = function(Value)
+			_cursorShakeInstance.Magnitude = Value
+		end,
+	})
+end
+
+ADD_CURSORSHAKE()
 
 legitTab:CreateSection('Target Spring')
 
-local movementSpringEnabled = legitTab:CreateToggle({
-	Name = 'Movement Spring Enabled',
-	CurrentValue = true,
-	Flag = "movementspringenabled",
-	Callback = function(Value, nosound)
-		movementSpringEnabled = Value;
-	end,
-})
+function ADD_MOVEMENTSPRING()
+	local movementSpringEnabled = legitTab:CreateToggle({
+		Name = 'Movement Spring Enabled',
+		CurrentValue = true,
+		Flag = "movementspringenabled",
+		Callback = function(Value, nosound)
+			movementSpringEnabled = Value;
+		end,
+	})
 
-local movementSpringXZ = legitTab:CreateSlider({
-	Name = 'Movement Spring X-Z',
-	Range = {1, 200},
-	Increment = .5,
-	Suffix = '',
-	CurrentValue = 89.5,
-	Flag = 'msXZ',
-	Callback = function(Value)
-		movementSpringXZ = Value/85
-	end,
-})
+	local movementSpringXZ = legitTab:CreateSlider({
+		Name = 'Movement Spring X-Z',
+		Range = {1, 200},
+		Increment = .5,
+		Suffix = '',
+		CurrentValue = 89.5,
+		Flag = 'msXZ',
+		Callback = function(Value)
+			movementSpringXZ = Value/85
+		end,
+	})
 
-local movementSpringY = legitTab:CreateSlider({
-	Name = 'Movement Spring Y',
-	Range = {1, 200},
-	Increment = .5,
-	Suffix = '',
-	CurrentValue = 75,
-	Flag = 'msY',
-	Callback = function(Value)
-		movementSpringY = Value/85
-	end,
-})
+	local movementSpringY = legitTab:CreateSlider({
+		Name = 'Movement Spring Y',
+		Range = {1, 200},
+		Increment = .5,
+		Suffix = '',
+		CurrentValue = 75,
+		Flag = 'msY',
+		Callback = function(Value)
+			movementSpringY = Value/85
+		end,
+	})
+end
+
+ADD_MOVEMENTSPRING()
 
 legitTab:CreateDivider()
 
 local shakeInfluenceXZ = 0;
 local shakeInfluenceY = 0;
 
-local charShakeEnabled = legitTab:CreateToggle({
-	Name = 'Target Shake Enabled',
-	CurrentValue = true,
-	Flag = "tse",
-	Callback = function(Value, nosound)
-		shakeEnabled = Value;
-	end,
-})
+function ADD_TARGETSHAKE()
+	local charShakeEnabled = legitTab:CreateToggle({
+		Name = 'Target Shake Enabled',
+		CurrentValue = true,
+		Flag = "tse",
+		Callback = function(Value, nosound)
+			shakeEnabled = Value;
+		end,
+	})
 
-local charShakeRoughness = legitTab:CreateSlider({
-	Name = 'Target Shake Roughness',
-	Range = {0, 15},
-	Increment = .1,
-	Suffix = '',
-	CurrentValue = 1.5,
-	Flag = 'soRHN',
-	Callback = function(Value)
-		_aimShakeInstance.Roughness = Value
-	end,
-})
+	local charShakeRoughness = legitTab:CreateSlider({
+		Name = 'Target Shake Roughness',
+		Range = {0, 15},
+		Increment = .1,
+		Suffix = '',
+		CurrentValue = 1.5,
+		Flag = 'soRHN',
+		Callback = function(Value)
+			_aimShakeInstance.Roughness = Value
+		end,
+	})
 
-local charShakeOffsetXZ = legitTab:CreateSlider({
-	Name = 'Target Shake X-Z',
-	Range = {0, 30},
-	Increment = .1,
-	Suffix = '',
-	CurrentValue = 2.1,
-	Flag = 'soXZ',
-	Callback = function(Value)
-		shakeInfluenceXZ = Value
-	end,
-})
+	local charShakeOffsetXZ = legitTab:CreateSlider({
+		Name = 'Target Shake X-Z',
+		Range = {0, 30},
+		Increment = .1,
+		Suffix = '',
+		CurrentValue = 2.1,
+		Flag = 'soXZ',
+		Callback = function(Value)
+			shakeInfluenceXZ = Value
+		end,
+	})
 
-local charShakeOffsetY = legitTab:CreateSlider({
-	Name = 'Target Shake Y',
-	Range = {0, 30},
-	Increment = .1,
-	Suffix = '',
-	CurrentValue = 3.3,
-	Flag = 'soY',
-	Callback = function(Value)
-		shakeInfluenceY = Value
-	end,
-})
+	local charShakeOffsetY = legitTab:CreateSlider({
+		Name = 'Target Shake Y',
+		Range = {0, 30},
+		Increment = .1,
+		Suffix = '',
+		CurrentValue = 3.3,
+		Flag = 'soY',
+		Callback = function(Value)
+			shakeInfluenceY = Value
+		end,
+	})
+end
+
+ADD_TARGETSHAKE()
 
 homeTab:CreateSection('Sensitivity [ Copy ur Rivals settings ]')
 
@@ -1120,106 +1155,95 @@ local sens = homeTab:CreateSlider({
 	end,
 })
 
-homeTab:CreateSection('Misc')
-
 -- // Satisfying Sounds
 
-local equalizerEffect = Instance.new('EqualizerSoundEffect');
-equalizerEffect.Enabled = false;
-equalizerEffect.LowGain = 5;
-equalizerEffect.MidGain = -10;
-equalizerEffect.HighGain = 4;
-equalizerEffect.Parent = soundService:WaitForChild('Other');
+function ADD_MISC()
+	homeTab:CreateSection('Misc')
+	
+	local equalizerEffect = Instance.new('EqualizerSoundEffect');
+	equalizerEffect.Enabled = false;
+	equalizerEffect.LowGain = 5;
+	equalizerEffect.MidGain = -10;
+	equalizerEffect.HighGain = 4;
+	equalizerEffect.Parent = soundService:WaitForChild('Other');
 
-local equalizerEnabled = homeTab:CreateToggle({
-	Name = 'Audio Equalizer Enabled',
-	CurrentValue = false,
-	Flag = 'soundequalizer',
-	Callback = function(Value, nosound)
-		equalizerEffect.Enabled = Value;
-	end,
-});
+	local equalizerEnabled = homeTab:CreateToggle({
+		Name = 'Audio Equalizer Enabled',
+		CurrentValue = false,
+		Flag = 'soundequalizer',
+		Callback = function(Value, nosound)
+			equalizerEffect.Enabled = Value;
+		end,
+	});
+end
 
 -- // Configs
-
-homeTab:CreateSection('Configs')
 
 if not isfile'EconConfig' then
 	writefile('EconConfig','ConeLegitDefault')
 end
 
-local infoLabel = homeTab:CreateLabel('Adding a new config clones the current', 6026568210, Color3.fromRGB(220, 130, 60), false)
 local currentConfig = readfile'EconConfig' or configsTable[1] or 'ConeLegitDefault';
 local newConfigName = 'Unnamed Config';
 
-local configDropdown = homeTab:CreateDropdown({
-	Name = 'Select Config',
-	Options = configsTable,
-	CurrentOption = {currentConfig},
-	MultipleOptions = false,
-	Ext = true; -- // Were not saving the save config :sob: wait what did i just say
-	Flag = 'sconfigdd',
-	Callback = function(Options,noPrev)
-		if noPrev ~= true then
-			currentConfig = Options[1];
+function ADD_CONFIG()
+	homeTab:CreateSection('Configs')
 
-			writefile('EconConfig',currentConfig)
-			EconField.CONE_FILE_NAME = './cone/'..currentConfig;
-			
-			local _fullFilePath = `./cone/{currentConfig}{fileType}`;
-			if not isfile(_fullFilePath) then
-				repeat RunService.Stepped:Wait() until isfile(_fullFilePath);
-			end;
-			
-			EconField:LoadConfiguration();
+	local infoLabel = homeTab:CreateLabel('Adding a new config clones the current', 6026568210, Color3.fromRGB(220, 130, 60), false)
+	local configDropdown = homeTab:CreateDropdown({
+		Name = 'Select Config',
+		Options = configsTable,
+		CurrentOption = {currentConfig},
+		MultipleOptions = false,
+		Ext = true; -- // Were not saving the save config :sob: wait what did i just say
+		Flag = 'sconfigdd',
+		Callback = function(Options,noPrev)
+			if noPrev ~= true then
+				currentConfig = Options[1];
+
+				writefile('EconConfig',currentConfig)
+				EconField.CONE_FILE_NAME = './cone/'..currentConfig;
+
+				local _fullFilePath = `./cone/{currentConfig}{fileType}`;
+				if not isfile(_fullFilePath) then
+					repeat RunService.Stepped:Wait() until isfile(_fullFilePath);
+				end;
+
+				EconField:LoadConfiguration();
+			end
+		end,
+	})
+
+	function updConfigDropdown(noPreviousSave,noLoad,noSet)
+		configDropdown:Refresh(configsTable);
+		if not noLoad then
+			task.spawn(function()
+				configDropdown:Close()
+			end)
+
+			configDropdown:Set({currentConfig},noPreviousSave and 'NoPrevSave' or noSet);
 		end
-	end,
-})
-
-function updConfigDropdown(noPreviousSave,noLoad,noSet)
-	configDropdown:Refresh(configsTable);
-	if not noLoad then
-		task.spawn(function()
-			configDropdown:Close()
-		end)
-		
-		configDropdown:Set({currentConfig},noPreviousSave and 'NoPrevSave' or noSet);
 	end
-end
-
-local configName = homeTab:CreateInput({
-	Name = 'Config Name',
-	CurrentValue = '',
-	PlaceholderText = 'Unnamed Config',
-	Ext = true,
-	Flag = 'cfninput',
-	Callback = function(txt, nosound)
-		newConfigName = txt:gsub('/',''):gsub('%.',''):gsub(':','')
-	end,
-})
-
-local configNew = homeTab:CreateButton({
-	Name = 'New Config',
-	Ext = true;
-	Callback = function()
+	
+	local ADD_CONFIG = function(contents)
 		if newConfigName == '' then
 			newConfigName = 'Unnamed'
 		end
 
 		local fullPath = './cone/'..newConfigName..fileType;
 		local isFile = table.find(configsTable,newConfigName);
-		
+
 		local suc, rep = pcall(function()
-			return EconField:SaveConfiguration(nil,fullPath)
+			return EconField:SaveConfiguration(nil,fullPath,contents)
 		end)
-		
+
 		if not table.find(configsTable,newConfigName) then
 			table.insert(configsTable,newConfigName);
 		end;
-		
+
 		currentConfig = newConfigName
 		updConfigDropdown(true)
-		
+
 		if suc then
 			EconField:Notify({
 				Title = isFile and 'Updated Config "'..newConfigName..'"' or 'New Config "'..newConfigName..'"',
@@ -1235,47 +1259,97 @@ local configNew = homeTab:CreateButton({
 				Duration = 7,
 			})
 		end
-	end,
-})
+	end
 
-local delConfig = homeTab:CreateButton({
-	Name = 'Remove Selected Config',
-	Ext = true;
-	Callback = function()
-		local fullPath = './cone/'..currentConfig..fileType;
-		local suc, rep = pcall(function()
-			if #configsTable > 1 then
-				return delfile(fullPath)
+	local configName = homeTab:CreateInput({
+		Name = 'Config Name',
+		CurrentValue = '',
+		PlaceholderText = 'Unnamed Config',
+		Ext = true,
+		Flag = 'cfninput',
+		Callback = function(txt, nosound)
+			newConfigName = txt:gsub('/',''):gsub('%.',''):gsub(':','')
+		end,
+	})
+
+	local configNew = homeTab:CreateButton({
+		Name = 'New Config',
+		Ext = true;
+		Callback = function()
+			ADD_CONFIG()
+		end,
+	})
+
+	local configDel = homeTab:CreateButton{
+		Name = 'Remove Selected Config',
+		Ext = true;
+		Callback = function()
+			local fullPath = './cone/'..currentConfig..fileType;
+			local suc, rep = pcall(function()
+				if #configsTable > 1 then
+					return delfile(fullPath)
+				else
+					error("This is your only config!")
+				end
+			end)
+
+			if suc then
+				local i = table.find(configsTable,currentConfig);
+				if i then
+					table.remove(configsTable,i);
+				end;
+
+				EconField:Notify({
+					Title = 'Config Removed',
+					Content = `Succesfully Removed Config "{currentConfig}"`, 
+					Image = 6022668939,
+					Duration = 5,
+				})
+
+				currentConfig = configsTable[1];
+				updConfigDropdown(true);
 			else
-				error("This is your only config!")
+				EconField:Notify({
+					Title = 'Config Remove Fail';
+					Content = rep, 
+					Image = 6031071057,
+					Duration = 7,
+				})
 			end
-		end)
+		end,
+	}
 
-		if suc then
-			local i = table.find(configsTable,currentConfig);
-			if i then
-				table.remove(configsTable,i);
-			end;
+	local configImport = homeTab:CreateButton{
+		Name = 'Import Config',
+		Ext = true;
+		Callback = function()
+			EconField:InputRequest{
+				Name = 'Paste Config',
+				Receive = function(txt)
+					local succ, resp = pcall(function()
+						return https:JSONDecode(txt);
+					end);
+					
+					if succ then
+						ADD_CONFIG(txt)
+					else
+						EconField:Notify({
+							Title = 'Import Fail';
+							Content = 'Invalid Config Contents', 
+							Image = 6031071057,
+							Duration = 6,
+						})
+					end
+				end;
+			};
+		end;
+	};
+end;
 
-			EconField:Notify({
-				Title = 'Config Removed',
-				Content = `Succesfully Removed Config "{currentConfig}"`, 
-				Image = 6022668939,
-				Duration = 5,
-			})
-			
-			currentConfig = configsTable[1];
-			updConfigDropdown(true);
-		else
-			EconField:Notify({
-				Title = 'Config Remove Fail';
-				Content = rep, 
-				Image = 6031071057,
-				Duration = 7,
-			})
-		end
-	end,
-})
+ADD_MISC()
+ADD_CONFIG()
+
+-- // Gameplay
 
 local gameplayTab = Window:CreateTab('Gameplay', 'gamepad-2') -- Title, Image
 local boxSection = gameplayTab:CreateSection'ESP'
@@ -1329,27 +1403,27 @@ local espop = gameplayTab:CreateDropdown({
 local boxNAC = Color3.fromRGB(70, 53, 44)
 local boxCOL = Color3.fromRGB(255, 143, 52)
 
-local boxColor = gameplayTab:CreateColorPicker({
+local boxColor = gameplayTab:CreateColorPicker{
 	Name = 'ESP Color',
 	Color = Color3.fromRGB(255, 143, 52),
 	Flag = 'ESPColor',
 	Callback = function(Value)
 		boxCOL = Value
 	end
-})
+}
 
-local boxNoaymbotColor = gameplayTab:CreateColorPicker({
+local boxNoaymbotColor = gameplayTab:CreateColorPicker{
 	Name = 'ESP No aimbot Color',
 	Color = Color3.fromRGB(70, 53, 44),
 	Flag = 'NAColor',
 	Callback = function(Value)
 		boxNAC = Value
 	end
-})
+}
 
 local visualSection = gameplayTab:CreateSection('Rival Visuals')
 
-local evpop = gameplayTab:CreateDropdown({
+local evpop = gameplayTab:CreateDropdown{
 	Name = 'Rival Health',
 	Options = {'Off', 'With ESP', 'Always'},
 	CurrentOption = {'Always'},
@@ -1362,7 +1436,7 @@ local evpop = gameplayTab:CreateDropdown({
 			playSound(1)
 		end
 	end,
-})
+}
 
 -- // Teammate
 
@@ -1370,7 +1444,7 @@ local nl = plr.PlayerScripts.UserInterface:WaitForChild('TeammateLabel')
 
 -- // Device
 
-local deviceDropdown = gameplayTab:CreateDropdown({
+local deviceDropdown = gameplayTab:CreateDropdown{
 	Name = 'Change Device',
 	Options = {'VR', 'Touch', 'Gamepad', 'MouseKeyboard'},
 	CurrentOption = {'MouseKeyboard'},
@@ -1379,7 +1453,7 @@ local deviceDropdown = gameplayTab:CreateDropdown({
 	Callback = function(Options)
 		ReplicatedStorage.Remotes.Replication.Fighter.SetControls:FireServer(Options[1])
 	end,
-})
+}
 
 -- // Movement
 
@@ -1399,7 +1473,7 @@ function setJumpPhysics()
 	end
 end
 
-local slideJumpMult = gameplayTab:CreateSlider({
+local slideJumpMult = gameplayTab:CreateSlider{
 	Name = 'Slide Jump Boost',
 	Range = {0, 100},
 	Increment = 1,
@@ -1409,13 +1483,13 @@ local slideJumpMult = gameplayTab:CreateSlider({
 	Callback = function(Value)
 		slide = lerpz(.7, 0, Value/100)
 	end,
-})
+}
 
 -- // Areas
 
 local areas = gameplayTab:CreateSection'Areas'
 
-local shootingRange = gameplayTab:CreateToggle({
+local shootingRange = gameplayTab:CreateToggle{
 	Name = 'Shooting Range',
 	CurrentValue = true,
 	Flag = 'srtoggle',
@@ -1426,9 +1500,9 @@ local shootingRange = gameplayTab:CreateToggle({
 			playSound(shra and 1 or .8)
 		end
 	end,
-})
+}
 
-local ingame_ = gameplayTab:CreateToggle({
+local ingame_ = gameplayTab:CreateToggle{
 	Name = 'Ingame',
 	CurrentValue = true,
 	Flag = 'ingtoggle',
@@ -1439,13 +1513,13 @@ local ingame_ = gameplayTab:CreateToggle({
 			playSound(igam and 1 or .8)
 		end
 	end,
-})
+}
 
 -- // Gameplay
 
 local gameplaySection = gameplayTab:CreateSection('Gameplay','swords')
 
-local autoReload = gameplayTab:CreateToggle({
+local autoReload = gameplayTab:CreateToggle{
 	Name = 'Auto Reload',
 	CurrentValue = false,
 	Flag = 'artoggle',
@@ -1456,9 +1530,9 @@ local autoReload = gameplayTab:CreateToggle({
 			playSound(reload and 1 or .8)
 		end
 	end,
-})
+}
 
-local autoKatana = gameplayTab:CreateToggle({
+local autoKatana = gameplayTab:CreateToggle{
 	Name = 'Auto Katana [ Unreliable ]',
 	CurrentValue = true,
 	Flag = 'aktoggle',
@@ -1469,9 +1543,9 @@ local autoKatana = gameplayTab:CreateToggle({
 			playSound(katana and 1 or .8)
 		end
 	end,
-})
+}
 
-local teamCheck = gameplayTab:CreateToggle({
+local teamCheck = gameplayTab:CreateToggle{
 	Name = 'Team Check [ Recommended ]',
 	CurrentValue = true,
 	Flag = 'tctoggle',
@@ -1486,9 +1560,9 @@ local teamCheck = gameplayTab:CreateToggle({
 			playSound(Value and 1 or .8)
 		end 
 	end,
-})
+}
 
-local matchCheck = gameplayTab:CreateToggle({
+local matchCheck = gameplayTab:CreateToggle{
 	Name = 'Match Check [ Recommended ]',
 	CurrentValue = true,
 	Flag = 'ictoggle',
@@ -1499,7 +1573,7 @@ local matchCheck = gameplayTab:CreateToggle({
 			playSound(Value and 1 or .8)
 		end
 	end,
-})
+}
 
 -- // Skin
 
@@ -1523,7 +1597,7 @@ table.insert(initConnections, UserInputService.InputBegan:Connect(function(input
 			end
 		end
 	elseif input.UserInputType == Enum.UserInputType.MouseButton1 and silactive then
-		car()
+		__auto()
 	elseif input.KeyCode == Enum.KeyCode.H and not processed then
 		boxEnabled:Set(not boxactive)
 	elseif input.KeyCode.Name == 'Y' and not processed then
@@ -1570,24 +1644,28 @@ table.insert(initConnections, RunService.RenderStepped:Connect(function()
 	local screenSize = cam.ViewportSize/Vector2.new(1536,864);
 	local finalMult = (screenSize.X+screenSize.Y)/2;
 	local finalPixels = FOVCircleSize*finalMult;
-	
+
 	FOVPixels = finalPixels
 	FOVCIRCLE_FRAME.Size = UDim2.fromOffset(finalPixels,finalPixels);
-	
+
 	-- // Silent Aim
-	
+
 	local iH,iT,iM = silentAimPart == 'Head', silentAimPart == 'Torso', silentAimPart == 'Mixed'
 	local hitboxPos = {
 		HitboxBody = iH and 6 or iT and 5 or iM and Random.new():NextNumber(5,6);
 		HitboxHead = iH and 5 or iT and 6 or iM and Random.new():NextNumber(5,6);
 	};
 	
+	for n, v in hitboxPos do
+		hitboxPos[n] = v*silentAimDistance;
+	end;
+
 	local selectedChar = CURRENT_CHAR
 	if not selectedChar then
 		local get = getNearestHead();
 		selectedChar = get and get.Parent;
 	end
-	
+
 	if permVars.lastSilentAim ~= selectedChar and typeof(permVars.lastSilentAim) == 'Instance' then
 		local piv = permVars.lastSilentAim:GetPivot();
 		for _, v:Instance in permVars.lastSilentAim:GetChildren() do
@@ -1600,7 +1678,7 @@ table.insert(initConnections, RunService.RenderStepped:Connect(function()
 			end;
 		end;
 	end;
-	
+
 	if typeof(selectedChar) == 'Instance' and silentAimEnabled then
 		for _, v in selectedChar:GetChildren() do
 			local p = hitboxPos[v.Name]
@@ -1613,19 +1691,19 @@ table.insert(initConnections, RunService.RenderStepped:Connect(function()
 			end;
 		end;
 	end;
-	
+
 	permVars.lastSilentAim = silentAimEnabled and selectedChar
-	
+
 	-- // Main Mouse
-	
+
 	moveMouseToWorldPosition(CURRENT_APOS,CURRENT_CHAR);
 	setJumpPhysics();
-	
+
 	e.FillColor = boxCOL;
 	e.OutlineColor = boxCOL;
 	o.FillColor = boxNAC;
 	o.OutlineColor = boxNAC;
-	
+
 	_aimShakeInstance.PositionInfluence = Vector3.new(shakeInfluenceXZ,shakeInfluenceY,shakeInfluenceXZ);
 end));
 
@@ -1636,7 +1714,7 @@ local function createbox(player)
 		espBox.Thickness = 1;
 		espBox.Transparency = 1;
 		espBox.Visible = true;
-		
+
 		local espLine = Drawing.new'Line';
 		espLine.Thickness = 1;
 		espLine.Transparency = 1;
@@ -1730,7 +1808,7 @@ local function createbox(player)
 		if player.Character then
 			x(player.Character)
 		end
-		
+
 		local mainCon
 		mainCon = RunService.RenderStepped:Connect(function()
 			local char = player.Character
@@ -1762,7 +1840,7 @@ local function createbox(player)
 					task.spawn(v);
 				end;
 			end;
-			
+
 			if not plr or not plr.Parent then 
 				deactivate();
 				espBox:Remove();
@@ -1770,7 +1848,7 @@ local function createbox(player)
 				mainCon:Disconnect();
 				return 
 			end;
-			
+
 			if not char or not char.Parent then deactivate() return end;
 
 			if boxactive and not table.find(noPlayers, player.UserId) and (player:GetAttribute('EnvironmentID') == plr:GetAttribute('EnvironmentID') or not igCheck) and (not id() or id() ~= '߿' and igam or id() == '߿' and shra) and root and hum and hum.Health > 0 and player.Character:FindFirstChild("HumanoidRootPart") and getWeapon() then
@@ -1829,7 +1907,7 @@ local function createbox(player)
 				func()
 			end
 		end)
-		
+
 		table.insert(initConnections, mainCon)
 	end
 end
