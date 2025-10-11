@@ -994,13 +994,15 @@ function RayfieldLibrary:InputRequest(data) -- // RequestInput
 		local inputUI = Rayfield.InputRequest:Clone();
 		local inputBox = inputUI.Input.Scroll.Config::TextBox;
 		local visible = true;
+		inputBox.PlaceholderText = data.Placeholder or inputBox.PlaceholderText
 		inputUI.Title.Text = data.Title or data.Name or 'InputRequestElement'
 		
 		inputUI.Name = 'InputUI:{'..inputUI.Title.Text..'}'
 		inputUI.Parent = Rayfield
 
 		inputRequesting = true
-
+		
+		inputUI.Input.Scroll.ScrollBarImageTransparency = 1;
 		inputUI.Size = UDim2.new(0, 467, 0, 175)
 		inputUI.BackgroundTransparency = 1
 		inputUI.Shadow.Image.ImageTransparency = 1
@@ -1011,7 +1013,9 @@ function RayfieldLibrary:InputRequest(data) -- // RequestInput
 		inputUI.Hide.ImageTransparency = 1
 		
 		inputUI.Visible = true
-		inputBox:CaptureFocus(); -- // Force plr to type
+		if data.Focus then
+			inputBox:CaptureFocus(); -- // Force plr to type
+		end
 
 		local clicked
 		local focuslost
@@ -1021,6 +1025,10 @@ function RayfieldLibrary:InputRequest(data) -- // RequestInput
 			inputRequesting = false;
 			focuslost:Disconnect();
 			clicked:Disconnect();
+			
+			inputBox:ReleaseFocus();
+			inputBox.Interactable = false;
+			inputBox.TextEditable = false;
 
 			TweenService:Create(inputUI, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
 			TweenService:Create(inputUI, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 467, 0, 175)}):Play()
