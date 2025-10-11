@@ -932,7 +932,7 @@ end
 
 local zlodconf = LoadConfiguration
 
-local function SaveConfiguration(_,specificLocation)
+local function SaveConfiguration(_,specificLocation,contents)
 	if not RayfieldLibrary.CONE_FILE_NAME then return end
 	if debugX then
 		print('Saving')
@@ -940,19 +940,21 @@ local function SaveConfiguration(_,specificLocation)
 	
 	local loc = (specificLocation or RayfieldLibrary.CONE_FILE_NAME .. ConfigurationExtension)
 	local Data = {}
-	for i, v in pairs(RayfieldLibrary.Flags) do
-		if not v.Ext then
-			if v.Type == "ColorPicker" then
-				Data[i] = PackColor(v.Color)
-			else
-				if typeof(v.CurrentValue) == 'boolean' then
-					if v.CurrentValue == false then
-						Data[i] = false
+	if not contents then
+		for i, v in pairs(RayfieldLibrary.Flags) do
+			if not v.Ext then
+				if v.Type == "ColorPicker" then
+					Data[i] = PackColor(v.Color)
+				else
+					if typeof(v.CurrentValue) == 'boolean' then
+						if v.CurrentValue == false then
+							Data[i] = false
+						else
+							Data[i] = v.CurrentValue or v.CurrentKeybind or v.CurrentOption or v.Color
+						end
 					else
 						Data[i] = v.CurrentValue or v.CurrentKeybind or v.CurrentOption or v.Color
 					end
-				else
-					Data[i] = v.CurrentValue or v.CurrentKeybind or v.CurrentOption or v.Color
 				end
 			end
 		end
@@ -982,7 +984,7 @@ local function SaveConfiguration(_,specificLocation)
 		warn(HttpService:JSONEncode(Data))
 	end
 
-	writefile(loc, tostring(HttpService:JSONEncode(Data)))
+	writefile(loc, contents or tostring(HttpService:JSONEncode(Data)))
 end
 
 local inputRequesting = false
