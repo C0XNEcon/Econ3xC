@@ -1089,10 +1089,6 @@ function applySkin(skinName, cs)
 
 					-- // ANIMATIONS TABLE
 
-					local econAnim = vm:FindFirstChild('Anims') or Instance.new('Folder', vm)
-					econAnim:ClearAllChildren()
-					econAnim.Name = 'Anims'
-
 					local animator = vm.AnimationController.Animator
 
 					local animtbl = {}
