@@ -988,76 +988,78 @@ end
 local inputRequesting = false
 
 function RayfieldLibrary:InputRequest(data) -- // RequestInput
-	if inputRequesting then return end
-	
-	local inputUI = Rayfield.InputRequest:Clone();
-	local inputBox = inputUI.Input.Scroll.Config::TextBox;
-	local visible = true;
-	inputUI.Title.Text = data.Title or data.Name or 'InputRequestElement'
-	
-	inputRequesting = true
-	
-	inputUI.Size = UDim2.new(0, 467, 0, 175)
-	inputUI.BackgroundTransparency = 1
-	inputUI.Shadow.Image.ImageTransparency = 1
-	inputUI.Title.TextTransparency = 1
-	inputUI.Input.BackgroundTransparency = 1
-	inputUI.Input.UIStroke.Transparency = 1
-	inputBox.TextTransparency = 1
-	inputUI.Hide.ImageTransparency = 1
-	
-	inputBox:CaptureFocus(); -- // Force plr to type
-	
-	local clicked
-	local focuslost
-	
-	local FINISHED_INP = function(txt)
-		visible = false;
-		inputRequesting = false;
-		focuslost:Disconnect();
-		clicked:Disconnect();
-		
-		TweenService:Create(inputUI, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
-		TweenService:Create(inputUI, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 467, 0, 175)}):Play()
-		TweenService:Create(inputUI.Shadow.Image, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {ImageTransparency = 1}):Play()
-		TweenService:Create(inputUI.Title, TweenInfo.new(0.4, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
-		TweenService:Create(inputUI.Input, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
-		TweenService:Create(inputUI.Input.UIStroke, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
-		TweenService:Create(inputBox, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
-		TweenService:Create(inputUI.Hide, TweenInfo.new(0.4, Enum.EasingStyle.Exponential), {ImageTransparency = 1}):Play()
-		
-		if txt and data.Receive then
-			task.spawn(data.Receive,txt);
-		end;
-		
-		task.wait(.5);
-		inputUI:Destroy();
-	end
-	
-	clicked = inputUI.Hide.MouseButton1Click:Once(FINISHED_INP);
-	focuslost = inputBox.FocusLost:Connect(function(enter)
-		if enter then
-			FINISHED_INP(inputBox.Text);
-		end;
-	end);
-	
-	TweenService:Create(inputUI, TweenInfo.new(.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
-	TweenService:Create(inputUI, TweenInfo.new(.6, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 500, 0, 187)}):Play()
-	TweenService:Create(inputUI.Shadow.Image, TweenInfo.new(.5, Enum.EasingStyle.Exponential), {ImageTransparency = 0.5}):Play()
-	
-	task.wait(.05)
-	if not visible then return end
-	TweenService:Create(inputUI.Title, TweenInfo.new(.4, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
-	
-	task.wait(.05)
-	if not visible then return end
-	TweenService:Create(inputUI.Input, TweenInfo.new(.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
-	TweenService:Create(inputUI.Input.UIStroke, TweenInfo.new(.5, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
-	TweenService:Create(inputBox, TweenInfo.new(.5, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
-	
-	task.wait(.155)
-	if not visible then return end
-	TweenService:Create(inputUI.Hide, TweenInfo.new(.4, Enum.EasingStyle.Exponential), {ImageTransparency = .3}):Play()
+	task.spawn(function()
+		if inputRequesting then return end
+
+		local inputUI = Rayfield.InputRequest:Clone();
+		local inputBox = inputUI.Input.Scroll.Config::TextBox;
+		local visible = true;
+		inputUI.Title.Text = data.Title or data.Name or 'InputRequestElement'
+
+		inputRequesting = true
+
+		inputUI.Size = UDim2.new(0, 467, 0, 175)
+		inputUI.BackgroundTransparency = 1
+		inputUI.Shadow.Image.ImageTransparency = 1
+		inputUI.Title.TextTransparency = 1
+		inputUI.Input.BackgroundTransparency = 1
+		inputUI.Input.UIStroke.Transparency = 1
+		inputBox.TextTransparency = 1
+		inputUI.Hide.ImageTransparency = 1
+
+		inputBox:CaptureFocus(); -- // Force plr to type
+
+		local clicked
+		local focuslost
+
+		local FINISHED_INP = function(txt)
+			visible = false;
+			inputRequesting = false;
+			focuslost:Disconnect();
+			clicked:Disconnect();
+
+			TweenService:Create(inputUI, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
+			TweenService:Create(inputUI, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 467, 0, 175)}):Play()
+			TweenService:Create(inputUI.Shadow.Image, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {ImageTransparency = 1}):Play()
+			TweenService:Create(inputUI.Title, TweenInfo.new(0.4, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
+			TweenService:Create(inputUI.Input, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
+			TweenService:Create(inputUI.Input.UIStroke, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
+			TweenService:Create(inputBox, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
+			TweenService:Create(inputUI.Hide, TweenInfo.new(0.4, Enum.EasingStyle.Exponential), {ImageTransparency = 1}):Play()
+
+			if txt and data.Receive then
+				task.spawn(data.Receive,txt);
+			end;
+
+			task.wait(.5);
+			inputUI:Destroy();
+		end
+
+		clicked = inputUI.Hide.MouseButton1Click:Once(FINISHED_INP);
+		focuslost = inputBox.FocusLost:Connect(function(enter)
+			if enter then
+				FINISHED_INP(inputBox.Text);
+			end;
+		end);
+
+		TweenService:Create(inputUI, TweenInfo.new(.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
+		TweenService:Create(inputUI, TweenInfo.new(.6, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 500, 0, 187)}):Play()
+		TweenService:Create(inputUI.Shadow.Image, TweenInfo.new(.5, Enum.EasingStyle.Exponential), {ImageTransparency = 0.5}):Play()
+
+		task.wait(.05)
+		if not visible then return end
+		TweenService:Create(inputUI.Title, TweenInfo.new(.4, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+
+		task.wait(.05)
+		if not visible then return end
+		TweenService:Create(inputUI.Input, TweenInfo.new(.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
+		TweenService:Create(inputUI.Input.UIStroke, TweenInfo.new(.5, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()
+		TweenService:Create(inputBox, TweenInfo.new(.5, Enum.EasingStyle.Exponential), {TextTransparency = 0}):Play()
+
+		task.wait(.155)
+		if not visible then return end
+		TweenService:Create(inputUI.Hide, TweenInfo.new(.4, Enum.EasingStyle.Exponential), {ImageTransparency = .3}):Play()
+	end)
 end
 
 function RayfieldLibrary:Notify(data) -- action e.g open messages
