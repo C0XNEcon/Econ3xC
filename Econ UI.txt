@@ -995,6 +995,9 @@ function RayfieldLibrary:InputRequest(data) -- // RequestInput
 		local inputBox = inputUI.Input.Scroll.Config::TextBox;
 		local visible = true;
 		inputUI.Title.Text = data.Title or data.Name or 'InputRequestElement'
+		
+		inputUI.Name = 'InputUI:{'..inputUI.Title.Text..'}'
+		inputUI.Parent = Rayfield
 
 		inputRequesting = true
 
@@ -1006,7 +1009,8 @@ function RayfieldLibrary:InputRequest(data) -- // RequestInput
 		inputUI.Input.UIStroke.Transparency = 1
 		inputBox.TextTransparency = 1
 		inputUI.Hide.ImageTransparency = 1
-
+		
+		inputUI.Visible = true
 		inputBox:CaptureFocus(); -- // Force plr to type
 
 		local clicked
