@@ -53,7 +53,7 @@ local module = {
 		9390007618; -- // Ylian
 		9502659782; -- // ConePalt
 	};
-	
+
 	WEAPON_TYPES = {'Primary';'Secondary';'Melee';'Utility'};
 	headshotid = 'rbxassetid://16537337310'; -- RIVALS | Headshot SoundId
 	bodyshotid = 'rbxassetid://13110130082'; -- RIVALS | Bodyshot SoundId
@@ -178,7 +178,7 @@ evars.BYTEID_REMOTE = rep.Remotes.Replication.Fighter.Replicate.OnClientEvent:Co
 				elseif args[5] == 1 then
 					table.clear(evars.BYTE_WEAPONS[userId])
 				end
-				
+
 				evars.BYTE_WEAPONS[userId][weaponData['¿']] = weaponData.e
 			end
 		end
@@ -447,7 +447,7 @@ if not evars.OG_VMS then
 	for _, v in pairs(rep.Modules.Finishers:GetChildren()) do
 		NAME_FINISHER[v.Name] = v
 	end
-	
+
 	for _, v in pairs(skins:GetDescendants()) do
 		if v:IsA('Model') then
 			local FINAL_TB = {
@@ -546,7 +546,7 @@ function readFile()
 					enableCharChanging = v == string.char(3)
 				end,
 			}
-			
+
 			if f[i] then
 				f[i]()
 			else
@@ -640,7 +640,7 @@ _G.hd = {
 
 			local userId = evars.RIVALS_BYTEPLR[_byteID]
 			local isOurs = plr.UserId == userId
-			
+
 			if not evars.BYTE_WEAPONS[userId] then return end
 
 			local _weapon = evars.BYTE_WEAPONS[userId][args[4]]
@@ -697,7 +697,7 @@ for t, weapons in pairs(UTILS.WEAPON_TYPES.typeToWeapons) do
 	if t == 1 then
 		local sec = gameplayTab:CreateSection'Character Changer'
 		local getAll_result = UTILS.WRAPPER_MOD:getAll()
-		
+
 		local charToggle = gameplayTab:CreateToggle({
 			Name = 'Enable Character Change',
 			CurrentValue = false,
@@ -707,9 +707,9 @@ for t, weapons in pairs(UTILS.WEAPON_TYPES.typeToWeapons) do
 				enableCharChanging = Value;
 			end,
 		})
-		
+
 		charToggle:Set(enableCharChanging)
-		
+
 		local charchanger = gameplayTab:CreateInput({
 			Name = 'Player ID / Name',
 			CurrentValue = tostring(evars.CURRENT_ID),
@@ -732,7 +732,7 @@ for t, weapons in pairs(UTILS.WEAPON_TYPES.typeToWeapons) do
 				if id then
 					evars.NAME_ID[t] = id
 					evars.CURRENT_ID = id
-					
+
 					if enableCharChanging then
 						UTILS.ID_CHANGER.cchar(id)
 					end
@@ -766,7 +766,7 @@ for t, weapons in pairs(UTILS.WEAPON_TYPES.typeToWeapons) do
 				wrap = selectedWrap,
 				inverted = inverted,
 			};
-			
+
 			finisherSkinInfo[name] = selectedFinisher
 
 			writeFile()
@@ -876,7 +876,7 @@ for t, weapons in pairs(UTILS.WEAPON_TYPES.typeToWeapons) do
 				end
 			end,
 		})
-		
+
 		-- // Rest
 
 		local function _vmAdded(v)
@@ -894,7 +894,7 @@ for t, weapons in pairs(UTILS.WEAPON_TYPES.typeToWeapons) do
 			local n = cw.Name:split' - '[2]
 			local inf = wrapSkinInfo[n]
 			local finisher = finisherSkinInfo[n]
-			
+
 			visualSection:Set(n and 'Wraps - '..n or 'Wraps - Hold a weapon')
 
 			task.spawn(function()
@@ -1033,6 +1033,15 @@ end
 
 local _lastLoadErrNotif = tick()
 
+-- // Skin Vars
+
+local customPriorities = {
+	idle = Enum.AnimationPriority.Idle;
+	sprint = Enum.AnimationPriority.Movement;
+}
+
+-- // Main
+
 function applySkin(skinName, cs)
 	task.spawn(function()
 		if skinName == 'Dont Change' then return end
@@ -1120,26 +1129,25 @@ function applySkin(skinName, cs)
 						function x:play(args)
 							args = args or {}
 
-							local ref = args.reference
-							if ref and not ref.IsPlaying then return end
-
-							if not special(b.name) and not args.isSpecial then
+							local ref = args.reference;
+							if not ref or not ref.IsPlaying then warn(`<< Econ Skinchanger >> Reference is nil or not playing`) return end
+							
+							if not special(b.name) then--and not args.isSpecial then
 								for _, v in pairs(animator:GetPlayingAnimationTracks()) do
 									if table.find(evars.ECON_ANIMS, v) and not special(toname[v.Animation.AnimationId]) then
-										v:Stop()
-									end
-								end
-							end
+										v:Stop();
+									end;
+								end;
+							end;
 
-							local loaded = b.anim
-							loaded.Priority = args.priority or prs[loaded] or Enum.AnimationPriority.Action2
-							loaded.TimePosition = args.pos or 0
-							loaded:Play()
-							loaded:AdjustWeight(1)
-							loaded:AdjustSpeed(b.relinfo.Speed)
+							local loaded = b.anim;
+							loaded.Priority = args.priority or prs[x] or Enum.AnimationPriority.Action2;
+							loaded.TimePosition = args.pos or 0;
+							loaded:Play();
+							loaded:AdjustWeight(1);
+							loaded:AdjustSpeed(b.relinfo.Speed);
 
 							local norm = loaded.Speed
-							prs[loaded] = loaded.Priority
 
 							if b then
 								if args.silenceReference and ref then
@@ -1173,7 +1181,7 @@ function applySkin(skinName, cs)
 								end
 
 								if b.name:find'sprint' and hum then
-									local con = hum:GetPropertyChangedSignal('FloorMaterial'):Connect(upd)
+									local con = hum:GetPropertyChangedSignal'FloorMaterial':Connect(upd)
 									upd()
 
 									table.insert(evars.VMS_CONS[name], con)
@@ -1189,7 +1197,7 @@ function applySkin(skinName, cs)
 
 					local _ogidtoinf = {}
 					local _ogprentoid = {}
-					
+
 					local TO_LOAD = {}
 
 					for prename, name in pairs(UTILS.SKIN_MOD.viewmodels[ig].anims) do
@@ -1219,9 +1227,9 @@ function applySkin(skinName, cs)
 							table.insert(evars.ECON_ANIMS, LOADED_ANIM)
 
 							toname[nowid.AnimationID] = name
-							
+
 							local f = UTILS.SKIN_SOUND_CODE[typeToReal]
-							
+
 							local tb = {
 								anim = LOADED_ANIM,
 								name = typeToReal,
@@ -1229,10 +1237,10 @@ function applySkin(skinName, cs)
 								type = animType,
 								relinfo = nowid,
 								soundcall = f and f();
-							}
-							
-							animtbl[id] = tb
-							_precontr:add(prename, animtbl[id])
+							};
+
+							animtbl[id] = tb;
+							_precontr:add(prename, tb);
 						end
 					end
 
@@ -1240,52 +1248,42 @@ function applySkin(skinName, cs)
 
 					local playing = {}
 
-					local function ct(track)
+					local function ct(track:AnimationTrack)
 						if not table.find(evars.ECON_ANIMS, track) then
-							local pr = track.Priority;
-							track:AdjustWeight(.0001, 0);
-							track:AdjustSpeed(0);
-							track.Priority = Enum.AnimationPriority.Core;
-
-							local bg = _ogidtoinf[track.Animation.AnimationId];
-							local b = animtbl[track.Animation.AnimationId];
-
-							local z
-
-							if bg and bg.prename == 'rareinspect' then
-								z = _precontr.anims.inspect;
-							end;
+							local b  = animtbl[track.Animation.AnimationId];
+							local z = b and b.prename == 'rareinspect' and _precontr.anims.inspect;
 
 							local ri = _precontr.anims.rareinspect;
 							local inspects = {'inspect', 'rareinspect'};
 							local rare = false;
-							if ri and math.random(1, (_G.rarechance or 6)) == 1 and table.find(inspects, bg.prename) then
-								z = _precontr.anims.inspect;
+							if ri and math.random(1, (_G.rarechance or 6)) == 1 and table.find(inspects, b.prename) then
+								z = ri;
 								rare = true;
 
-								local s = 1 + 0.25*math.random();
-								UTILS.RIVALS_UTILS:CreateSound('rbxassetid://13159969353', .25, s, nil, true);
+								UTILS.RIVALS_UTILS:CreateSound('rbxassetid://13159969353', .25, 1 + 0.25*math.random(), nil, true);
 							end;
 
-							if b or z then
-								local z = z or _precontr.anims[b.prename];
-								if z then
-									local tbl = {
-										pos = track.TimePosition;
-										priority = prs[z.tbl.anim] or pr;
-										reference = track;
-									};
-
-									if ri and rare then
-										ri:play({
-											reference = track,
-											isSpecial = 1,
-											priority = tbl.priority,
-										});
-									else
-										z:play(tbl);
-									end;
+							z = z or b and _precontr.anims[b.prename];
+							if z then
+								local pr = customPriorities[b.prename] or track.Priority;
+								track:AdjustWeight(.0001, 0);
+								track:AdjustSpeed(0);
+								track.Priority = Enum.AnimationPriority.Core;
+								
+								if not prs[z] then
+									prs[z] = pr;
 								end;
+								
+								local tbl = {
+									pos = track.TimePosition;
+									priority = prs[z];
+									reference = track;
+								};
+								
+								tbl.isSpecial = rare;
+								z:play(tbl);
+							else
+								warn(`<< Econ Skinchanger >> Animation not found: {b.prename}`)
 							end;
 						end;
 					end;
@@ -1333,7 +1331,7 @@ function applySkin(skinName, cs)
 					end)
 
 					pt(vm.Parent)
-					
+
 					-- // Unimportant [ Effects ]
 
 					task.spawn(function()
