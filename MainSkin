@@ -96,38 +96,38 @@ end;
 
 ----------- [ Services ] -----------
 
-local httpserv = game:GetService'HttpService'
-local players = game:GetService'Players'
-local run = game:GetService'RunService'
-local ss = game:GetService'SoundService'
-local uis = game:GetService'CoreGui'
-local cs = game:GetService'TextChatService'
-local rep = game:GetService'ReplicatedStorage'
+local rep       = game:GetService'ReplicatedStorage'
+local cs        = game:GetService'TextChatService'
+local ss        = game:GetService'SoundService'
+local httpserv  = game:GetService'HttpService'
+local run       = game:GetService'RunService'
 local workspace = game:GetService'Workspace'
+local players   = game:GetService'Players'
+local uis       = game:GetService'CoreGui'
 
 ----------- [ Player Assets ] -----------
 
-local plr = players.LocalPlayer
+local plr     = players.LocalPlayer
 local scripts = plr.PlayerScripts
 
 local repAssets = rep:WaitForChild'Assets'
-local temp = repAssets:WaitForChild'Temp'
-local assets = scripts:WaitForChild'Assets'
-local modules = scripts:WaitForChild'Modules'
+local temp      = repAssets:WaitForChild'Temp'
+local assets    = scripts:WaitForChild'Assets'
+local modules   = scripts:WaitForChild'Modules'
 
-local vms = workspace:WaitForChild'ViewModels'.FirstPerson
+local vms     = workspace:WaitForChild'ViewModels'.FirstPerson
 local tempvms = temp:WaitForChild'ViewModels'
 
-local misc        = assets:WaitForChild'Misc'
-local skins       = assets:WaitForChild'ViewModels'
-local throwables  = assets:WaitForChild'Throwables'
 local projectiles = assets:WaitForChild'Projectiles'
+local throwables  = assets:WaitForChild'Throwables'
+local skins       = assets:WaitForChild'ViewModels'
+local misc        = assets:WaitForChild'Misc'
 
-local vmModsOG = modules:FindFirstChild'OriginalViewModels'
-local vmModules = vmModsOG or modules:WaitForChild'ViewModels'
+local vmModsOG    = modules:FindFirstChild'OriginalViewModels'
+local vmModules   = vmModsOG or modules:WaitForChild'ViewModels'
 local modulesCopy = nil
 
-local weaponSounds = scripts.Modules.ClientReplicatedClasses.ClientFighter.ClientItem
+local weaponSounds    = scripts.Modules.ClientReplicatedClasses.ClientFighter.ClientItem
 local hitmarkerSounds = weaponSounds.ClientViewModel
 
 ----------- [ Main ] -----------
@@ -1133,7 +1133,7 @@ function applySkin(skinName, cs)
 
 							local loaded = b.anim
 							loaded.Priority = args.priority or prs[loaded] or Enum.AnimationPriority.Action2
-							loaded.TimePosition = args.pos or 0			
+							loaded.TimePosition = args.pos or 0
 							loaded:Play()
 							loaded:AdjustWeight(1)
 							loaded:AdjustSpeed(b.relinfo.Speed)
@@ -1236,88 +1236,59 @@ function applySkin(skinName, cs)
 						end
 					end
 
-					for prename, name in pairs(UTILS.SKIN_MOD.viewmodels[skinName].anims) do
-						if not table.find(inz, prename) then
-							local nowid = UTILS.ANIM_LIB.Info[name]
-
-							if nowid.AnimationID then
-								local LOADED_ANIM = Instance.new('Animation')
-								LOADED_ANIM.AnimationId = nowid.AnimationID
-								LOADED_ANIM = animator:LoadAnimation(LOADED_ANIM)
-
-								table.insert(evars.ECON_ANIMS, LOADED_ANIM)
-
-								toname[nowid.AnimationID] = name
-								
-								local f = UTILS.SKIN_SOUND_CODE[name]
-								
-								local tb = {
-									anim = LOADED_ANIM,
-									name = prename,
-									prename = prename,
-									type = prename,
-									relinfo = nowid,
-									soundcall = f and f();
-								}
-
-								_precontr:add(prename, tb)
-							end
-						end
-					end
-
 					-- // Rest
 
 					local playing = {}
 
 					local function ct(track)
 						if not table.find(evars.ECON_ANIMS, track) then
-							local pr = track.Priority
-							track:AdjustWeight(0.0001, 0)
-							track:AdjustSpeed(0)
-							track.Priority = Enum.AnimationPriority.Core
+							local pr = track.Priority;
+							track:AdjustWeight(.0001, 0);
+							track:AdjustSpeed(0);
+							track.Priority = Enum.AnimationPriority.Core;
 
-							local bg = _ogidtoinf[track.Animation.AnimationId]
-							local b = animtbl[track.Animation.AnimationId]
+							local bg = _ogidtoinf[track.Animation.AnimationId];
+							local b = animtbl[track.Animation.AnimationId];
 
 							local z
 
 							if bg and bg.prename == 'rareinspect' then
-								z = _precontr.anims.inspect
-							end
+								z = _precontr.anims.inspect;
+							end;
 
-							local ri = _precontr.anims.rareinspect
-							local inspects = {'inspect', 'rareinspect'}
-							local rare = false
+							local ri = _precontr.anims.rareinspect;
+							local inspects = {'inspect', 'rareinspect'};
+							local rare = false;
 							if ri and math.random(1, (_G.rarechance or 6)) == 1 and table.find(inspects, bg.prename) then
-								z = _precontr.anims.inspect
-								rare = true
+								z = _precontr.anims.inspect;
+								rare = true;
 
-								local s = 1 + 0.25*math.random()
-								UTILS.RIVALS_UTILS:CreateSound('rbxassetid://13159969353', .25, s, nil, true)
-							end
+								local s = 1 + 0.25*math.random();
+								UTILS.RIVALS_UTILS:CreateSound('rbxassetid://13159969353', .25, s, nil, true);
+							end;
 
 							if b or z then
-								local z = z or _precontr.anims[b.prename]
+								local z = z or _precontr.anims[b.prename];
 								if z then
 									local tbl = {
-										pos = track.TimePosition,
-										priority = prs[z.tbl.anim] or pr,
-										reference = track
-									}
+										pos = track.TimePosition;
+										priority = prs[z.tbl.anim] or pr;
+										reference = track;
+									};
 
 									if ri and rare then
 										ri:play({
 											reference = track,
 											isSpecial = 1,
 											priority = tbl.priority,
-										})
+										});
 									else
-										z:play(tbl)
-									end
-								end
-							end
-						end
-					end
+										z:play(tbl);
+									end;
+								end;
+							end;
+						end;
+					end;
 
 					table.insert(evars.APPLIED_VMS, vm)
 
@@ -1350,13 +1321,8 @@ function applySkin(skinName, cs)
 						ct(v)
 					end
 
-					evars.VMS_CONS[name][3] = vm:GetPropertyChangedSignal('Parent'):Connect(function()
+					evars.VMS_CONS[name][3] = vm:GetPropertyChangedSignal'Parent':Connect(function()
 						pt(vm.Parent)
-					end)
-
-					pt(vm.Parent)
-
-					evars.VMS_CONS[name][2] = vm:GetPropertyChangedSignal('Parent'):Once(function()
 						if not vm.Parent then
 							pt()
 							for _, v in pairs(evars.VMS_CONS[name]) do
@@ -1366,6 +1332,8 @@ function applySkin(skinName, cs)
 						end
 					end)
 
+					pt(vm.Parent)
+					
 					-- // Unimportant [ Effects ]
 
 					task.spawn(function()
@@ -1450,7 +1418,7 @@ function applySkin(skinName, cs)
 
 						-- // Aiming Connection
 
-						evars.VMS_CONS[name][4] = vig:GetPropertyChangedSignal('ImageTransparency'):Connect(function()
+						evars.VMS_CONS[name][4] = vig:GetPropertyChangedSignal'ImageTransparency':Connect(function()
 							local _c = aiming
 							if vig.ImageTransparency > last and aiming then
 								aiming = false
