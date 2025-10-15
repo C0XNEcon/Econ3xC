@@ -110,8 +110,8 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 						v.Reflectance = info[4] or v.Reflectance
 
 						if info[5] then
-							for _, v in ogt[info[5]]:GetChildren() do
-								local c = v:Clone();
+							for _, z in ogt[info[5]]:GetChildren() do
+								local c = z:Clone();
 								c.Parent = v;
 								table.insert(econwrap.saved[v].Destroy,c);
 								table.insert(new, c);
