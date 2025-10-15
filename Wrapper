@@ -118,7 +118,7 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 						end
 					end
 				end;
-			elseif v:IsA'Beam' then
+			elseif v:IsA'Beam' or v:IsA'Trail' or v:IsA'ParticleEmitter' then
 				if econwrap.saved[v] then
 					v.Color = econwrap.saved[v].Color;
 				end;
@@ -136,7 +136,7 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 							};
 						end;
 
-						v.Color = info[2] or v.Color;
+						v.Color = info[2] and ColorSequence.new(info[2]) or v.Color;
 					end
 				end;
 			end;
