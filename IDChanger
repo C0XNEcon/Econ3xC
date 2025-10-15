@@ -24,7 +24,7 @@ return {
 		local dn = (plr.DisplayName or plr.Name)..(plr.HasVerifiedBadge and ' '..utf8.char(0xE000) or '')
 		local usn = plr.Name
 		
-		-- // Cons [ idc this code sucks its old and irrelevant ]
+		-- // Cons
 		
 		local prcons = {}
 		local pacons = {}
@@ -43,17 +43,9 @@ return {
 				content = s.content
 				isReady = s.isReady
 			else
-				local suc, c, r = pcall(function()
-					return players:GetUserThumbnailAsync(id, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
-				end)
-
-				if not suc or not r then --[[Icon Error]] return end
-
-				content = c
-				r = r
-
+				content = 'rbxthumb://type=AvatarHeadShot&id='..id..'&w=420&h=420'
 				ECON_VARS.SAVED_ICONS[id] = {
-					content = c, isReady = r
+					content = content, isReady = true
 				}
 			end
 
