@@ -1133,7 +1133,7 @@ function applySkin(skinName, cs)
 							local ref = args.reference;
 							if not ref or not ref.IsPlaying then warn(`<< Econ Skinchanger >> Reference is nil or not playing`) return end
 							
-							if not special(b.name) then--and not args.isSpecial then
+							if not special(b.name) then
 								for _, v in pairs(animator:GetPlayingAnimationTracks()) do
 									if table.find(evars.ECON_ANIMS, v) and not special(toname[v.Animation.AnimationId]) then
 										v:Stop();
@@ -1281,10 +1281,9 @@ function applySkin(skinName, cs)
 									reference = track;
 								};
 								
-								tbl.isSpecial = rare;
 								z:play(tbl);
 							else
-								warn(`<< Econ Skinchanger >> Animation not found: {b.prename}`)
+								warn(`<< Econ Skinchanger >> Animation not found: {b.prename}`);
 							end;
 						end;
 					end;
@@ -1389,81 +1388,81 @@ function applySkin(skinName, cs)
 									arg1.CircleImage.Size = UDim2.new(1.25, 0, 1.25, 0)
 									arg1._dont_rotate_scope_while_sliding = true
 								end,
-							}
-
+							};
+							
 							if scopes[skinName] then
-								scopes[skinName]()
-							end
-						end
+								scopes[skinName]();
+							end;
+						end;
 
-						set()
+						set();
 
-						local vig = itemint.AimingVignette
-						local last = vig.ImageTransparency
-						local aiming = false
+						local vig = itemint.AimingVignette;
+						local last = vig.ImageTransparency;
+						local aiming = false;
 
 						local function aimingCallback(v)
 							local funcs = {
 								['AKEY-47'] = function()
 									local var5 = v and .1 or 0
 									UTILS.RIVALS_UTILS:CreateSound("rbxassetid://96253147006478", 0.375, 2 + var5, true, var5)
-								end,
-							}
+								end;
+							};
 
 							if funcs[skinName] then
-								funcs[skinName]()
-							end
-						end
+								funcs[skinName]();
+							end;
+						end;
 
 						-- // Aiming Connection
 
 						evars.VMS_CONS[name][4] = vig:GetPropertyChangedSignal'ImageTransparency':Connect(function()
-							local _c = aiming
+							local _c = aiming;
 							if vig.ImageTransparency > last and aiming then
-								aiming = false
+								aiming = false;
 							elseif vig.ImageTransparency < last and not aiming then
-								aiming = true
-							end
+								aiming = true;
+							end;
 
 							if aiming ~= _c and math.abs(last-vig.ImageTransparency) < .8 then aimingCallback(aiming) end
 
-							last = vig.ImageTransparency
-						end)
-					end)
-				end
-			end)
-		end
+							last = vig.ImageTransparency;
+						end);
+					end);
+				end;
+			end);
+		end;
 
 		local function check(v)
-			local z = v and v.Name:split' - '
+			local z = v and v.Name:split' - ';
 			if z and z[1] == plr.Name and z[2] == ogitem then
-				apl(v)
-			end
-		end
+				apl(v);
+			end;
+		end;
 
-		check(vms:GetChildren()[1])
+		check(vms:GetChildren()[1]);
 		for _, v in pairs(rep.Assets.Temp.ViewModels:GetChildren()) do
-			check(v)
-		end
-	end)
-end
+			check(v);
+		end;
+	end);
+end;
 
 ----------- [ Execute ] -----------
 
-readFile()
+readFile();
 
 if enableCharChanging then
-	UTILS.ID_CHANGER.cchar()
-end
+	UTILS.ID_CHANGER.cchar();
+end;
 
 table.insert(evars.INIT_CONS, plr.CharacterAdded:Connect(function()
 	if enableCharChanging then
-		UTILS.ID_CHANGER.cchar()
-	end
-end))
+		UTILS.ID_CHANGER.cchar();
+	end;
+end));
 
 -- //
 
 if not _G.SIGNAL_QUEUE then
-	queue_on_teleport(__GETURL'MainSkin')
-end
+	queue_on_teleport(__GETURL'MainSkin');
+end;
