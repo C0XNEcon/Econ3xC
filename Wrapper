@@ -23,7 +23,15 @@ _G.speed = .008
 
 local ITEM_WRAPS = {}
 
-local save = {'Material','MaterialVariant','Color','Transparency','Reflectance'}
+local save = {'Material','MaterialVariant','Color','Transparency','Reflectance'};
+
+if not _G.EconWrap then
+	_G.EconWrap = {
+		saved = {};
+	};
+end;
+
+local econwrap = _G.EconWrap;
 
 function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 	-- ONLY PARTS WITH WRAP GROUP ATTRIBUTE ARE AFFECTED
@@ -52,65 +60,87 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 
 	local new = {}
 	_G.cn = new
+	
+	-- MATERIAL, COLOR, TRANSPARENCY, REFLECTANCE, TEXTURES (#TABLES ARE WRAP GROUPS 1-3)
 
 	for _, v in item:GetDescendants() do
-		local wg = v:GetAttribute('WrapGroup')
-		if v:IsA('BasePart') and wg then
-			wg = tonumber(wg)
+		local wg = v:GetAttribute'WrapGroup'
+		if wg then
+			wg = tonumber(wg);
+			
+			if v:IsA'BasePart' then
+				if econwrap.saved[v] then
+					for n, s in econwrap.saved[v] do
+						v[n] = s;
+					end;
 
-			if v:HasTag('OG') then
-				for n, s in save do
-					v[s] = v:GetAttribute(s)
-				end
-
-				for _, v in v:GetChildren() do
-					if v:HasTag('Wrapped') then
-						v:Destroy()
-					end
-				end
-			end
-
-			if wrapx ~= 'None' then
-				local part = v
-				if inverted then
-					wg = invertedT[wg]
-				end
-
-				local info = wg == 1 and wrap.g1 or wg == 2 and wrap.g2 or wrap.g3
-				if info then
-					-- MATERIAL, COLOR, TRANSPARENCY, REFLECTANCE, TEXTURES (#TABLES ARE WRAP GROUPS 1-3)
-					
-					if not part:HasTag'OG' then
-						part:AddTag('OG')
-						
-						for _, v in save do
-							part:SetAttribute(v,part[v])
-						end
-					end
-
-					if typeof(info[1]) ~= 'string' then
-						part.MaterialVariant = ''
-						part.Material = info[1] or part.Material
-					elseif info[1] then
-						part.MaterialVariant = info[1] or ''
-						part.Material = game:GetService('MaterialService'):FindFirstChild(info[1], true).BaseMaterial
-					end
-
-					part.Color = info[2] or part.Color
-					part.Transparency = info[3] or part.Transparency
-					part.Reflectance = info[4] or part.Reflectance
-
-					if info[5] then
-						for _, v in ogt[info[5]]:GetChildren() do
-							local c = v:Clone()
-							c:AddTag'Wrapped'
-							c.Parent = part
-							table.insert(new, c)
+					for _, v in v:GetChildren() do
+						if v:HasTag'Wrapped' then
+							v:Destroy()
 						end
 					end
 				end
-			end
-		end
+
+				if wrapx ~= 'None' then
+					if inverted then
+						wg = invertedT[wg]
+					end
+
+					local info = wg == 1 and wrap.g1 or wg == 2 and wrap.g2 or wrap.g3
+					if info then
+						if not econwrap.saved[v] then
+							local tb = {};
+							for _, p in save do
+								tb[p] = v[p]
+							end;
+							econwrap.saved[v] = tb;
+						end
+
+						if typeof(info[1]) ~= 'string' then
+							v.MaterialVariant = ''
+							v.Material = info[1] or v.Material
+						elseif info[1] then
+							v.MaterialVariant = info[1] or ''
+							v.Material = game:GetService'MaterialService':FindFirstChild(info[1], true).BaseMaterial
+						end
+
+						v.Color = info[2] or v.Color
+						v.Transparency = info[3] or v.Transparency
+						v.Reflectance = info[4] or v.Reflectance
+
+						if info[5] then
+							for _, v in ogt[info[5]]:GetChildren() do
+								local c = v:Clone()
+								c:AddTag'Wrapped'
+								c.Parent = v
+								table.insert(new, c)
+							end
+						end
+					end
+				end;
+			elseif v:IsA'Beam' then
+				if econwrap.saved[v] then
+					v.Color = econwrap.saved[v].Color;
+				end;
+
+				if wrapx ~= 'None' then
+					if inverted then
+						wg = invertedT[wg]
+					end
+
+					local info = wg == 1 and wrap.g1 or wg == 2 and wrap.g2 or wrap.g3
+					if info then
+						if not econwrap.saved[v] then
+							econwrap.saved[v] = {
+								Color = v.Color;
+							};
+						end;
+
+						v.Color = info[2] or v.Color;
+					end
+				end;
+			end;
+		end;
 	end
 	
 	local TweenService_upvr = game:GetService('TweenService')
