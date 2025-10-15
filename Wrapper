@@ -70,14 +70,12 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 			
 			if v:IsA'BasePart' then
 				if econwrap.saved[v] then
-					for n, s in econwrap.saved[v] do
+					for n, s in econwrap.saved[v].Properties do
 						v[n] = s;
 					end;
 
-					for _, v in v:GetChildren() do
-						if v:HasTag'Wrapped' then
-							v:Destroy()
-						end
+					for _, v in econwrap.saved[v].Destroy do
+						v:Destroy()
 					end
 				end
 
@@ -93,7 +91,10 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 							for _, p in save do
 								tb[p] = v[p]
 							end;
-							econwrap.saved[v] = tb;
+							econwrap.saved[v] = {
+								Properties = tb;
+								Destroy = {};
+							};
 						end
 
 						if typeof(info[1]) ~= 'string' then
@@ -110,17 +111,17 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 
 						if info[5] then
 							for _, v in ogt[info[5]]:GetChildren() do
-								local c = v:Clone()
-								c:AddTag'Wrapped'
-								c.Parent = v
-								table.insert(new, c)
-							end
-						end
-					end
+								local c = v:Clone();
+								c.Parent = v;
+								table.insert(econwrap.saved[v].Destroy,c);
+								table.insert(new, c);
+							end;
+						end;
+					end;
 				end;
 			elseif v:IsA'Beam' or v:IsA'Trail' or v:IsA'ParticleEmitter' then
 				if econwrap.saved[v] then
-					v.Color = econwrap.saved[v].Color;
+					v.Color = econwrap.saved[v].Properties.Color;
 				end;
 
 				if wrapx ~= 'None' then
@@ -132,7 +133,9 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 					if info then
 						if not econwrap.saved[v] then
 							econwrap.saved[v] = {
-								Color = v.Color;
+								Properties = {
+									Color = v.Color
+								};
 							};
 						end;
 
