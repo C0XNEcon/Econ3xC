@@ -448,17 +448,25 @@ if not evars.OG_VMS then
 	for _, v in pairs(rep.Modules.Finishers:GetChildren()) do
 		NAME_FINISHER[v.Name] = v
 	end
-
-	for _, v in pairs(skins:GetDescendants()) do
-		if v:IsA('Model') then
+	
+	local function check(v)
+		if v:IsA'Model' then
 			local FINAL_TB = {
-				model  = v;
+				model = v;
 				mod = vmModsOG:FindFirstChild(v.Name,true);
-			}
+			};
 
-			OG_VMS.fromName[v.Name] = FINAL_TB
-			table.insert(OG_VMS.all, FINAL_TB)
-		end
+			OG_VMS.fromName[v.Name] = FINAL_TB;
+			table.insert(OG_VMS.all, FINAL_TB);
+		elseif v:IsA('Folder') then
+			for _, v in pairs(v:GetChildren()) do
+				check(v);
+			end;
+		end;
+	end;
+	
+	for _, v in pairs(skins:GetChildren()) do
+		check(v)
 	end
 
 	evars.OG_VMS = OG_VMS
