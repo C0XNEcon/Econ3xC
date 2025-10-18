@@ -448,7 +448,7 @@ if not evars.OG_VMS then
 	for _, v in pairs(rep.Modules.Finishers:GetChildren()) do
 		NAME_FINISHER[v.Name] = v
 	end
-	
+
 	local function check(v)
 		if v:IsA'Model' then
 			local FINAL_TB = {
@@ -464,7 +464,7 @@ if not evars.OG_VMS then
 			end;
 		end;
 	end;
-	
+
 	for _, v in pairs(skins:GetChildren()) do
 		check(v)
 	end
@@ -619,7 +619,7 @@ end
 
 _G.hd = {
 	hs = hitmarkerSounds.ChildAdded:Connect(function(v)
-		if v:IsA('Sound') and v.SoundId == module.headshotid then
+		if v:IsA'Sound' and v.SoundId == module.headshotid then
 			for _, v in pairs(evars.HEADSHOT_FUNCS) do
 				v()
 			end
@@ -1136,11 +1136,12 @@ function applySkin(skinName, cs)
 						end
 
 						function x:play(args)
+							if b.anim.IsPlaying then return end
 							args = args or {}
 
-							local ref = args.reference;
+							local ref = args.reference::AnimationTrack;
 							if not ref or not ref.IsPlaying then warn(`<< Econ Skinchanger >> Reference is nil or not playing`) return end
-							
+
 							if not special(b.name) then
 								for _, v in pairs(animator:GetPlayingAnimationTracks()) do
 									if table.find(evars.ECON_ANIMS, v) and not special(toname[v.Animation.AnimationId]) then
@@ -1152,9 +1153,7 @@ function applySkin(skinName, cs)
 							local loaded = b.anim;
 							loaded.Priority = args.priority or prs[x] or Enum.AnimationPriority.Action2;
 							loaded.TimePosition = args.pos or 0;
-							loaded:Play();
-							loaded:AdjustWeight(1);
-							loaded:AdjustSpeed(b.relinfo.Speed);
+							loaded:Play(nil,1,b.relinfo.Speed);
 
 							local norm = loaded.Speed
 
@@ -1173,31 +1172,31 @@ function applySkin(skinName, cs)
 											table.remove(_G.silenced, table.find(_G.silenced, ref))
 										end
 
-										loaded:Stop()
-									end))
-								end
+										loaded:Stop();
+									end));
+								end;
 
 								local function upd()
 									if b.name:find'sprint' then
 										loaded:AdjustSpeed(table.find({'Water', 'Air'}, hum.FloorMaterial.Name) and .15 or norm)
-									end
-								end
+									end;
+								end;
 
 								if args.stopref and ref then
-									ref.Priority = Enum.AnimationPriority.Core
-									ref:AdjustSpeed(0)
-									ref:AdjustWeight(.001, 0)
-								end
+									ref.Priority = Enum.AnimationPriority.Core;
+									ref:AdjustSpeed(0);
+									ref:AdjustWeight(.001, 0);
+								end;
 
 								if b.name:find'sprint' and hum then
-									local con = hum:GetPropertyChangedSignal'FloorMaterial':Connect(upd)
-									upd()
+									local con = hum:GetPropertyChangedSignal'FloorMaterial':Connect(upd);
+									upd();
 
-									table.insert(evars.VMS_CONS[name], con)
+									table.insert(evars.VMS_CONS[name], con);
 									loaded.Stopped:Once(function()
-										con:Disconnect()
-									end)
-								end
+										con:Disconnect();
+									end);
+								end;
 							end
 						end
 
@@ -1216,10 +1215,6 @@ function applySkin(skinName, cs)
 						local animType = vmi.animsReverse[name]
 
 						_ogprentoid[prename] = id
-						_ogidtoinf[id] = {
-							name = name,
-							prename = prename,
-						}
 
 						local new = UTILS.SKIN_MOD.viewmodels[skinName]
 						local typeToReal = new.anims[animType]
@@ -1250,35 +1245,63 @@ function applySkin(skinName, cs)
 
 							animtbl[id] = tb;
 							_precontr:add(prename, tb);
-						end
-					end
+						else
+							animtbl[id] = {
+								name = name,
+								prename = prename,
+							};
+						end;
+					end;
+
+					-- // Skin Anims
+
+					for prename, name in pairs(UTILS.SKIN_MOD.viewmodels[skinName].anims) do
+						local nowid = UTILS.ANIM_LIB.Info[name];
+
+						if nowid.AnimationID then
+							local SOUND_CODE = UTILS.SKIN_SOUND_CODE[name];
+
+							local LOADED_ANIM = Instance.new'Animation';
+							LOADED_ANIM.AnimationId = nowid.AnimationID;
+							LOADED_ANIM = animator:LoadAnimation(LOADED_ANIM);
+
+							table.insert(evars.ECON_ANIMS, LOADED_ANIM);
+							
+							toname[nowid.AnimationID] = name;
+							_precontr:add(prename, {
+								anim = LOADED_ANIM,
+								name = prename,
+								prename = prename,
+								type = prename,
+								relinfo = nowid,
+								soundcall = SOUND_CODE and SOUND_CODE()
+							});
+						end;
+					end;
 
 					-- // Rest
 
 					local playing = {}
 
 					local function ct(track:AnimationTrack)
-						if not table.find(evars.ECON_ANIMS, track) then
-							local b  = animtbl[track.Animation.AnimationId];
+						if not table.find(evars.ECON_ANIMS, track) then							
+							local b = animtbl[track.Animation.AnimationId];
 							local z = b and b.prename == 'rareinspect' and _precontr.anims.inspect;
+
+							local pr = customPriorities[b and b.prename] or track.Priority;
+							track:AdjustWeight(.0001, 0);
+							track:AdjustSpeed(0);
+							track.Priority = Enum.AnimationPriority.Core;
 
 							local ri = _precontr.anims.rareinspect;
 							local inspects = {'inspect', 'rareinspect'};
-							local rare = false;
 							if ri and math.random(1, (_G.rarechance or 6)) == 1 and table.find(inspects, b.prename) then
 								z = ri;
-								rare = true;
-
 								UTILS.RIVALS_UTILS:CreateSound('rbxassetid://13159969353', .25, 1 + 0.25*math.random(), nil, true);
 							end;
 
 							z = z or b and _precontr.anims[b.prename];
-							if z then
-								local pr = customPriorities[b.prename] or track.Priority;
-								track:AdjustWeight(.0001, 0);
-								track:AdjustSpeed(0);
-								track.Priority = Enum.AnimationPriority.Core;
-								
+							if z and z.play then
 								if not prs[z] then
 									prs[z] = pr;
 								end;
@@ -1291,7 +1314,7 @@ function applySkin(skinName, cs)
 								
 								z:play(tbl);
 							else
-								warn(`<< Econ Skinchanger >> Animation not found: {b.prename}`);
+								--warn(`<< Econ Skinchanger >> Skin animation not found: {z and z.prename or 'anim.noname'}`);
 							end;
 						end;
 					end;
@@ -1310,16 +1333,18 @@ function applySkin(skinName, cs)
 						end
 
 						if not c or c == vm or not table.find(evars.APPLIED_VMS, c) then
-							soundOn = p ~= vms
-							soundGroup.Volume = soundOn and ss.Other.Volume or 0
+							soundOn = p ~= vms;
+							soundGroup.Volume = soundOn and ss.Other.Volume or 0;
 
 							if soundOn then
 								for _, v in pairs(animtbl) do
-									v.anim:Stop()
-								end
-							end
-						end
-					end
+									if v.anim then
+										v.anim:Stop();
+									end;
+								end;
+							end;
+						end;
+					end;
 
 					evars.VMS_CONS[name] = {}
 					evars.VMS_CONS[name][1] = animator.AnimationPlayed:Connect(ct)
@@ -1353,9 +1378,9 @@ function applySkin(skinName, cs)
 										silenceReference = 1,
 										unsilenceAfter = 1,
 									})
-								end
-							end)
-						end
+								end;
+							end);
+						end;
 
 						local itemint = plr.PlayerGui.MainGui.MainFrame.ItemInterfaces:WaitForChild(plr.Name.. ' - '..spl[2])
 
@@ -1397,7 +1422,7 @@ function applySkin(skinName, cs)
 									arg1._dont_rotate_scope_while_sliding = true
 								end,
 							};
-							
+
 							if scopes[skinName] then
 								scopes[skinName]();
 							end;
