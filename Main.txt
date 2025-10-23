@@ -481,7 +481,7 @@ function isTypeDown(arg)
 	return UserInputService:IsMouseButtonPressed(Enum.UserInputType[arg or 'MouseButton1'])
 end
 
-function moveMouseToWorldPosition(targetVector3,tchar)
+function moveMouseToWorldPosition(targetVector3,tchar,right)
 	if tchar and not tchar.Parent then
 		tchar = nil;
 	end;
@@ -545,7 +545,8 @@ function moveMouseToWorldPosition(targetVector3,tchar)
 		end;
 
 		local mysens = .36000001430511475;
-		local delta = (pos2 - screenCenter)/(UGS.MouseSensitivity/mysens)*lerp*extraDeltaMult;
+		local rivalsens = (right and sens/ads or sens);
+		local delta = ((pos2 - screenCenter)/(UGS.MouseSensitivity/mysens)*lerp*extraDeltaMult)/rivalsens;
 
 		local function assertPos(val:boolean,pos)
 			local oldDelta = delta;
@@ -1696,7 +1697,7 @@ table.insert(initConnections, RunService.RenderStepped:Connect(function()
 
 	-- // Main Mouse
 
-	moveMouseToWorldPosition(CURRENT_APOS,CURRENT_CHAR);
+	moveMouseToWorldPosition(CURRENT_APOS,CURRENT_CHAR,down2);
 	setJumpPhysics();
 
 	e.FillColor = boxCOL;
