@@ -1158,6 +1158,8 @@ local sens = homeTab:CreateSlider({
 
 -- // Satisfying Sounds
 
+local stretchedres = 0;
+
 function ADD_MISC()
 	homeTab:CreateSection('Misc')
 	
@@ -1176,7 +1178,19 @@ function ADD_MISC()
 			equalizerEffect.Enabled = Value;
 		end,
 	});
-end
+	
+	local sres = homeTab:CreateSlider({
+		Name = 'Stretched Resolution',
+		Range = {0, 5},
+		Increment = .05,
+		Suffix = '',
+		CurrentValue = 0,
+		Flag = 'stretchres',
+		Callback = function(Value)
+			stretchedres = Value
+		end;
+	});
+end;
 
 -- // Configs
 
@@ -1648,7 +1662,11 @@ table.insert(initConnections, RunService.RenderStepped:Connect(function()
 
 	FOVPixels = finalPixels
 	FOVCIRCLE_FRAME.Size = UDim2.fromOffset(finalPixels,finalPixels);
-
+	
+	if stretchedres > 0 then
+		cam.CFrame *= CFrame CFrame.new(0, 0, 0, 1, 0, 0, 0, stretchedres, 0, 0, 0, 1); -- // Stretched Resolution
+	end;
+	
 	-- // Silent Aim
 
 	local iH,iT,iM = silentAimPart == 'Head', silentAimPart == 'Torso', silentAimPart == 'Mixed'
