@@ -1666,7 +1666,7 @@ table.insert(initConnections, RunService.RenderStepped:Connect(function()
 	FOVCIRCLE_FRAME.Size = UDim2.fromOffset(finalPixels,finalPixels);
 	
 	if stretchedres > 0 then
-		cam.CFrame *= CFrame CFrame.new(0, 0, 0, 1, 0, 0, 0, stretchedres, 0, 0, 0, 1); -- // Stretched Resolution
+		cam.CFrame *= CFrame.new(0, 0, 0, 1, 0, 0, 0, stretchedres, 0, 0, 0, 1); -- // Stretched Resolution
 	end;
 	
 	-- // Silent Aim
