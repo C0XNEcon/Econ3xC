@@ -22,12 +22,14 @@ local SCRIPT_WHITELIST = {
 	9390007618; -- // Ylian
 	9502659782; -- // ConePAlt
 	9405913287; -- // CPartyAltB
+	9711984939; -- // Econ07Rivel
 };
 
 local SKINCHANGER_WHITELIST = {
 	2318573471; -- // Reno
 	9390007618; -- // Ylian
 	9502659782; -- // ConePAlt
+	9711984939; -- // Econ07Rivel
 	--9405913287; -- // CPartyAltB
 };
 
