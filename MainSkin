@@ -52,6 +52,7 @@ local module = {
 		2318573471; -- // Reno
 		9390007618; -- // Ylian
 		9502659782; -- // ConePalt
+		9711984939; -- // Econ07Rivel
 	};
 
 	WEAPON_TYPES = {'Primary';'Secondary';'Melee';'Utility'};
