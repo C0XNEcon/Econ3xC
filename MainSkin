@@ -98,6 +98,8 @@ local remchar = {
 	["weapon"] = "e"
 };
 
+local changedremchars = {};
+
 _G.getRemChar = function()
 	return stringify(remchar);
 end;
@@ -180,21 +182,23 @@ evars.BYTEID_REMOTE = rep.Remotes.Replication.Fighter.Replicate.OnClientEvent:Co
 	if typeof(args[4]) == 'table' then -- Player Data
 		-- // Setting Indexes
 		
-		if not remchar.plr then
+		if not changedremchars.plr then
 			for i, v in args[4] do
 				if typeof(v) == 'Instance' and v:IsA'Player' then
 					remchar.plr = i;
+					changedremchars.plr = true;
 				end;
 			end;
 		end;
 
-		if not remchar.a then
+		if not changedremchars.a then
 			for i, v in args[4] do
 				if typeof(v) == 'table' then
 					for i2, v in v do
 						if typeof(v) == 'table' and v.e then
 							remchar.a = i;
 							remchar.b = i2;
+							changedremchars.a = true;
 							for i, v in v do
 								if i ~= remchar.weapon then
 									remchar.weaponbyte = i;
