@@ -12,6 +12,49 @@ local Workspace         = game:GetService'Workspace'
 local Players           = game:GetService'Players'
 local coregui           = game:GetService'CoreGui'
 
+local newind = function()
+	local CURR_FUNCS = {};
+	local ind = 0;
+	local ret = {};
+	function ret:add()
+		local _ret = {};
+		local _curInd = ind+1;
+		ind += 1;
+
+		for i, func:()->() in CURR_FUNCS do
+			func();
+		end;
+
+		CURR_FUNCS = {};
+
+		-- Runs the function whenever a new thing gets added
+		function _ret:FireUponChange(func:()->())
+			table.insert(CURR_FUNCS,func);
+		end;
+
+		-- Disconnects the connection whenever a new thing gets added [Like Mekbok]
+		function _ret:Connect(connection:RBXScriptConnection)
+			table.insert(CURR_FUNCS,function()
+				connection:Disconnect();
+			end);
+		end;
+
+		return function(_time:number,_func:()->())
+			if _func then
+				task.delay(_time,_func,ind == _curInd);
+				return;
+			end;
+
+			if _time then
+				task.wait(_time);
+			end;
+
+			return ind == _curInd;
+		end, _ret
+	end;
+	return ret;
+end;
+
 local cam   = Workspace.CurrentCamera;
 local plr   = Players.LocalPlayer;
 local mouse = plr:GetMouse();
@@ -395,6 +438,7 @@ local silentAimDistance = 1;
 
 local softLockEnabled = true;
 local softLockLerp = 0;
+local softLockReaction = 0;
 
 local cursorSpringEnabled = true;
 local cursorSpringDivider = 1;
@@ -477,6 +521,11 @@ local lerp = 1
 local sens = 1
 local ads = 1
 
+local lray = false;
+local ins = false;
+
+local softind = newind();
+
 local LAST_MOUSEDOWN = true
 
 function isTypeDown(arg)
@@ -524,7 +573,16 @@ function moveMouseToWorldPosition(targetVector3,tchar,right)
 
 			local cf = cam.CFrame;
 			local ray = Workspace:Raycast(cf.Position,cf.LookVector*1e5,params);
-			extraDeltaMult = ray and (softLockLerp or .025) or 1;
+			local r = ray and true;
+			
+			if lray ~= r then
+				lray = r;
+				softind:add()(softLockReaction,function()
+					ins = r;
+				end);
+			end;
+			
+			extraDeltaMult = ins and (softLockLerp or .025) or 1;
 		end
 
 		if tchar and triggerbotEnabled then
@@ -905,10 +963,22 @@ function ADD_SOFTLOCK()
 		CurrentValue = .125,
 		Flag = 'softlockhitboxlerpmult',
 		Callback = function(Value)
-			softLockLerp = Value
-		end,
-	})
-end
+			softLockLerp = Value;
+		end;
+	});
+	
+	local softlockLerp = legitTab:CreateSlider({
+		Name = 'In Hitbox Reaction Time',
+		Range = {0, .5},
+		Increment = .025,
+		Suffix = '',
+		CurrentValue = 0,
+		Flag = 'softlockhitboxreactiontime',
+		Callback = function(Value)
+			softLockReaction = Value;
+		end;
+	});
+end;
 
 ADD_SOFTLOCK()
 
