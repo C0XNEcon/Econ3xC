@@ -438,7 +438,8 @@ local silentAimDistance = 1;
 
 local softLockEnabled = true;
 local softLockLerp = 0;
-local softLockReaction = 0;
+local softLockReactionIn = 0;
+local softLockReactionOut = 0;
 
 local cursorSpringEnabled = true;
 local cursorSpringDivider = 1;
@@ -577,7 +578,7 @@ function moveMouseToWorldPosition(targetVector3,tchar,right)
 			
 			if lray ~= r then
 				lray = r;
-				softind:add()(softLockReaction,function()
+				softind:add()(r and softLockReactionIn or softLockReactionOut,function()
 					ins = r;
 				end);
 			end;
@@ -967,15 +968,27 @@ function ADD_SOFTLOCK()
 		end;
 	});
 	
-	local softlockLerp = legitTab:CreateSlider({
+	local reactin = legitTab:CreateSlider({
 		Name = 'In Hitbox Reaction Time',
-		Range = {0, .5},
+		Range = {0, 1},
 		Increment = .025,
 		Suffix = '',
 		CurrentValue = 0,
-		Flag = 'softlockhitboxreactiontime',
+		Flag = 'softlockhitboxreactiontimein',
 		Callback = function(Value)
-			softLockReaction = Value;
+			softLockReactionIn = Value;
+		end;
+	});
+	
+	local reactout = legitTab:CreateSlider({
+		Name = 'Out Hitbox Reaction Time',
+		Range = {0, 1},
+		Increment = .025,
+		Suffix = '',
+		CurrentValue = 0,
+		Flag = 'softlockhitboxreactiontimeout',
+		Callback = function(Value)
+			softLockReactionOut = Value;
 		end;
 	});
 end;
