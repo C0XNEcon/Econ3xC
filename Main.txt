@@ -435,6 +435,7 @@ local cursorShakeEnabled = true;
 local silentAimEnabled = false;
 local silentAimPart = 'Head';
 local silentAimDistance = 1;
+local nearbyheadDiv = 30;
 local nearbyheadMult = 1;
 
 local softLockEnabled = true;
@@ -671,7 +672,7 @@ function __auto(right, needs, head)
 
 			local typ = right and trackType or clickType
 			if typ ~= 'Head' then
-				local val = changeVal.Value*math.clamp(((cam.CFrame.p-pos).Magnitude/30)/nearbyheadMult,.001,1);
+				local val = changeVal.Value*math.clamp(((cam.CFrame.p-pos).Magnitude/nearbyheadDiv)/nearbyheadMult,.001,1);
 				pos = typ == 'Changing [ Outdated ]' and targetHead.Position+val or targetHead.Parent.HumanoidRootPart.Position
 			end
 
@@ -870,7 +871,7 @@ local aymLerping = homeTab:CreateSlider({
 	end,
 })
 
-homeTab:CreateParagraph({Title = 'Docs', Content = `Aim Part: Changing > Multiplies headshot chance the closer u are`})
+homeTab:CreateDivider()
 
 local changingHeadshotDivider = homeTab:CreateSlider({
 	Name = 'Changing Head Multiplier',
@@ -881,6 +882,18 @@ local changingHeadshotDivider = homeTab:CreateSlider({
 	Flag = 'nearbyheadmultiplier',
 	Callback = function(Value)
 		nearbyheadMult = Value;
+	end;
+});
+
+local changingHeadshotDistDiv = homeTab:CreateSlider({
+	Name = 'Distance Divider',
+	Range = {1, 100},
+	Increment = .5,
+	Suffix = '',
+	CurrentValue = 30,
+	Flag = 'distancediv',
+	Callback = function(Value)
+		nearbyheadDiv = Value;
 	end;
 });
 
