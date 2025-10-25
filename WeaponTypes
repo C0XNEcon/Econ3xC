@@ -109,10 +109,4 @@ local tbl = {
             [13] = "Warpstone"
         }
     }
-}tbl.typeToWeapons = {
-	tbl.typeToWeapons.Primary,
-	tbl.typeToWeapons.Secondary,
-	tbl.typeToWeapons.Melee,
-	tbl.typeToWeapons.Utility
-}
-return tbl
+}return tbl
