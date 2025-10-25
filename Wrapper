@@ -1313,21 +1313,25 @@ local wraps = {
     },
     ["Scribble"] = {
         ["g1"] = {
-            [1] = "Scribble",
-            [2] = 1, 1, 1,
+            [1] = "ScribbleWrapping",
+            [2] = 0.972549, 0.972549, 0.972549,
             [3] = 0,
-            [4] = 0
+            [4] = 0,
+            [5] = "Scribble1",
+            [7] = "Scribble"
         },
         ["rarity"] = "Unobtainable",
         ["g2"] = {
-            [1] = "Scribble",
-            [2] = 0, 0, 0,
+            [1] = "ScribbleWrapping",
+            [2] = 0.0666667, 0.0666667, 0.0666667,
             [3] = 0,
-            [4] = 0
+            [4] = 0,
+            [5] = "Scribble2",
+            [7] = "Scribble"
         },
         ["g3"] = {
             [1] = Enum.Material.Neon,
-            [2] = 0.623529, 0.631373, 0.67451,
+            [2] = 0, 0, 0,
             [3] = 0,
             [4] = 0
         },
@@ -3074,6 +3078,27 @@ local wraps = {
             [4] = 0
         }
     },
+    ["Chrome"] = {
+        ["g1"] = {
+            [1] = Enum.Material.SmoothPlastic,
+            [2] = 1, 1, 1,
+            [3] = 0,
+            [4] = 1
+        },
+        ["rarity"] = "Legendary",
+        ["g2"] = {
+            [1] = Enum.Material.SmoothPlastic,
+            [2] = 1, 1, 1,
+            [3] = 0,
+            [4] = 1
+        },
+        ["g3"] = {
+            [1] = Enum.Material.SmoothPlastic,
+            [2] = 1, 1, 1,
+            [3] = 0,
+            [4] = 1
+        }
+    },
     ["Cheese"] = {
         ["g1"] = {
             [1] = "Cheese",
@@ -3134,6 +3159,28 @@ local wraps = {
             [4] = 0
         }
     },
+    ["Ultrablue"] = {
+        ["g1"] = {
+            [1] = Enum.Material.SmoothPlastic,
+            [2] = 1, 0.835294, 0,
+            [3] = 0,
+            [4] = 10
+        },
+        ["rarity"] = "Unobtainable",
+        ["g2"] = {
+            [1] = Enum.Material.SmoothPlastic,
+            [2] = 1, 0.835294, 0,
+            [3] = 0,
+            [4] = 10
+        },
+        ["g3"] = {
+            [1] = Enum.Material.Glass,
+            [2] = 1, 1, 1,
+            [3] = 0.5,
+            [4] = 0
+        },
+        ["desc"] = true
+    },
     ["Jolly Wrapping"] = {
         ["g1"] = {
             [1] = "WrappingPaper",
@@ -3156,24 +3203,42 @@ local wraps = {
             [4] = 0
         }
     },
-    ["Ultrablue"] = {
+    ["Accretion"] = {
         ["g1"] = {
             [1] = Enum.Material.SmoothPlastic,
-            [2] = 1, 0.835294, 0,
+            [2] = 0.584314, 0.654902, 0.972549,
             [3] = 0,
-            [4] = 10
+            [4] = 0.4
+        },
+        ["rarity"] = "Unobtainable",
+        ["g2"] = {
+            [1] = Enum.Material.Neon,
+            [2] = 0, 0, 0,
+            [3] = 0,
+            [4] = 0,
+            [5] = "Accretion2"
+        },
+        ["g3"] = {
+            [1] = Enum.Material.Neon,
+            [2] = 0, 0, 0,
+            [3] = 0,
+            [4] = 0,
+            [5] = "Accretion3"
+        },
+        ["desc"] = true
+    },
+    ["MISSING_WRAP"] = {
+        ["g1"] = {
+            [1] = Enum.Material.SmoothPlastic,
+            [2] = 1, 0, 1,
+            [3] = 0,
+            [4] = 0
         },
         ["rarity"] = "Unobtainable",
         ["g2"] = {
             [1] = Enum.Material.SmoothPlastic,
-            [2] = 1, 0.835294, 0,
+            [2] = 0, 0, 0,
             [3] = 0,
-            [4] = 10
-        },
-        ["g3"] = {
-            [1] = Enum.Material.Glass,
-            [2] = 1, 1, 1,
-            [3] = 0.5,
             [4] = 0
         },
         ["desc"] = true
@@ -3220,29 +3285,27 @@ local wraps = {
             [4] = 0
         }
     },
-    ["Accretion"] = {
+    ["Igneous"] = {
         ["g1"] = {
             [1] = Enum.Material.SmoothPlastic,
-            [2] = 0.584314, 0.654902, 0.972549,
-            [3] = 0,
-            [4] = 0.4
-        },
-        ["rarity"] = "Unobtainable",
-        ["g2"] = {
-            [1] = Enum.Material.Neon,
             [2] = 0, 0, 0,
             [3] = 0,
+            [4] = 0.05
+        },
+        ["rarity"] = "Rare",
+        ["g2"] = {
+            [1] = Enum.Material.Neon,
+            [2] = 1, 0.690196, 0.435294,
+            [3] = 0,
             [4] = 0,
-            [5] = "Accretion2"
+            [5] = "Igneous"
         },
         ["g3"] = {
             [1] = Enum.Material.Neon,
-            [2] = 0, 0, 0,
+            [2] = 0.658824, 0.568627, 0.364706,
             [3] = 0,
-            [4] = 0,
-            [5] = "Accretion3"
-        },
-        ["desc"] = true
+            [4] = 0
+        }
     },
     ["Lovely Leopard"] = {
         ["g1"] = {
@@ -3266,22 +3329,6 @@ local wraps = {
             [3] = 0,
             [4] = 0
         }
-    },
-    ["MISSING_WRAP"] = {
-        ["g1"] = {
-            [1] = Enum.Material.SmoothPlastic,
-            [2] = 1, 0, 1,
-            [3] = 0,
-            [4] = 0
-        },
-        ["rarity"] = "Unobtainable",
-        ["g2"] = {
-            [1] = Enum.Material.SmoothPlastic,
-            [2] = 0, 0, 0,
-            [3] = 0,
-            [4] = 0
-        },
-        ["desc"] = true
     },
     ["Encroached"] = {
         ["g1"] = {
@@ -3400,6 +3447,33 @@ local wraps = {
             [4] = 0
         }
     },
+    ["Dark Matter"] = {
+        ["g1"] = {
+            [1] = "CandyGlossy",
+            [2] = 0.505882, 0.419608, 1,
+            [3] = 0,
+            [4] = 0,
+            [5] = "DarkMatter1",
+            [7] = "Dark Matter"
+        },
+        ["rarity"] = "Mythical",
+        ["g2"] = {
+            [1] = "CandyGlossy",
+            [2] = 0.505882, 0.419608, 1,
+            [3] = 0,
+            [4] = 0,
+            [5] = "DarkMatter2",
+            [7] = "Dark Matter"
+        },
+        ["g3"] = {
+            [1] = Enum.Material.Neon,
+            [2] = 0.556863, 0.384314, 0.933333,
+            [3] = 0,
+            [4] = 0,
+            [5] = "DarkMatter3",
+            [7] = "Dark Matter"
+        }
+    },
     ["Clouds"] = {
         ["g1"] = {
             [1] = "Clouds",
@@ -3436,31 +3510,27 @@ local wraps = {
             [2] = 0.745098, 0.282353, 0.282353
         }
     },
-    ["Dark Matter"] = {
+    ["Necromancer"] = {
         ["g1"] = {
-            [1] = "CandyGlossy",
-            [2] = 0.505882, 0.419608, 1,
+            [1] = Enum.Material.SmoothPlastic,
+            [2] = 0.105882, 0.164706, 0.207843,
             [3] = 0,
             [4] = 0,
-            [5] = "DarkMatter1",
-            [7] = "Dark Matter"
+            [5] = "Necromancer1"
         },
-        ["rarity"] = "Mythical",
+        ["rarity"] = "Legendary",
         ["g2"] = {
-            [1] = "CandyGlossy",
-            [2] = 0.505882, 0.419608, 1,
+            [1] = "NecromancerGlossy",
+            [2] = 0.188235, 0.203922, 0.313726,
             [3] = 0,
             [4] = 0,
-            [5] = "DarkMatter2",
-            [7] = "Dark Matter"
+            [5] = "Necromancer2"
         },
         ["g3"] = {
-            [1] = Enum.Material.Neon,
-            [2] = 0.556863, 0.384314, 0.933333,
-            [3] = 0,
-            [4] = 0,
-            [5] = "DarkMatter3",
-            [7] = "Dark Matter"
+            [1] = Enum.Material.Glass,
+            [2] = 0.384314, 0.305882, 0.592157,
+            [3] = 0.5,
+            [4] = 0
         }
     },
     ["Bee"] = {
@@ -4294,26 +4364,28 @@ local wraps = {
             [2] = 0, 0, 0
         }
     },
-    ["Igneous"] = {
+    ["Soul Scourge"] = {
         ["g1"] = {
-            [1] = Enum.Material.SmoothPlastic,
-            [2] = 0, 0, 0,
-            [3] = 0,
-            [4] = 0.05
-        },
-        ["rarity"] = "Rare",
-        ["g2"] = {
             [1] = Enum.Material.Neon,
-            [2] = 1, 0.690196, 0.435294,
+            [2] = 0.364706, 0.701961, 1,
             [3] = 0,
             [4] = 0,
-            [5] = "Igneous"
+            [5] = "SoulScourge1",
+            [7] = "Soul Scourge"
+        },
+        ["rarity"] = "Mythical",
+        ["g2"] = {
+            [1] = Enum.Material.Metal,
+            [2] = 0.0705882, 0.164706, 0.188235,
+            [3] = 0,
+            [4] = 0,
+            [5] = "SoulScourge2"
         },
         ["g3"] = {
-            [1] = Enum.Material.Neon,
-            [2] = 0.658824, 0.568627, 0.364706,
-            [3] = 0,
-            [4] = 0
+            [1] = Enum.Material.SmoothPlastic,
+            [2] = 0.329412, 0.945098, 1,
+            [3] = 0.5,
+            [4] = 0.5
         }
     },
     ["Maize"] = {
@@ -4747,26 +4819,29 @@ local wraps = {
             [4] = 0
         }
     },
-    ["Chrome"] = {
+    ["Only Six"] = {
         ["g1"] = {
-            [1] = Enum.Material.SmoothPlastic,
-            [2] = 1, 1, 1,
-            [3] = 0,
-            [4] = 1
+            [1] = "K_Material",
+            [2] = 0.866667, 0.780392, 1,
+            [3] = 0.2,
+            [4] = 1,
+            [5] = "K_Textures",
+            [7] = "Only Six"
         },
-        ["rarity"] = "Legendary",
+        ["rarity"] = "Unobtainable",
         ["g2"] = {
-            [1] = Enum.Material.SmoothPlastic,
-            [2] = 1, 1, 1,
-            [3] = 0,
-            [4] = 1
+            [1] = Enum.Material.Glass,
+            [2] = 0.164706, 0.164706, 0.164706,
+            [3] = 0.7,
+            [4] = 0
         },
         ["g3"] = {
-            [1] = Enum.Material.SmoothPlastic,
-            [2] = 1, 1, 1,
+            [1] = Enum.Material.Neon,
+            [2] = 0.623529, 0.631373, 0.67451,
             [3] = 0,
-            [4] = 1
-        }
+            [4] = 0
+        },
+        ["desc"] = true
     },
     ["Nova"] = {
         ["g1"] = {
@@ -5863,21 +5938,24 @@ local wraps = {
     [272] = "Devourer",
     [273] = "Bee",
     [274] = "Mint Choco Chip",
-    [275] = "Dark Matter",
-    [276] = "Neon Lights",
-    [277] = "Solar",
-    [278] = "Speed",
-    [279] = "Celestial",
-    [280] = "Encroached",
-    [281] = "Fracture",
-    [282] = "Aegis",
-    [283] = "MISSING_WRAP",
-    [284] = "Rivalry",
-    [285] = "Scribble",
-    [286] = "Net",
-    [287] = "Accretion",
-    [288] = "Eruption",
-    [289] = "Ultrablue"
+    [275] = "Necromancer",
+    [276] = "Dark Matter",
+    [277] = "Neon Lights",
+    [278] = "Solar",
+    [279] = "Speed",
+    [280] = "Celestial",
+    [281] = "Encroached",
+    [282] = "Fracture",
+    [283] = "Aegis",
+    [284] = "Soul Scourge",
+    [285] = "MISSING_WRAP",
+    [286] = "Rivalry",
+    [287] = "Scribble",
+    [288] = "Net",
+    [289] = "Accretion",
+    [290] = "Eruption",
+    [291] = "Ultrablue",
+    [292] = "Only Six"
 }
 local run = game:GetService('RunService')
 
