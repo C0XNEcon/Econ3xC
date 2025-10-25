@@ -60,6 +60,15 @@ local module = {
 	bodyshotid = 'rbxassetid://13110130082'; -- RIVALS | Bodyshot SoundId
 }
 
+local remchar = {
+	a = nil; -- // 4th tb
+	b = nil; -- // In 4th tb thing yk like the second but inside of it where the wepon is
+	plr = nil; -- // Player Data Playerr
+	
+	weapon = 'e';
+	weaponbyte = '¿';
+};
+
 --[[ ADDING NEW SKINS ]|
 
 - Copying ItemLibrary to -- << TODO:Econ/WeaponTypes >>
@@ -136,8 +145,39 @@ local enableCharChanging = false;
 evars.BYTEID_REMOTE = rep.Remotes.Replication.Fighter.Replicate.OnClientEvent:Connect(function(...)
 	local args = {...}
 	if typeof(args[4]) == 'table' then -- Player Data
-		local _plr = args[4]["º"]
+		-- // Setting Indexes
+		
+		if not remchar.plr then
+			for i, v in args[4] do
+				if typeof(v) == 'Instance' and v:IsA'Player' then
+					remchar.plr = i;
+				end;
+			end;
+		end;
+
+		if not remchar.a then
+			for i, v in args[4] do
+				if typeof(v) == 'table' then
+					for i2, v in v do
+						if typeof(v) == 'table' and v.e then
+							remchar.a = i;
+							remchar.b = i2;
+							for i, v in v do
+								if i ~= remchar.weapon then
+									remchar.weaponbyte = i;
+								end;
+							end;
+						end;
+					end;
+				end;
+			end;
+		end;
+
+		-- // Main
+		
+		local _plr = args[4][remchar.plr]
 		local _byteID = args[2]
+		
 		if _plr then -- Player Byte ID
 			if _plr.Name == plr.Name then
 				local _lastByteID = evars.OUR_BYTEID
@@ -149,17 +189,17 @@ evars.BYTEID_REMOTE = rep.Remotes.Replication.Fighter.Replicate.OnClientEvent:Co
 			end
 
 			evars.RIVALS_BYTEPLR[_byteID] = players[_plr.Name].UserId
-		elseif args[4]['·'] then -- Player Weapon Equipped
+		elseif args[4][remchar.a] then -- Player Weapon Equipped
 			local userId = evars.RIVALS_BYTEPLR[_byteID]
-			local weaponData = args[4]['·']
+			local weaponData = args[4][remchar.b]
 			if userId then 
 				if not evars.BYTE_WEAPONS[userId] then
 					evars.BYTE_WEAPONS[userId] = {}
 				elseif args[5] == 1 then
 					table.clear(evars.BYTE_WEAPONS[userId])
 				end
-
-				evars.BYTE_WEAPONS[userId][weaponData['¿']] = weaponData.e
+				
+				evars.BYTE_WEAPONS[userId][weaponData[remchar.weaponbyte]] = weaponData[remchar.weapon]
 			end
 		end
 	end
@@ -630,12 +670,12 @@ _G.hd = {
 	weaponReceiver = rep.Remotes.Replication.Fighter.Replicate.OnClientEvent:Connect(function(...)
 		local args = {...}
 		if typeof(args[4]) == 'table' then -- Player Data
-			local _plr = args[4]["¸"]
+			local _plr = args[4][remchar.a]
 			local _byteID = args[2]
-			if args[4]['·'] then -- Player Weapon Equipped
+			if args[4][remchar.b] then -- Player Weapon Equipped
 				local userId = evars.RIVALS_BYTEPLR[_byteID]
 				if _plr then
-					local weaponData = _plr['·']
+					local weaponData = _plr[remchar.b]
 					if weaponData then
 						if userId == plr.UserId then
 							__updVMMod(weaponData.e,true)
