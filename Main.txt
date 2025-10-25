@@ -435,6 +435,7 @@ local cursorShakeEnabled = true;
 local silentAimEnabled = false;
 local silentAimPart = 'Head';
 local silentAimDistance = 1;
+local nearbyheadMult = 1;
 
 local softLockEnabled = true;
 local softLockLerp = 0;
@@ -643,14 +644,15 @@ local aymmode = 'MouseMoveRel'
 changeVal.Name = 'ChangeVal'
 
 task.spawn(function()
-	while task.wait(2) do
+	local speed = 1;
+	while task.wait(speed) do
 		if going then
 			switch = not switch
-			ts:Create(changeVal, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Value = switch and Vector3.zero or Vector3.new(0, -1.5, 0)}):Play()
+			ts:Create(changeVal, TweenInfo.new(speed, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Value = switch and Vector3.zero or Vector3.yAxis*-1.5}):Play()
 		else
-			break
-		end
-	end
+			break;
+		end;
+	end;
 end)
 
 function __auto(right, needs, head)
@@ -669,7 +671,8 @@ function __auto(right, needs, head)
 
 			local typ = right and trackType or clickType
 			if typ ~= 'Head' then
-				pos = typ == 'Changing [ Outdated ]' and targetHead.Position+changeVal.Value or targetHead.Parent.HumanoidRootPart.Position
+				local val = changeVal.Value*math.clamp(((cam.CFrame.p-pos).Magnitude/30)/nearbyheadMult,.001,1);
+				pos = typ == 'Changing [ Outdated ]' and targetHead.Position+val or targetHead.Parent.HumanoidRootPart.Position
 			end
 
 			local apos = pos
@@ -867,6 +870,20 @@ local aymLerping = homeTab:CreateSlider({
 	end,
 })
 
+homeTab:CreateParagraph({Title = 'Docs', Content = `Aim Part: Changing > Multiplies headshot chance the closer u are`})
+
+local changingHeadshotDivider = homeTab:CreateSlider({
+	Name = 'Changing Head Multiplier',
+	Range = {1, 10},
+	Increment = .25,
+	Suffix = '',
+	CurrentValue = 1,
+	Flag = 'nearbyheadmultiplier',
+	Callback = function(Value)
+		nearbyheadMult = Value;
+	end;
+});
+
 homeTab:CreateSection('Aim Prediction')
 
 function ADD_AIMPREDICTION()
@@ -909,7 +926,7 @@ ADD_AIMPREDICTION()
 homeTab:CreateDivider()
 
 function ADD_BLATANT()
-	local para = homeTab:CreateParagraph({Title = 'Silent Aim Notice', Content = `If silent aim is on, throwables visual models [ Grenade ] will be incorrect`})
+	homeTab:CreateParagraph({Title = 'Silent Aim Notice', Content = `If silent aim is on, throwables visual models [ Grenade ] will be incorrect`})
 	local triggerEnabled = homeTab:CreateToggle({
 		Name = 'Triggerbot Enabled [!]',
 		CurrentValue = false,
