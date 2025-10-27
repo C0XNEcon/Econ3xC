@@ -6213,20 +6213,6 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 			end)
 		end;Encroached = function()
 			
-		end;Kirby = function()
-			local z
-			z = run.Heartbeat:Connect(function()
-				if #new > 0 and new[1].Parent and IS_CURRENT() then
-					for i, v in new do
-						local speed, dir = v:GetAttribute('Speed'), v:GetAttribute('Direction')
-						if speed and dir then
-							v.OffsetStudsU = tick() * speed * dir.X % v.StudsPerTileU
-						end
-					end
-				else
-					z:Disconnect()
-				end
-			end)
 		end;
 	}
 
