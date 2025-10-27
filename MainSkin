@@ -181,7 +181,7 @@ evars.BYTEID_REMOTE = rep.Remotes.Replication.Fighter.Replicate.OnClientEvent:Co
 	local args = {...}
 	if typeof(args[4]) == 'table' then -- Player Data
 		-- // Setting Indexes
-		
+
 		if not changedremchars.plr then
 			for i, v in args[4] do
 				if typeof(v) == 'Instance' and v:IsA'Player' then
@@ -211,10 +211,10 @@ evars.BYTEID_REMOTE = rep.Remotes.Replication.Fighter.Replicate.OnClientEvent:Co
 		end;
 
 		-- // Main
-		
+
 		local _plr = args[4][remchar.plr]
 		local _byteID = args[2]
-		
+
 		if _plr then -- Player Byte ID
 			if _plr.Name == plr.Name then
 				local _lastByteID = evars.OUR_BYTEID
@@ -235,7 +235,7 @@ evars.BYTEID_REMOTE = rep.Remotes.Replication.Fighter.Replicate.OnClientEvent:Co
 				elseif args[5] == 1 then
 					table.clear(evars.BYTE_WEAPONS[userId])
 				end
-				
+
 				evars.BYTE_WEAPONS[userId][weaponData[remchar.weaponbyte]] = weaponData[remchar.weapon]
 			end
 		end
@@ -337,10 +337,20 @@ for name, REQUIRED_URL in _loaded do
 				add_texture({Name = 'Coneova'; StudsPerTileU = 1.5; StudsPerTileV = 1; Color3 = Color3.fromRGB(255,218,133); Texture = 'rbxassetid://105834110571067'})
 				add_texture({Name = 'Sky'; StudsPerTileU = 1.5; StudsPerTileV = 1; Color3 = Color3.fromRGB(350,350,350); Texture = 'rbxassetid://102467065142059'})
 				add_texture({Name = 'Churning'; OffsetStudsV = .5; StudsPerTileU = 1; StudsPerTileV = 1; Color3 = Color3.fromRGB(500, 500, 500); Texture = 'rbxassetid://124258215383148', Attributes = {Direction = Vector3.new(1,0,0);Speed = .7;}})
-				add_texture({Name = 'AnimatedTest'; OffsetStudsV = .5; StudsPerTileU = 1; StudsPerTileV = 1; Color3 = Color3.fromRGB(400, 400, 400); Texture = 'rbxassetid://124258215383148', Attributes = {Direction = Vector3.new(-1,0,0);Speed = .8;}})
+				add_texture({Name = 'AnimatedTest'; OffsetStudsV = 0; StudsPerTileU = 7; StudsPerTileV = 7; Color3 = Color3.fromRGB(400, 400, 400); Texture = 'rbxassetid://96476684760107', Attributes = {Direction = Vector3.zero;Speed = 0;}})
+				
+				-- // Kirby & Kirby Crystals
+				
+				local crystalSpecs = {Name = 'Kirby'; Transparency = .2; OffsetStudsV = .5; StudsPerTileU = 1; ZIndex = 2; StudsPerTileV = 1; Color3 = Color3.fromRGB(139128, 488, 561); Texture = 'rbxassetid://96476684760107', Attributes = {Direction = Vector3.new(-1,0,0);Speed = 0;}};
+				add_texture({Name = 'Kirby'; OffsetStudsV = 0; StudsPerTileU = 6.3636; StudsPerTileV = 3.6363; Color3 = Color3.fromRGB(300, 300, 300); Texture = 'rbxassetid://80915968043800', Attributes = {Direction = Vector3.new(-1,0,0);Speed = .1;}})
+				add_texture(crystalSpecs);
+				crystalSpecs.Name = 'KirbyCrystals';
+				add_texture(crystalSpecs);
+				
 				add_wrap('Unobtainable', 'Burning, Churning', {Enum.Material.Neon, Color3.fromRGB(255, 141, 75), 0, 0, "Churning"}, {Enum.Material.Neon, Color3.fromRGB(255, 141, 75), 0, 0, "AnimatedTest"}, {Enum.Material.Neon, Color3.fromRGB(255, 151, 82), nil, nil, nil}, nil, 'Cone Party')
 				add_wrap('Unobtainable', 'blueorsmt', {Enum.Material.Neon, Color3.fromRGB(102, 105, 255), 0, 0, "Sky"}, {Enum.Material.Neon, Color3.fromRGB(106, 93, 255), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(156, 163, 255), 0, 0, nil})
 				add_wrap('Unobtainable', 'Coneova', {Enum.Material.Neon, Color3.fromRGB(255, 169, 93), 0, 0, 'Coneova'}, {'Pine', Color3.fromRGB(255, 177, 99), 0, 0, nil}, {Enum.Material.Neon, Color3.fromRGB(255, 174, 103), 0, 0, nil})
+				add_wrap('Unobtainable', 'Kirby', {Enum.Material.Neon, Color3.fromRGB(255, 167, 240), 0, 0, 'Kirby'}, {Enum.Material.Glass, Color3.fromRGB(255, 160, 217), .5, 0, 'KirbyCrystals'}, {Enum.Material.Neon, Color3.fromRGB(255, 155, 193), 0, 0, nil})
 			end;SKIN_MOD = function()
 				repeat run.Stepped:Wait() until REQUIRED_URL and REQUIRED_URL.add_viewmodel
 				REQUIRED_URL.add_viewmodel("Cone Horizon", "rbxassetid://76724077959833", "rbxassetid://76724077959833", nil, nil, nil, CFrame.new(0, 0, -0.25), "sniper_eventhorizon_equip", "sniper_eventhorizon_idle", "sniper_eventhorizon_sprint", "sniper_eventhorizon_inspect", nil, {
@@ -1344,7 +1354,7 @@ function applySkin(skinName, cs)
 							LOADED_ANIM = animator:LoadAnimation(LOADED_ANIM);
 
 							table.insert(evars.ECON_ANIMS, LOADED_ANIM);
-							
+
 							toname[nowid.AnimationID] = name;
 							_precontr:add(prename, {
 								anim = LOADED_ANIM,
@@ -1383,13 +1393,13 @@ function applySkin(skinName, cs)
 								if not prs[z] then
 									prs[z] = pr;
 								end;
-								
+
 								local tbl = {
 									pos = track.TimePosition;
 									priority = prs[z];
 									reference = track;
 								};
-								
+
 								z:play(tbl);
 							else
 								--warn(`<< Econ Skinchanger >> Skin animation not found: {z and z.prename or 'anim.noname'}`);
