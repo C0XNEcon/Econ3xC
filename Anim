@@ -554,6 +554,10 @@ return {
             ["Speed"] = 1.5,
             ["AnimationID"] = "rbxassetid://88842201450798"
         },
+        ["warpstone_warpeye_sprint"] = {
+            ["Speed"] = 1,
+            ["AnimationID"] = "rbxassetid://117226424385841"
+        },
         ["burstrifle_spectralburst_shoot1"] = {
             ["Speed"] = 1,
             ["AnimationID"] = "rbxassetid://13204428113"
@@ -976,6 +980,12 @@ return {
             ["Speed"] = 0.75,
             ["AnimationID"] = "rbxassetid://75870947119848"
         },
+        ["warpstone_warpeye_throw_finish"] = {
+            ["ActionTimestamp"] = 0.25,
+            ["Speed"] = 1,
+            ["Length"] = 0.7,
+            ["AnimationID"] = "rbxassetid://110454659256897"
+        },
         ["bow_keybow_charge"] = {
             ["ExtraInformation"] = {
                 ["ChargeTimestamps"] = {
@@ -1120,10 +1130,36 @@ return {
             ["Speed"] = 1,
             ["AnimationID"] = "rbxassetid://79031054510997"
         },
+        ["minigun_equip"] = {
+            ["Speed"] = 1,
+            ["Length"] = 1,
+            ["AnimationID"] = "rbxassetid://17245211573"
+        },
         ["burstrifle_pixelburst_equip"] = {
             ["Speed"] = 1,
             ["Length"] = 0.75,
             ["AnimationID"] = "rbxassetid://96027715467221"
+        },
+        ["warpstone_warpeye_lob_idle"] = {
+            ["Speed"] = 1,
+            ["AnimationID"] = "rbxassetid://95833970250310"
+        },
+        ["warhorn_inspect"] = {
+            ["Speed"] = 1,
+            ["AnimationID"] = "rbxassetid://118241731290742"
+        },
+        ["warpstone_warpeye_throw_idle"] = {
+            ["Speed"] = 1,
+            ["AnimationID"] = "rbxassetid://78898486523965"
+        },
+        ["warpstone_warpeye_throw_start"] = {
+            ["Speed"] = 1,
+            ["Length"] = 1,
+            ["AnimationID"] = "rbxassetid://113379908468089"
+        },
+        ["warpstone_warpeye_inspect"] = {
+            ["Speed"] = 1,
+            ["AnimationID"] = "rbxassetid://72124077534136"
         },
         ["katana_keytana_inspect"] = {
             ["Speed"] = 1,
@@ -1132,6 +1168,15 @@ return {
         ["chainsaw_megadrill_idle"] = {
             ["Speed"] = 1,
             ["AnimationID"] = "rbxassetid://140629755205961"
+        },
+        ["warpstone_warpeye_idle"] = {
+            ["Speed"] = 1,
+            ["AnimationID"] = "rbxassetid://127023134645174"
+        },
+        ["warpstone_warpeye_equip"] = {
+            ["Speed"] = 1,
+            ["Length"] = 0.85,
+            ["AnimationID"] = "rbxassetid://136448352154525"
         },
         ["chainsaw_idle"] = {
             ["Speed"] = 1,
@@ -2142,9 +2187,10 @@ return {
             ["Length"] = 1.9,
             ["AnimationID"] = "rbxassetid://120111163675397"
         },
-        ["warhorn_inspect"] = {
+        ["warpstone_warpeye_lob_start"] = {
             ["Speed"] = 1,
-            ["AnimationID"] = "rbxassetid://118241731290742"
+            ["Length"] = 1,
+            ["AnimationID"] = "rbxassetid://115710622911452"
         },
         ["katana_archkatana_deflect_idle"] = {
             ["Speed"] = 1,
@@ -2298,10 +2344,11 @@ return {
             ["Speed"] = 1.25,
             ["AnimationID"] = "rbxassetid://109733633551931"
         },
-        ["minigun_equip"] = {
+        ["warpstone_warpeye_lob_finish"] = {
+            ["ActionTimestamp"] = 0.32,
             ["Speed"] = 1,
-            ["Length"] = 1,
-            ["AnimationID"] = "rbxassetid://17245211573"
+            ["Length"] = 0.68,
+            ["AnimationID"] = "rbxassetid://94841328368422"
         },
         ["revolver_reload_empty"] = {
             ["ActionTimestamp"] = 1.16,
@@ -4384,6 +4431,10 @@ return {
             ["Name"] = "grenade_sprint",
             ["Speed"] = 1
         },
+        ["rbxassetid://117226424385841"] = {
+            ["Name"] = "warpstone_warpeye_sprint",
+            ["Speed"] = 1
+        },
         ["rbxassetid://17266003293"] = {
             ["ActionTimestamp"] = 0.65,
             ["Name"] = "exogun_reload",
@@ -4608,6 +4659,10 @@ return {
             ["Name"] = "katana_archkatana_sprint2",
             ["Speed"] = 1
         },
+        ["rbxassetid://72124077534136"] = {
+            ["Name"] = "warpstone_warpeye_inspect",
+            ["Speed"] = 1
+        },
         ["rbxassetid://18875555761"] = {
             ["Name"] = "assaultrifle_aug_equip",
             ["Speed"] = 1.288,
@@ -4750,6 +4805,11 @@ return {
         ["rbxassetid://17091725958"] = {
             ["Name"] = "paintballgun_idle",
             ["Speed"] = 1
+        },
+        ["rbxassetid://113379908468089"] = {
+            ["Name"] = "warpstone_warpeye_throw_start",
+            ["Speed"] = 1,
+            ["Length"] = 1
         },
         ["rbxassetid://17245250490"] = {
             ["Name"] = "minigun_inspect",
@@ -5240,6 +5300,12 @@ return {
             ["Name"] = "slingshot_shoot1",
             ["Speed"] = 1
         },
+        ["rbxassetid://94841328368422"] = {
+            ["ActionTimestamp"] = 0.32,
+            ["Name"] = "warpstone_warpeye_lob_finish",
+            ["Speed"] = 1,
+            ["Length"] = 0.68
+        },
         ["rbxassetid://17274291035"] = {
             ["Name"] = "grenadelauncher_shoot1",
             ["Speed"] = 1
@@ -5248,16 +5314,39 @@ return {
             ["Name"] = "handgun_handgun_shoot_final",
             ["Speed"] = 1
         },
+        ["rbxassetid://95833970250310"] = {
+            ["Name"] = "warpstone_warpeye_lob_idle",
+            ["Speed"] = 1
+        },
         ["rbxassetid://110216216870037"] = {
             ["ActionTimestamp"] = 1.15,
             ["Name"] = "crossbow_reload",
             ["Speed"] = 2,
             ["Length"] = 1.55
         },
+        ["rbxassetid://115710622911452"] = {
+            ["Name"] = "warpstone_warpeye_lob_start",
+            ["Speed"] = 1,
+            ["Length"] = 1
+        },
+        ["rbxassetid://110454659256897"] = {
+            ["ActionTimestamp"] = 0.25,
+            ["Name"] = "warpstone_warpeye_throw_finish",
+            ["Speed"] = 1,
+            ["Length"] = 0.7
+        },
+        ["rbxassetid://78898486523965"] = {
+            ["Name"] = "warpstone_warpeye_throw_idle",
+            ["Speed"] = 1
+        },
         ["rbxassetid://133316959169350"] = {
             ["Name"] = "chainsaw_megadrill_hold_start",
             ["Speed"] = 1.333,
             ["Length"] = 0.11252813203300825
+        },
+        ["rbxassetid://127023134645174"] = {
+            ["Name"] = "warpstone_warpeye_idle",
+            ["Speed"] = 1
         },
         ["rbxassetid://17091628355"] = {
             ["Name"] = "paintballgun_inspect",
@@ -5276,6 +5365,11 @@ return {
         ["rbxassetid://140530564891164"] = {
             ["Name"] = "burstrifle_famas_idle",
             ["Speed"] = 0.875
+        },
+        ["rbxassetid://136448352154525"] = {
+            ["Name"] = "warpstone_warpeye_equip",
+            ["Speed"] = 1,
+            ["Length"] = 0.85
         },
         ["rbxassetid://119997151817807"] = {
             ["ActionTimestamp"] = 1.5,
