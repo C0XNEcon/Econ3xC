@@ -535,7 +535,7 @@ function isTypeDown(arg)
 	return UserInputService:IsMouseButtonPressed(Enum.UserInputType[arg or 'MouseButton1'])
 end
 
-function moveMouseToWorldPosition(targetVector3,tchar,right)
+function moveMouseToWorldPosition(targetVector3,tchar,right,dt)
 	if tchar and not tchar.Parent then
 		tchar = nil;
 	end;
@@ -621,6 +621,8 @@ function moveMouseToWorldPosition(targetVector3,tchar,right)
 
 		local _deltaPriorCursorAdders = assertPos(tchar and cursorShakeEnabled,_cursorShakeOffset);
 		local _deltaPriorCursorSpring = assertPos(tchar and cursorSpringEnabled,Vector2.new(_cursorSpring.p.X/cursorSpringDivider,_cursorSpring.p.Y/cursorSpringDivider));
+		
+		delta *= dt;
 
 		-- // MoveMouse
 
@@ -1770,7 +1772,7 @@ local permVars = {
 	lastSilentAim = nil;
 };
 
-table.insert(initConnections, RunService.RenderStepped:Connect(function()
+table.insert(initConnections, RunService.RenderStepped:Connect(function(dt)
 	local screenSize = cam.ViewportSize/Vector2.new(1536,864);
 	local finalMult = (screenSize.X+screenSize.Y)/2;
 	local finalPixels = FOVCircleSize*finalMult;
@@ -1830,7 +1832,7 @@ table.insert(initConnections, RunService.RenderStepped:Connect(function()
 
 	-- // Main Mouse
 
-	moveMouseToWorldPosition(CURRENT_APOS,CURRENT_CHAR,down2);
+	moveMouseToWorldPosition(CURRENT_APOS,CURRENT_CHAR,down2,dt*60);
 	setJumpPhysics();
 
 	e.FillColor = boxCOL;
