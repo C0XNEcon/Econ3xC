@@ -621,9 +621,7 @@ function moveMouseToWorldPosition(targetVector3,tchar,right,dt)
 
 		local _deltaPriorCursorAdders = assertPos(tchar and cursorShakeEnabled,_cursorShakeOffset);
 		local _deltaPriorCursorSpring = assertPos(tchar and cursorSpringEnabled,Vector2.new(_cursorSpring.p.X/cursorSpringDivider,_cursorSpring.p.Y/cursorSpringDivider));
-		
-		delta *= dt;
-
+	
 		-- // MoveMouse
 
 		mousemoverel(delta.X, delta.Y);
