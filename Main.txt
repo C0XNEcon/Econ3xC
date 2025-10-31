@@ -155,8 +155,6 @@ end
 
 -- // Objects
 
-local _material_black = game:GetObjects'rbxassetid://73412517251168'[1]::MaterialVariant;
-
 local FOVCIRCLE_UI = coregui:FindFirstChild'EconFOV';
 local FOVCIRCLE_FRAME = FOVCIRCLE_UI and FOVCIRCLE_UI:FindFirstChild('Root');
 if not FOVCIRCLE_UI then
@@ -177,7 +175,9 @@ if not FOVCIRCLE_UI then
 	FOVCIRCLE_UI.Parent = coregui;
 end
 
+local _material_black = Instance.new('MaterialVariant');
 _material_black.BaseMaterial = Enum.Material.SmoothPlastic;
+_material_black.ColorMap = 'rbxassetid://92795575599771';
 _material_black.Parent = ms:WaitForChild'Other';
 
 -- // Main
