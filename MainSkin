@@ -2,9 +2,9 @@
 
 local module = {	
 	canPlay = {
-		'rbxassetid://13158735106', 
-		'rbxassetid://13158734943', 
-		'rbxassetid://13158735037',
+		'rbxassetid://13158735106';
+		'rbxassetid://13158734943'; 
+		'rbxassetid://13158735037';
 	};
 
 	toName = {
@@ -473,6 +473,23 @@ function __updVMMod(weapon, enabled, PROJ_THROW)
 
 	if PROJ_THROW or BOTH then
 		__handleMultiWeaponFolder'ProjectileOrThrowable'
+	end;
+	
+	if OG_MISC.fromWeapon[weapon] then
+		for _, d in pairs(OG_MISC.fromWeapon[weapon]) do
+			local fromName = {}
+			local tn = module.toName[d.fold.Name]
+
+			for _, v in pairs(d.fold:GetChildren()) do
+				local skin = d.toClone[v].Name
+				local __selected = tn and tn[oselected] or oselected
+
+				v.Name = not enabled and skin 
+					or __selected == skin and 'Default' 
+					or skin == 'Default' and __selected ~= weapon and d.toReal[__selected] and '_econ.'..(skin:lower())..'/^w^'
+					or skin
+			end
+		end
 	end
 
 	if not PROJ_THROW or BOTH then
@@ -495,23 +512,6 @@ function __updVMMod(weapon, enabled, PROJ_THROW)
 					or oselected == skin and weapon 
 					or skin == weapon and oselected ~= weapon and '_econ.'..(skin:lower())..'/>w<'
 					or skin
-			end
-		end
-
-		if OG_MISC.fromWeapon[weapon] then
-			for _, d in pairs(OG_MISC.fromWeapon[weapon]) do
-				local fromName = {}
-				local tn = module.toName[d.fold.Name]
-
-				for _, v in pairs(d.fold:GetChildren()) do
-					local skin = d.toClone[v].Name
-					local __selected = tn and tn[oselected] or oselected
-
-					v.Name = not enabled and skin 
-						or __selected == skin and 'Default' 
-						or skin == 'Default' and __selected ~= weapon and d.toReal[__selected] and '_econ.'..(skin:lower())..'/^w^'
-						or skin
-				end
 			end
 		end
 
@@ -741,8 +741,8 @@ _G.hd = {
 			if not evars.BYTE_WEAPONS[userId] then return end
 
 			local _weapon = evars.BYTE_WEAPONS[userId][args[4]]
-			local _isValidProjectile = module.modelList[_weapon == 'Slingshot' and '' or args[5]] and (typeof(args[6]) == 'Instance' or _weapon and table.find({'Slingshot'},_weapon))
-
+			local _isValidProjectile = true--module.modelList[_weapon == 'Slingshot' and '' or args[5]] and (typeof(args[6]) == 'Instance' or _weapon and table.find({'Slingshot'},_weapon))
+			
 			if not _weapon or not isOurs and _isValidProjectile then
 				if _weapon and PROJ_THROW_ACTIVE[_weapon] then
 					__updVMMod(_weapon,false,true)
