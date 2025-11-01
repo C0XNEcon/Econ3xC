@@ -43,9 +43,10 @@ local module = {
 		Projectiles = 'ProjectileOrThrowable';
 		Throwables = 'ProjectileOrThrowable';
 	};
-
-	skinToBehaviourName = {
-		['Cone Horizon'] = 'Event Horizon';
+	
+	customSkins = {
+		'Cone Horizon'; 
+		'KARBY';
 	};
 
 	SCRIPT_WHITELIST = {
@@ -59,6 +60,11 @@ local module = {
 	headshotid = 'rbxassetid://16537337310'; -- RIVALS | Headshot SoundId
 	bodyshotid = 'rbxassetid://13110130082'; -- RIVALS | Bodyshot SoundId
 }
+
+module.skinToBehaviourName = {
+	[module.customSkins[1]] = 'Event Horizon';
+	[module.customSkins[2]] = 'AUG';
+};
 
 local stringify
 local insert = table.insert
@@ -353,20 +359,29 @@ for name, REQUIRED_URL in _loaded do
 				add_wrap('Unobtainable', 'Kirby', {Enum.Material.Neon, Color3.fromRGB(255, 167, 240), 0, 0, 'Kirby'}, {Enum.Material.Glass, Color3.fromRGB(255, 160, 217), .5, 0, 'KirbyCrystals'}, {Enum.Material.Neon, Color3.fromRGB(255, 155, 193), 0, 0, nil})
 			end;SKIN_MOD = function()
 				repeat run.Stepped:Wait() until REQUIRED_URL and REQUIRED_URL.add_viewmodel
-				REQUIRED_URL.add_viewmodel("Cone Horizon", "rbxassetid://76724077959833", "rbxassetid://76724077959833", nil, nil, nil, CFrame.new(0, 0, -0.25), "sniper_eventhorizon_equip", "sniper_eventhorizon_idle", "sniper_eventhorizon_sprint", "sniper_eventhorizon_inspect", nil, {
+				REQUIRED_URL.add_viewmodel(module.customSkins[1], "rbxassetid://76724077959833", "rbxassetid://76724077959833", nil, nil, nil, CFrame.new(0, 0, -0.25), "sniper_eventhorizon_equip", "sniper_eventhorizon_idle", "sniper_eventhorizon_sprint", "sniper_eventhorizon_inspect", nil, {
 					Shoot1 = "sniper_eventhorizon_shoot1";
 					FinalShoot = nil;
 					Reload = "sniper_eventhorizon_reload";
 					EmptyReload = "sniper_eventhorizon_reload_empty";
+				});
+				
+				REQUIRED_URL.add_viewmodel(module.customSkins[2], "rbxassetid://109526817083813", "rbxassetid://109526817083813", nil, nil, nil, CFrame.new(0.15, -0.2, -0.25) * CFrame.Angles(0, -0.05235987755982989, 0), "assaultrifle_aug_equip", "assaultrifle_aug_idle", "assaultrifle_aug_sprint", "assaultrifle_aug_inspect", nil, {
+					Shoot1 = "assaultrifle_aug_shoot1";
+					FinalShoot = nil;
+					Reload = "assaultrifle_aug_reload";
+					EmptyReload = nil;
 				})
 			end;SKIN_INFO = function()
-				REQUIRED_URL.addSkin('Sniper','Cone Horizon')
+				REQUIRED_URL.addSkin('Sniper',module.customSkins[1]);
+				REQUIRED_URL.addSkin('Assault Rifle',module.customSkins[2]);
 
-				local _model = game:GetObjects('rbxassetid://115436494918393')[1]
-				_model.Name = 'Cone Horizon'
-				_model.Parent = skins.Other
-			end,
-		}
+				local _models = game:GetObjects'rbxassetid://128294562654042'[1];
+				for _, v in _models:GetChildren() do
+					v.Parent = skins.Other;
+				end;
+			end;
+		};
 
 		if nameFuncs[name] then
 			nameFuncs[name]()
@@ -740,7 +755,7 @@ _G.hd = {
 
 			if not evars.BYTE_WEAPONS[userId] then return end
 
-			local _weapon = evars.BYTE_WEAPONS[userId][args[4]]
+ 			local _weapon = evars.BYTE_WEAPONS[userId][args[4]]
 			local _isValidProjectile = true--module.modelList[_weapon == 'Slingshot' and '' or args[5]] and (typeof(args[6]) == 'Instance' or _weapon and table.find({'Slingshot'},_weapon))
 			
 			if not _weapon or not isOurs and _isValidProjectile then
@@ -1033,12 +1048,11 @@ for t, weapons in pairs(UTILS.WEAPON_TYPES.typeToWeapons) do
 			end
 
 			local selectedSkin = [[Dont Change]]
-			local specials = {'Cone Horizon'}
 			local drop = gameplayTab:CreateDropdown({
 				Name = skin,
 				Options = v,
 				CurrentOption = {[[Dont Change]]},
-				SpecialOptions = specials,
+				SpecialOptions = module.customSkins,
 				MultipleOptions = false,
 				Flag = skin,
 				Ext = true;
@@ -1060,7 +1074,7 @@ for t, weapons in pairs(UTILS.WEAPON_TYPES.typeToWeapons) do
 				end,
 			})
 
-			for _, v in pairs(specials) do
+			for _, v in pairs(module.customSkins) do
 				local frame = drop.Frames[v]
 				if frame then
 					frame.Title.FontFace = Font.fromName('Montserrat',Enum.FontWeight.ExtraBold,Enum.FontStyle.Normal)
