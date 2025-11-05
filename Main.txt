@@ -56,10 +56,6 @@ local newind = function()
 	return ret;
 end;
 
-local cam   = Workspace.CurrentCamera;
-local plr   = Players.LocalPlayer;
-local mouse = plr:GetMouse();
-
 ----------- [ Executor Functions ] -----------
 
 local SCRIPT_WHITELIST = {
@@ -249,6 +245,14 @@ local function playSound(sp, rep, vol)
 		new:Destroy()
 	end)
 end
+
+if not Players.LocalPlayer then
+	repeat RunService.Stepped:Wait() until Players.LocalPlayer;
+end;
+
+local cam   = Workspace.CurrentCamera;
+local plr   = Players.LocalPlayer;
+local mouse = plr:GetMouse();
 
 if plr:GetAttribute('OriginalPosition') then 
 	plr:SetAttribute('OriginalPosition', nil)		
