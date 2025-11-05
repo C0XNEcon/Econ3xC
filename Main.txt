@@ -79,14 +79,14 @@ local SKINCHANGER_WHITELIST = {
 
 local request = (syn and syn.request) or (fluxus and fluxus.request) or (http and http.request) or http_request or request
 
-if not table.find(SCRIPT_WHITELIST,plr.UserId) then
-	plr:Kick("You don't have permission to use Econ")
-	plr.Parent = nil
-	return
-elseif not request then
-	plr:Kick('Your executor is not supported for Econ [ Missing function: "request" ]')
-	return
-end
+--if not table.find(SCRIPT_WHITELIST,plr.UserId) then
+--	plr:Kick("You don't have permission to use Econ")
+--	plr.Parent = nil
+--	return
+--elseif not request then
+--	plr:Kick('Your executor is not supported for Econ [ Missing function: "request" ]')
+--	return
+--end
 
 local URL_ROOT = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/'
 local ECON_TOKEN = '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'
@@ -1501,7 +1501,6 @@ local boxSection = gameplayTab:CreateSection'ESP'
 
 local evtype = 'Off'
 local gui = {}
-local shooting_range = '߿'
 
 local function canPopup()
 	return evtype == 'Always' or evtype == 'With ESP' and boxactive
@@ -1722,11 +1721,11 @@ local matchCheck = gameplayTab:CreateToggle{
 
 -- // Skin
 
-if table.find(SKINCHANGER_WHITELIST,plr.UserId) then
+--if table.find(SKINCHANGER_WHITELIST,plr.UserId) then
 	_G.ECON_UI = EconField
 	_G.SIGNAL_QUEUE = true
 	task.spawn(allLoadstrings.mainSkin)	
-end
+--end
 
 -- // Rest
 
@@ -2004,10 +2003,10 @@ local function createbox(player)
 				local head = player.Character:FindFirstChild("Head")
 
 				if root and head then
-					local rootPos, rootVisible = cam:WorldToViewportPoint(root.Position)
-					local headPos, headVisible = cam:WorldToViewportPoint(head.Position + Vector3.new(0, 0.5, 0))
+					local rootPos, rootVisible = cam:WorldToViewportPoint(root.Position);
+					local headPos, headVisible = cam:WorldToViewportPoint(head.Position + Vector3.yAxis/2);
 
-					local fcol = silactive or spactivate
+					local fcol = silactive or spactivate;
 
 					if rootVisible and headVisible then
 						local f = {
