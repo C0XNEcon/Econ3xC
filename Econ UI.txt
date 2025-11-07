@@ -30,8 +30,9 @@ local _ui_blur = {
 		DOF.InFocusRadius = 50;
 		DOF.NearIntensity = 1;
 		
+		local scale = .97;
 		local frame = Instance.new('Frame');
-		frame.Size = UDim2.fromScale(.975,975);
+		frame.Size = UDim2.fromScale(scale,scale);
 		frame.Position = UDim2.fromScale(.5,.5);
 		frame.AnchorPoint = Vector2.one/2;
 		frame.Transparency = 1;
