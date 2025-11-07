@@ -141,7 +141,7 @@ local _ui_blur = {
 				BrickColor = BrickColor.new('Institutional white');
 			}
 			
-			DOF.Enabled = frame.Visible;
+			DOF.Enabled = fr.Visible;
 
 			local zIndex = 1 - 0.05*frame.ZIndex;
 
