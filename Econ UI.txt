@@ -20,7 +20,7 @@ local lht = game:GetService'Lighting';
 local cid = 0;
 
 local _ui_blur = {
-	new = function(obj:Frame)
+	new = function(frame:Frame)
 		local camera = workspace.CurrentCamera;
 		local root = Instance.new('Folder', camera);
 
@@ -29,13 +29,6 @@ local _ui_blur = {
 		DOF.FocusDistance = 51.6;
 		DOF.InFocusRadius = 50;
 		DOF.NearIntensity = 1;
-
-		local frame = Instance.new('Frame');
-		frame.Size = UDim2.fromScale(0.95,0.95);
-		frame.Position = UDim2.fromScale(0.5,0.5);
-		frame.AnchorPoint = Vector2.one*.5;
-		frame.Transparency = 1;
-		frame.Parent = obj;
 
 		cid += 1;
 		local uid = cid;
@@ -139,6 +132,8 @@ local _ui_blur = {
 				Transparency = 0.98;
 				BrickColor = BrickColor.new('Institutional white');
 			}
+			
+			DOF.Enabled = frame.Visible;
 
 			local zIndex = 1 - 0.05*frame.ZIndex;
 
