@@ -131,7 +131,9 @@ local _ui_blur = {
 		add(frame);
 
 		local function UpdateOrientation(fetchProps)
-			if not root or not root.Parent then
+			if not root or not root.Parent or not fr or not fr.Parent then
+				DOF:Destroy();
+				root:Destroy();
 				run:UnbindFromRenderStep(uid);
 				return;
 			end;
