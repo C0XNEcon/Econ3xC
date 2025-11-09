@@ -13,6 +13,41 @@ local Workspace         = game:GetService'Workspace'
 local Players           = game:GetService'Players'
 local coregui           = game:GetService'CoreGui'
 
+function getCorners(part, cframe, size)	
+	local cf = cframe or part.CFrame
+	local size = size or part.Size
+	local p = cf.Position
+
+	local frontFaceCenter = (cf + cf.LookVector * size.Z/2)
+	local backFaceCenter = (cf - cf.LookVector * size.Z/2)
+
+	local topFrontEdgeCenter = frontFaceCenter + frontFaceCenter.UpVector * size.Y/2
+	local bottomFrontEdgeCenter = frontFaceCenter - frontFaceCenter.UpVector * size.Y/2
+	local topBackEdgeCenter = backFaceCenter + backFaceCenter.UpVector * size.Y/2
+	local bottomBackEdgeCenter = backFaceCenter - backFaceCenter.UpVector * size.Y/2
+
+	local zH = Vector3.zAxis*(size.Z/2)
+	local xH = Vector3.xAxis*(size.X/2)
+
+	local tbl = {}
+	local t = table.insert
+	local function centerStuff(add)
+		add = add or Vector3.zero
+		t(tbl, (p+zH+xH) + add)
+		t(tbl, (p-zH-xH) + add)
+		t(tbl, (p+xH-zH) + add)
+		t(tbl, (p-xH+zH) + add)
+	end
+
+	centerStuff()
+
+	for _, v in {2, -2} do
+		centerStuff(Vector3.yAxis*size.Y/v)
+	end
+
+	return tbl
+end
+
 local newind = function()
 	local CURR_FUNCS = {};
 	local ind = 0;
@@ -453,6 +488,9 @@ local softLockLerp = 0;
 local softLockReactionIn = 0;
 local softLockReactionOut = 0;
 
+local softlockToPreferredLerp = .5;
+local softlockPreferred = {'Head','Torso'};
+
 local cursorSpringEnabled = true;
 local cursorSpringDivider = 1;
 
@@ -536,6 +574,7 @@ local ads = 1
 
 local lray = false;
 local ins = false;
+local rtyp = '';
 
 local softind = newind();
 
@@ -595,13 +634,14 @@ function moveMouseToWorldPosition(targetVector3,tchar,right,dt)
 				end);
 			end;
 			
-			extraDeltaMult = ins and (softLockLerp or .025) or 1;
+			extraDeltaMult = ins and (not table.find(softlockPreferred,rtyp) and softlockToPreferredLerp or softLockLerp or .025) or 1;
 		end
 
 		if tchar and triggerbotEnabled then
 			local params = RaycastParams.new();
 			params.CollisionGroup = 'CollideWithPlayersOnly';
 			params.RespectCanCollide = false;
+			
 
 			local cf = cam.CFrame;
 			local ray = Workspace:Raycast(cf.Position,cf.LookVector*1e5,params);
@@ -613,6 +653,11 @@ function moveMouseToWorldPosition(targetVector3,tchar,right,dt)
 			else
 				disableTrigger();
 			end;
+			
+			if ray then
+				local part = ray.Instance.Name:gsub('Hitbox',''):gsub('Small','');
+				rtyp = part;
+			end
 		else
 			disableTrigger();
 		end;
@@ -988,16 +1033,16 @@ legitTab:CreateSection('Legit Basic')
 
 function ADD_SOFTLOCK()
 	local softlockEnabled = legitTab:CreateToggle({
-		Name = 'SoftLock Enabled',
+		Name = 'Softlock Enabled',
 		CurrentValue = true,
 		Flag = "sfle",
 		Callback = function(Value, nosound)
 			softLockEnabled = Value;
-		end,
-	})
+		end;
+	});
 
 	local softlockLerp = legitTab:CreateSlider({
-		Name = 'In Hitbox Aim Lerp Multiplication',
+		Name = 'In Hitbox Aim Lerp Mult',
 		Range = {0, 2},
 		Increment = .025,
 		Suffix = '',
@@ -1029,6 +1074,29 @@ function ADD_SOFTLOCK()
 		Flag = 'softlockhitboxreactiontimeout',
 		Callback = function(Value)
 			softLockReactionOut = Value;
+		end;
+	});
+	
+	local softlockPreferreddd = legitTab:CreateDropdown({
+		Name = 'Softlock Preferred Parts';
+		Options = {'Head','Torso'};
+		CurrentOption = {};
+		MultipleOptions = true;
+		Flag = 'softlockpreferred';
+		Callback = function(Options)
+			softlockPreferred = #Options > 0 and Options or {'Head','Torso'};
+		end;
+	});
+	
+	local preferredlerp = legitTab:CreateSlider({
+		Name = 'To Preferred Aim Lerp Mult',
+		Range = {0, 2},
+		Increment = .025,
+		Suffix = '',
+		CurrentValue = .5,
+		Flag = 'topreferredlerpmult',
+		Callback = function(Value)
+			softlockToPreferredLerp = Value;
 		end;
 	});
 end;
@@ -2076,4 +2144,8 @@ EconField.CONE_FILE_NAME = './cone/'..currentConfig
 EconField:LoadConfiguration(true)
 updConfigDropdown(nil,nil,true)
 
-queue_on_teleport(__GETURL'Main.txt')
+plr.OnTeleport:Connect(function(state)
+	if state == Enum.TeleportState.Started then
+		queue_on_teleport(__GETURL'Main.txt');
+	end;
+end);
