@@ -678,7 +678,8 @@ function moveMouseToWorldPosition(targetVector3,tchar,right,dt)
 		local _deltaPriorCursorSpring = assertPos(tchar and cursorSpringEnabled,Vector2.new(_cursorSpring.p.X/cursorSpringDivider,_cursorSpring.p.Y/cursorSpringDivider));
 	
 		-- // MoveMouse
-
+		
+		delta *= dt
 		mousemoverel(delta.X, delta.Y);
 		_cursorSpring:Impulse(Vector3.new(_deltaPriorCursorAdders.X,_deltaPriorCursorAdders.Y,1));
 	else
@@ -1916,7 +1917,7 @@ table.insert(initConnections, RunService.RenderStepped:Connect(function(dt)
 
 	-- // Main Mouse
 
-	moveMouseToWorldPosition(CURRENT_APOS,CURRENT_CHAR,down2,dt*60);
+	moveMouseToWorldPosition(CURRENT_APOS,CURRENT_CHAR,down2,dt*120);
 	setJumpPhysics();
 
 	e.FillColor = boxCOL;
@@ -2144,8 +2145,4 @@ EconField.CONE_FILE_NAME = './cone/'..currentConfig
 EconField:LoadConfiguration(true)
 updConfigDropdown(nil,nil,true)
 
-plr.OnTeleport:Connect(function(state)
-	if state == Enum.TeleportState.Started then
-		queue_on_teleport(__GETURL'Main.txt');
-	end;
-end);
+queue_on_teleport(__GETURL'Main.txt');
