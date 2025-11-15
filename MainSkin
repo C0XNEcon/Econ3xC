@@ -129,7 +129,7 @@ end;
 local request = (syn and syn.request) or (fluxus and fluxus.request) or (http and http.request) or http_request or request
 
 local URL_ROOT = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/'
-local ECON_TOKEN = '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'
+local ECON_TOKEN = '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'
 local __GETURL = function(URL)
 	return request({Url = URL_ROOT..URL; Method = 'GET'; Headers = {
 		Authorization = 'token '..ECON_TOKEN;
