@@ -120,7 +120,7 @@ local request = (syn and syn.request) or (fluxus and fluxus.request) or (http an
 --end
 
 local URL_ROOT = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/'
-local ECON_TOKEN = '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'
+local ECON_TOKEN = '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'
 local __GETURL = function(URL)
 	return request({Url = URL_ROOT..URL; Method = 'GET'; Headers = {
 		Authorization = 'token '..ECON_TOKEN;
@@ -300,6 +300,7 @@ local on = true
 local going = true
 
 local Window = nil;
+local EconField = allLoadstrings.econUI()
 
 table.insert(initConnections, plr:GetAttributeChangedSignal('OriginalPosition'):Connect(function()
 	for _, v in pairs(initConnections) do
@@ -314,8 +315,8 @@ table.insert(initConnections, plr:GetAttributeChangedSignal('OriginalPosition'):
 		v:Remove()
 	end
 
-	if Window then
-		Window:Destroy();
+	if EconField then
+		EconField:Destroy();
 	end;
 
 	playSound(1.5, knifeSound);
@@ -377,8 +378,6 @@ end
 table.insert(initConnections, _items.ChildAdded:Connect(_reloadcar))
 
 -- // EconField Setup
-
-local EconField = allLoadstrings.econUI()
 
 Window = EconField:CreateWindow({
 	Name = "Econ",
@@ -1792,7 +1791,38 @@ local matchCheck = gameplayTab:CreateToggle{
 	end,
 }
 
--- // Skin
+-- // Graphics
+
+local graphicsTab = Window:CreateTab('Graphics', 'wallpaper') -- Title, Image
+graphicsTab:CreateSection('Skies','cloud')
+
+local skydropdown = graphicsTab:CreateDropdown{
+	Name = 'Change Skybox';
+	CurrentOption = {'None'};
+	MultipleOptions = false;
+	Flag = 'skybox';
+	Options = {
+		'Galaxy';
+		'Custom';
+		'None';
+	};
+	
+	Callback = function(Options)
+		
+	end;
+};
+
+local customsky = graphicsTab:CreateInput({
+	Name = 'Custom Sky ID',
+	CurrentValue = '',
+	PlaceholderText = '15983996673',
+	Flag = 'skyid',
+	Callback = function(txt, nosound)
+		
+	end;
+});
+
+-- // Skinchanger
 
 --if table.find(SKINCHANGER_WHITELIST,plr.UserId) then
 	_G.ECON_UI = EconField
