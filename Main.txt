@@ -1841,9 +1841,15 @@ local customsky = graphicsTab:CreateInput({
 		if txt == l2 then return end;
 		l2 = txt;
 		local succ, sky = pcall(function()
-			return game:GetObjects(`{id}{txt:gsub(id,'')}`)[1];
+			return game:GetObjects(`{id}{txt:gsub(id,'')}`);
 		end);
 		if succ then
+			for _, v in sky do
+				if v:IsA('Sky') then
+					sky = v;
+					break;
+				end;
+			end;
 			customSky = sky
 			skydropdown.Frames.Custom.BG.Image = customSky.SkyboxFt;
 			skydropdown.Frames.Custom.BG.Visible = true;
