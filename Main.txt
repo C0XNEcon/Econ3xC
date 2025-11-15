@@ -186,6 +186,7 @@ end
 
 -- // Objects
 
+local skyObjects = game:GetObjects'rbxassetid://78543754925908'[1];
 local FOVCIRCLE_UI = coregui:FindFirstChild'EconFOV';
 local FOVCIRCLE_FRAME = FOVCIRCLE_UI and FOVCIRCLE_UI:FindFirstChild('Root');
 if not FOVCIRCLE_UI then
@@ -1796,29 +1797,57 @@ local matchCheck = gameplayTab:CreateToggle{
 local graphicsTab = Window:CreateTab('Graphics', 'wallpaper') -- Title, Image
 graphicsTab:CreateSection('Skies','cloud')
 
+local customSky = nil;
+local selectedSky = nil;
+
+local tb = {};
+for _, v in skyObjects:GetChildren() do
+	table.insert(tb,v.Name);
+end;
+
+table.insert(tb,'Custom');
+table.insert(tb,'None');
+
 local skydropdown = graphicsTab:CreateDropdown{
 	Name = 'Change Skybox';
 	CurrentOption = {'None'};
 	MultipleOptions = false;
 	Flag = 'skybox';
-	Options = {
-		'Galaxy';
-		'Custom';
-		'None';
-	};
+	Options = tb;
 	
 	Callback = function(Options)
-		
+		pcall(function()
+			selectedSky = Options[1] == 'Custom' and customSky or skyObjects[Options[1]];
+		end);
 	end;
 };
 
+for _, v in tb do
+	local frame = skydropdown.Frames[v];
+	if v ~= 'None' and v ~= 'Custom' then
+		frame.BG.Image = skyObjects[v].SkyboxFt;
+		frame.BG.Visible = true;
+	end;
+end;
+
+local id = 'rbxassetid://';
+local l2 = '';
 local customsky = graphicsTab:CreateInput({
 	Name = 'Custom Sky ID',
 	CurrentValue = '',
 	PlaceholderText = '15983996673',
 	Flag = 'skyid',
 	Callback = function(txt, nosound)
-		
+		if txt == l2 then return end;
+		l2 = txt;
+		local succ, sky = pcall(function()
+			return game:GetObjects(`{id}{txt:gsub(id,'')}`)[1];
+		end);
+		if succ then
+			customSky = sky
+			skydropdown.Frames.Custom.BG.Image = customSky.SkyboxFt;
+			skydropdown.Frames.Custom.BG.Visible = true;
+		end;
 	end;
 });
 
@@ -1897,6 +1926,17 @@ table.insert(initConnections, RunService.RenderStepped:Connect(function(dt)
 	
 	if stretchedres > 0 then
 		cam.CFrame *= CFrame.new(0, 0, 0, 1, 0, 0, 0, 1-stretchedres, 0, 0, 0, 1); -- // Stretched Resolution
+	end;
+	
+	if selectedSky then
+		local csky = game.Lighting:FindFirstChildWhichIsA('Sky');
+		if csky and csky.SkyboxFt ~= selectedSky.SkyboxFt then
+			local skyprops = {'Bk','Dn','Ft','Lf','Rt','Up','CelestialBodiesShown','MoonAngularSize','SkyboxOrientation','SunAngularSize','StarCount','SunTextureId','MoonTextureId'};
+			for _, v in skyprops do
+				local prop = `Skybox{v}`;
+				csky[prop] = selectedSky[prop];
+			end;
+		end;
 	end;
 	
 	-- // Silent Aim
