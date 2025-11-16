@@ -98,7 +98,7 @@ local _ui_blur = {
 					p0.CanQuery = false;
 					p0.CanCollide = false;
 					p0.CastShadow = false;
-					p0.Material = Enum.Material.Glass;
+					p0.Material = DOF.Name == 'DepthOfField' and Enum.Material.Glass or Enum.Material.Wood;
 					p0.Size = Vector3.one*sz;
 					local mesh = Instance.new('SpecialMesh', p0);
 					mesh.MeshType = 2;
@@ -143,7 +143,7 @@ local _ui_blur = {
 				BrickColor = BrickColor.new('Institutional white');
 			}
 			
-			DOF.Enabled = fr.Visible;
+			DOF.Enabled = DOF.Name == 'DepthOfField' and fr.Visible;
 
 			local zIndex = 1 - 0.05*frame.ZIndex;
 
