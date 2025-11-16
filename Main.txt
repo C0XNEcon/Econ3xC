@@ -465,7 +465,7 @@ end
 local shra = true
 local igam = true
 
-local function id()
+local function __id()
 	return plr:GetAttribute('EnvironmentID')
 end
 
@@ -523,7 +523,7 @@ local function getNearestHead()
 	for _, player in pairs(Players:GetPlayers()) do
 		local char = player.Character;
 		local hum = char and char:FindFirstChild('Humanoid');
-		if player ~= plr and (player:GetAttribute('EnvironmentID') == id() or not igCheck) and (not id() or id() ~= '߿' and igam or id() == '߿' and shra) and not table.find(noPlayers, player.UserId) and hum and hum.Health > 0 then	
+		if player ~= plr and (player:GetAttribute('EnvironmentID') == __id() or not igCheck) and (not __id() or __id() ~= '߿' and igam or __id() == '߿' and shra) and not table.find(noPlayers, player.UserId) and hum and hum.Health > 0 then	
 			local cpos = char:GetPivot().Position
 			local screenSize = cam.ViewportSize;
 			local pos, onscreen = cam:WorldToViewportPoint(cpos);
@@ -2255,7 +2255,7 @@ local function createbox(player)
 
 			if not char or not char.Parent then deactivate() return end;
 
-			if boxactive and not table.find(noPlayers, player.UserId) and (player:GetAttribute('EnvironmentID') == plr:GetAttribute('EnvironmentID') or not igCheck) and (not id() or id() ~= '߿' and igam or id() == '߿' and shra) and root and hum and hum.Health > 0 and player.Character:FindFirstChild("HumanoidRootPart") and getWeapon() then
+			if boxactive and not table.find(noPlayers, player.UserId) and (player:GetAttribute('EnvironmentID') == plr:GetAttribute('EnvironmentID') or not igCheck) and (not __id() or __id() ~= '߿' and igam or __id() == '߿' and shra) and root and hum and hum.Health > 0 and player.Character:FindFirstChild("HumanoidRootPart") and getWeapon() then
 				local head = player.Character:FindFirstChild("Head")
 
 				if root and head then
