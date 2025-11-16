@@ -1850,12 +1850,107 @@ local customsky = graphicsTab:CreateInput({
 					break;
 				end;
 			end;
+			if selectedSky == customSky then
+				selectedSky = sky;
+			end;
 			customSky = sky
 			skydropdown.Frames.Custom.BG.Image = customSky.SkyboxFt;
 			skydropdown.Frames.Custom.BG.Visible = true;
 		end;
 	end;
 });
+
+graphicsTab:CreateSection('Lighting','sun');
+
+local lightingSettings = {
+	apply = false;
+	
+	ClockTime = 12;
+	GeographicLatitude=0;
+	ExposureCompensation=0;
+	Ambient = Color3.new(0,0,0);
+	OutdoorAmbient = Color3.new(0,0,0);
+	Brightness=2;
+};
+
+local applyLighting = graphicsTab:CreateToggle{
+	Name = 'Apply Lighting',
+	CurrentValue = false,
+	Flag = 'aplight',
+	Callback = function(Value, nosound)
+		lightingSettings.apply = Value
+	end,
+};
+
+graphicsTab:CreateDivider();
+
+do
+	local clocktime = graphicsTab:CreateSlider{
+		Name = 'Clocktime',
+		Range = {0, 24},
+		Increment = .05,
+		Suffix = '',
+		CurrentValue = 6,
+		Flag = 'ctime',
+		Callback = function(Value)
+			lightingSettings.ClockTime = Value;
+		end;
+	};
+
+	local ambient = graphicsTab:CreateColorPicker{
+		Name = 'Ambient',
+		Color = Color3.fromRGB(0,0,0),
+		Flag = 'ambient',
+		Callback = function(Value)
+			lightingSettings.Ambient = Value;
+		end;
+	};
+
+	local outdoorambient = graphicsTab:CreateColorPicker{
+		Name = 'Outdoor Ambient',
+		Color = Color3.fromRGB(0,0,0),
+		Flag = 'oambient',
+		Callback = function(Value)
+			lightingSettings.OutdoorAmbient = Value;
+		end;
+	};
+
+	local geolat = graphicsTab:CreateInput({
+		Name = 'Geographic Latitude',
+		CurrentValue = '0',
+		PlaceholderText = '0',
+		Flag = 'glat',
+		Callback = function(txt, nosound)
+			if tonumber(txt) then
+				lightingSettings.GeographicLatitude = tonumber(txt);
+			end;
+		end;
+	});
+
+	local exposurecomp = graphicsTab:CreateSlider{
+		Name = 'Exposure Compensation',
+		Range = {-10, 10},
+		Increment = .1,
+		Suffix = '',
+		CurrentValue = 6,
+		Flag = 'ctime',
+		Callback = function(Value)
+			lightingSettings.ExposureCompensation = Value;
+		end;
+	};
+
+	local brightness = graphicsTab:CreateSlider{
+		Name = 'Brightness',
+		Range = {0, 10},
+		Increment = .1,
+		Suffix = '',
+		CurrentValue = 6,
+		Flag = 'bright',
+		Callback = function(Value)
+			lightingSettings.Brightness = Value;
+		end;
+	};
+end;
 
 -- // Skinchanger
 
@@ -1939,8 +2034,20 @@ table.insert(initConnections, RunService.RenderStepped:Connect(function(dt)
 		if csky and csky.SkyboxFt ~= selectedSky.SkyboxFt then
 			local skyprops = {'Bk','Dn','Ft','Lf','Rt','Up','CelestialBodiesShown','MoonAngularSize','SkyboxOrientation','SunAngularSize','StarCount','SunTextureId','MoonTextureId'};
 			for _, v in skyprops do
-				local prop = `Skybox{v}`;
-				csky[prop] = selectedSky[prop];
+				pcall(function()
+					local prop = `Skybox{v}`;
+					csky[prop] = selectedSky[prop];
+				end);
+			end;
+		end;
+	end;
+	
+	if lightingSettings.apply then
+		for n, v in lightingSettings do
+			if n ~= 'apply' then
+				pcall(function()
+					game.Lighting[n] = v;
+				end);
 			end;
 		end;
 	end;
@@ -1957,11 +2064,11 @@ table.insert(initConnections, RunService.RenderStepped:Connect(function(dt)
 		hitboxPos[n] = v*silentAimDistance;
 	end;
 
-	local selectedChar = CURRENT_CHAR
+	local selectedChar = CURRENT_CHAR;
 	if not selectedChar then
 		local get = getNearestHead();
 		selectedChar = get and get.Parent;
-	end
+	end;
 
 	if permVars.lastSilentAim ~= selectedChar and typeof(permVars.lastSilentAim) == 'Instance' then
 		local piv = permVars.lastSilentAim:GetPivot();
