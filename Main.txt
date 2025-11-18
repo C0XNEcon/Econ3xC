@@ -13,6 +13,23 @@ local Workspace         = game:GetService'Workspace'
 local Players           = game:GetService'Players'
 local coregui           = game:GetService'CoreGui'
 
+local SCRIPT_WHITELIST = {
+	9390007618; -- // Ylian
+	9502659782; -- // ConePAlt
+	9405913287; -- // CPartyAltB
+	9711984939; -- // Econ07Rivel
+};
+
+local keycontroller = loadstring(game:HttpGet'https://junkie-development.de/sdk/JunkieKeySystem.lua')();
+local s, valid = pcall(function()
+	return table.find(SCRIPT_WHITELIST,Players.LocalPlayer.UserId) or keycontroller.verifyKey('371b5300-1cc6-433a-9b9b-f36f6e600943', _G.econ_key_reg,'Econ|Key');
+end);
+
+if not valid then
+	Players.LocalPlayer:Kick();
+	return;
+end;
+
 function getCorners(part, cframe, size)	
 	local cf = cframe or part.CFrame
 	local size = size or part.Size
@@ -92,21 +109,6 @@ local newind = function()
 end;
 
 ----------- [ Executor Functions ] -----------
-
-local SCRIPT_WHITELIST = {
-	9390007618; -- // Ylian
-	9502659782; -- // ConePAlt
-	9405913287; -- // CPartyAltB
-	9711984939; -- // Econ07Rivel
-};
-
-local SKINCHANGER_WHITELIST = {
-	2318573471; -- // Reno
-	9390007618; -- // Ylian
-	9502659782; -- // ConePAlt
-	9711984939; -- // Econ07Rivel
-	--9405913287; -- // CPartyAltB
-};
 
 local request = (syn and syn.request) or (fluxus and fluxus.request) or (http and http.request) or http_request or request
 
@@ -1054,6 +1056,18 @@ function ADD_SOFTLOCK()
 		end;
 	});
 	
+	local aftersoftlocklerp = legitTab:CreateSlider({
+		Name = 'After In Hitbox Aim Lerp Mult',
+		Range = {0, 2},
+		Increment = .05,
+		Suffix = '',
+		CurrentValue = .125,
+		Flag = 'afterinhitboxlerpmult',
+		Callback = function(Value)
+			
+		end;
+	});
+	
 	local reactin = legitTab:CreateSlider({
 		Name = 'In Hitbox Reaction Time',
 		Range = {0, 1},
@@ -1890,7 +1904,7 @@ do
 		Range = {0, 24},
 		Increment = .05,
 		Suffix = '',
-		CurrentValue = 6,
+		CurrentValue = 12,
 		Flag = 'ctime',
 		Callback = function(Value)
 			lightingSettings.ClockTime = Value;
@@ -1899,7 +1913,7 @@ do
 
 	local ambient = graphicsTab:CreateColorPicker{
 		Name = 'Ambient',
-		Color = Color3.fromRGB(0,0,0),
+		Color = Color3.fromRGB(1,1,1),
 		Flag = 'ambient',
 		Callback = function(Value)
 			lightingSettings.Ambient = Value;
@@ -1932,7 +1946,7 @@ do
 		Range = {-10, 10},
 		Increment = .1,
 		Suffix = '',
-		CurrentValue = 6,
+		CurrentValue = 0,
 		Flag = 'ctime',
 		Callback = function(Value)
 			lightingSettings.ExposureCompensation = Value;
@@ -1944,7 +1958,7 @@ do
 		Range = {0, 10},
 		Increment = .1,
 		Suffix = '',
-		CurrentValue = 6,
+		CurrentValue = 2,
 		Flag = 'bright',
 		Callback = function(Value)
 			lightingSettings.Brightness = Value;
