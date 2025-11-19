@@ -1932,18 +1932,18 @@ end;
 
 graphicsTab:CreateSection('Lighting','sun');
 
+local lightingSettings = {
+	apply = false;
+
+	ClockTime = 12;
+	GeographicLatitude=0;
+	ExposureCompensation=0;
+	Ambient = Color3.new(0,0,0);
+	OutdoorAmbient = Color3.new(0,0,0);
+	Brightness=2;
+};
+
 do 
-	local lightingSettings = {
-		apply = false;
-
-		ClockTime = 12;
-		GeographicLatitude=0;
-		ExposureCompensation=0;
-		Ambient = Color3.new(0,0,0);
-		OutdoorAmbient = Color3.new(0,0,0);
-		Brightness=2;
-	};
-
 	local applyLighting = graphicsTab:CreateToggle{
 		Name = 'Apply Lighting',
 		CurrentValue = false,
