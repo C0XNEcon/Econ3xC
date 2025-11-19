@@ -77,7 +77,7 @@ end);
 local URL_ROOT = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/'
 local ECON_TOKEN = _G.econ_gitkey and deobfuscateSTR(_G.econ_gitkey);
 
-if not admin then
+if not admin or not ECON_TOKEN then
 	if not valid or not ECON_TOKEN then
 		Players.LocalPlayer:Kick();
 		return;
@@ -1802,151 +1802,157 @@ local ingame_ = gameplayTab:CreateToggle{
 
 local gameplaySection = gameplayTab:CreateSection('Gameplay','swords')
 
-local autoReload = gameplayTab:CreateToggle{
-	Name = 'Auto Reload',
-	CurrentValue = false,
-	Flag = 'artoggle',
-	Callback = function(Value, nosound)
-		reload = Value
+do
+	local autoReload = gameplayTab:CreateToggle{
+		Name = 'Auto Reload',
+		CurrentValue = false,
+		Flag = 'artoggle',
+		Callback = function(Value, nosound)
+			reload = Value
 
-		if not nosound then
-			playSound(reload and 1 or .8)
-		end
-	end,
-}
+			if not nosound then
+				playSound(reload and 1 or .8)
+			end
+		end,
+	}
 
-local autoKatana = gameplayTab:CreateToggle{
-	Name = 'Auto Katana [ Unreliable ]',
-	CurrentValue = true,
-	Flag = 'aktoggle',
-	Callback = function(Value, nosound)
-		katana = Value
+	local autoKatana = gameplayTab:CreateToggle{
+		Name = 'Auto Katana [ Unreliable ]',
+		CurrentValue = true,
+		Flag = 'aktoggle',
+		Callback = function(Value, nosound)
+			katana = Value
 
-		if not nosound then
-			playSound(katana and 1 or .8)
-		end
-	end,
-}
+			if not nosound then
+				playSound(katana and 1 or .8)
+			end
+		end,
+	}
 
-local teamCheck = gameplayTab:CreateToggle{
-	Name = 'Team Check [ Recommended ]',
-	CurrentValue = true,
-	Flag = 'tctoggle',
-	Callback = function(Value, nosound)
-		if Value then
-			noPlayers = ac 
-		else
-			noPlayers = {}
-		end
+	local teamCheck = gameplayTab:CreateToggle{
+		Name = 'Team Check [ Recommended ]',
+		CurrentValue = true,
+		Flag = 'tctoggle',
+		Callback = function(Value, nosound)
+			if Value then
+				noPlayers = ac 
+			else
+				noPlayers = {}
+			end
 
-		if not nosound then
-			playSound(Value and 1 or .8)
-		end 
-	end,
-}
+			if not nosound then
+				playSound(Value and 1 or .8)
+			end 
+		end,
+	}
 
-local matchCheck = gameplayTab:CreateToggle{
-	Name = 'Match Check [ Recommended ]',
-	CurrentValue = true,
-	Flag = 'ictoggle',
-	Callback = function(Value, nosound)
-		igCheck = Value
+	local matchCheck = gameplayTab:CreateToggle{
+		Name = 'Match Check [ Recommended ]',
+		CurrentValue = true,
+		Flag = 'ictoggle',
+		Callback = function(Value, nosound)
+			igCheck = Value
 
-		if not nosound then
-			playSound(Value and 1 or .8)
-		end
-	end,
-}
+			if not nosound then
+				playSound(Value and 1 or .8)
+			end
+		end,
+	};
+end;
 
 -- // Graphics
 
 local graphicsTab = Window:CreateTab('Graphics', 'wallpaper') -- Title, Image
-graphicsTab:CreateSection('Skies','cloud')
-
 local customSky = nil;
 local selectedSky = nil;
 
-local tb = {};
-for _, v in skyObjects:GetChildren() do
-	table.insert(tb,v.Name);
-end;
+do 
+	graphicsTab:CreateSection('Skies','cloud')
 
-table.insert(tb,'Custom');
-table.insert(tb,'None');
-
-local skydropdown = graphicsTab:CreateDropdown{
-	Name = 'Change Skybox';
-	CurrentOption = {'None'};
-	MultipleOptions = false;
-	Flag = 'skybox';
-	Options = tb;
-	
-	Callback = function(Options)
-		pcall(function()
-			selectedSky = Options[1] == 'Custom' and customSky or skyObjects[Options[1]];
-		end);
+	local tb = {};
+	for _, v in skyObjects:GetChildren() do
+		table.insert(tb,v.Name);
 	end;
-};
 
-for _, v in tb do
-	local frame = skydropdown.Frames[v];
-	if v ~= 'None' and v ~= 'Custom' then
-		frame.BG.Image = skyObjects[v].SkyboxFt;
-		frame.BG.Visible = true;
-	end;
-end;
+	table.insert(tb,'Custom');
+	table.insert(tb,'None');
 
-local id = 'rbxassetid://';
-local l2 = '';
-local customsky = graphicsTab:CreateInput({
-	Name = 'Custom Sky ID',
-	CurrentValue = '',
-	PlaceholderText = '15983996673',
-	Flag = 'skyid',
-	Callback = function(txt, nosound)
-		if txt == l2 then return end;
-		l2 = txt;
-		local succ, sky = pcall(function()
-			return game:GetObjects(`{id}{txt:gsub(id,'')}`);
-		end);
-		if succ then
-			for _, v in sky do
-				if v:IsA('Sky') then
-					sky = v;
-					break;
-				end;
-			end;
-			if selectedSky == customSky then
-				selectedSky = sky;
-			end;
-			customSky = sky
-			skydropdown.Frames.Custom.BG.Image = customSky.SkyboxFt;
-			skydropdown.Frames.Custom.BG.Visible = true;
+	local skydropdown = graphicsTab:CreateDropdown{
+		Name = 'Change Skybox';
+		CurrentOption = {'None'};
+		MultipleOptions = false;
+		Flag = 'skybox';
+		Options = tb;
+
+		Callback = function(Options)
+			pcall(function()
+				selectedSky = Options[1] == 'Custom' and customSky or skyObjects[Options[1]];
+			end);
+		end;
+	};
+
+	for _, v in tb do
+		local frame = skydropdown.Frames[v];
+		if v ~= 'None' and v ~= 'Custom' then
+			frame.BG.Image = skyObjects[v].SkyboxFt;
+			frame.BG.Visible = true;
 		end;
 	end;
-});
+
+	local id = 'rbxassetid://';
+	local l2 = '';
+	local customsky = graphicsTab:CreateInput({
+		Name = 'Custom Sky ID',
+		CurrentValue = '',
+		PlaceholderText = '15983996673',
+		Flag = 'skyid',
+		Callback = function(txt, nosound)
+			if txt == l2 then return end;
+			l2 = txt;
+			local succ, sky = pcall(function()
+				return game:GetObjects(`{id}{txt:gsub(id,'')}`);
+			end);
+			if succ then
+				for _, v in sky do
+					if v:IsA('Sky') then
+						sky = v;
+						break;
+					end;
+				end;
+				if selectedSky == customSky then
+					selectedSky = sky;
+				end;
+				customSky = sky
+				skydropdown.Frames.Custom.BG.Image = customSky.SkyboxFt;
+				skydropdown.Frames.Custom.BG.Visible = true;
+			end;
+		end;
+	});
+end;
 
 graphicsTab:CreateSection('Lighting','sun');
 
-local lightingSettings = {
-	apply = false;
-	
-	ClockTime = 12;
-	GeographicLatitude=0;
-	ExposureCompensation=0;
-	Ambient = Color3.new(0,0,0);
-	OutdoorAmbient = Color3.new(0,0,0);
-	Brightness=2;
-};
+do 
+	local lightingSettings = {
+		apply = false;
 
-local applyLighting = graphicsTab:CreateToggle{
-	Name = 'Apply Lighting',
-	CurrentValue = false,
-	Flag = 'aplight',
-	Callback = function(Value, nosound)
-		lightingSettings.apply = Value
-	end,
-};
+		ClockTime = 12;
+		GeographicLatitude=0;
+		ExposureCompensation=0;
+		Ambient = Color3.new(0,0,0);
+		OutdoorAmbient = Color3.new(0,0,0);
+		Brightness=2;
+	};
+
+	local applyLighting = graphicsTab:CreateToggle{
+		Name = 'Apply Lighting',
+		CurrentValue = false,
+		Flag = 'aplight',
+		Callback = function(Value, nosound)
+			lightingSettings.apply = Value
+		end,
+	};
+end;
 
 graphicsTab:CreateDivider();
 
