@@ -158,15 +158,12 @@ local isvalidkeyfile = function(key:{id:number,time:number,key:string})
 			}).Body;
 	end);
 
-	return key.id == Players.LocalPlayer.UserId and os.time()-key.time <= 120 and succ;
+	return key.id == Players.LocalPlayer.UserId and os.time()-key.time <= 3600 and succ;
 end;
 
 -- // Rest
 
 local admin = table.find(SCRIPT_WHITELIST,Players.LocalPlayer.UserId);
-
-local URL_ROOT = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/'
-local ECON_TOKEN = _G.econ_gitkey and deobfuscateSTR(_G.econ_gitkey);
 
 local str = isfile(file) and readfile(file);
 local s, dec = pcall(function()
@@ -177,6 +174,9 @@ if not dec or not isvalidkeyfile(dec) then
 	Players.LocalPlayer:Kick();
 	return;
 end;
+
+local URL_ROOT = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/'
+local ECON_TOKEN = dec.key;
 
 function getCorners(part, cframe, size)	
 	local cf = cframe or part.CFrame
