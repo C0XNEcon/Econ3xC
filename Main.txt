@@ -839,9 +839,8 @@ local trackType = 'Head'
 
 local homeTab = Window:CreateTab('Home', 'crosshair') -- Title, Image
 local aymSection = homeTab:CreateSection('Tracking')
-local CoreGui = game:GetService('CoreGui')
 
-local changeVal = Instance.new('Vector3Value', CoreGui:FindFirstChild("RobloxGui"))
+local changeVal = Instance.new('Vector3Value', coregui:FindFirstChild("RobloxGui"))
 local switch = false
 local aymmode = 'MouseMoveRel'
 changeVal.Name = 'ChangeVal'
@@ -1075,29 +1074,31 @@ local aymLerping = homeTab:CreateSlider({
 
 homeTab:CreateDivider()
 
-local changingHeadshotDivider = homeTab:CreateSlider({
-	Name = 'Changing Head Multiplier',
-	Range = {1, 10},
-	Increment = .25,
-	Suffix = '',
-	CurrentValue = 1,
-	Flag = 'nearbyheadmultiplier',
-	Callback = function(Value)
-		nearbyheadMult = Value;
-	end;
-});
+do
+	local changingHeadshotDivider = homeTab:CreateSlider({
+		Name = 'Changing Head Multiplier',
+		Range = {1, 10},
+		Increment = .25,
+		Suffix = '',
+		CurrentValue = 1,
+		Flag = 'nearbyheadmultiplier',
+		Callback = function(Value)
+			nearbyheadMult = Value;
+		end;
+	});
 
-local changingHeadshotDistDiv = homeTab:CreateSlider({
-	Name = 'Distance Divider',
-	Range = {1, 100},
-	Increment = .5,
-	Suffix = '',
-	CurrentValue = 30,
-	Flag = 'distancediv',
-	Callback = function(Value)
-		nearbyheadDiv = Value;
-	end;
-});
+	local changingHeadshotDistDiv = homeTab:CreateSlider({
+		Name = 'Distance Divider',
+		Range = {1, 100},
+		Increment = .5,
+		Suffix = '',
+		CurrentValue = 30,
+		Flag = 'distancediv',
+		Callback = function(Value)
+			nearbyheadDiv = Value;
+		end;
+	});
+end;
 
 homeTab:CreateSection('Aim Prediction')
 
@@ -1264,7 +1265,7 @@ ADD_SOFTLOCK()
 
 legitTab:CreateSection('Lock FOV')
 
-function ADD_LOCKFOV()
+do
 	local lockFOVEnabled = legitTab:CreateToggle({
 		Name = 'Lock FOV Enabled',
 		CurrentValue = false,
@@ -1294,10 +1295,8 @@ function ADD_LOCKFOV()
 		Callback = function(Value)
 			FOVCircleSize = (Value/100)*1200;
 		end,
-	})
-end
-
-ADD_LOCKFOV()
+	});
+end;
 
 legitTab:CreateSection'Cursor Movement Spring'
 
@@ -1433,7 +1432,7 @@ legitTab:CreateDivider()
 local shakeInfluenceXZ = 0;
 local shakeInfluenceY = 0;
 
-function ADD_TARGETSHAKE()
+do
 	local charShakeEnabled = legitTab:CreateToggle({
 		Name = 'Target Shake Enabled',
 		CurrentValue = true,
@@ -1478,35 +1477,35 @@ function ADD_TARGETSHAKE()
 			shakeInfluenceY = Value
 		end,
 	})
-end
 
-ADD_TARGETSHAKE()
+	-- // sens
 
-homeTab:CreateSection('Sensitivity [ Copy ur Rivals settings ]')
+	homeTab:CreateSection('Sensitivity [ Copy ur Rivals settings ]')
 
-local sens = homeTab:CreateSlider({
-	Name = 'Sensitivity',
-	Range = {.05, 4},
-	Increment = .05,
-	Suffix = '',
-	CurrentValue = 1,
-	Flag = 'senslider',
-	Callback = function(Value)
-		sens = Value
-	end,
-})
+	local sens = homeTab:CreateSlider({
+		Name = 'Sensitivity',
+		Range = {.05, 4},
+		Increment = .05,
+		Suffix = '',
+		CurrentValue = 1,
+		Flag = 'senslider',
+		Callback = function(Value)
+			sens = Value
+		end,
+	})
 
-local sens = homeTab:CreateSlider({
-	Name = 'ADS Sensitivity Multiplier',
-	Range = {.05, 2},
-	Increment = .05,
-	Suffix = '',
-	CurrentValue = 1,
-	Flag = 'adsenseslider',
-	Callback = function(Value)
-		ads = Value
-	end,
-})
+	local sens = homeTab:CreateSlider({
+		Name = 'ADS Sensitivity Multiplier',
+		Range = {.05, 2},
+		Increment = .05,
+		Suffix = '',
+		CurrentValue = 1,
+		Flag = 'adsenseslider',
+		Callback = function(Value)
+			ads = Value
+		end,
+	});
+end;
 
 -- // Satisfying Sounds
 
@@ -1761,74 +1760,73 @@ local boxEnabled = gameplayTab:CreateToggle({
 })
 
 local espType = {}
-local espop = gameplayTab:CreateDropdown({
-	Name = 'Enabled ESPs',
-	Options = {'Boxes', 'Highlights', 'Tracers'},
-	CurrentOption = {'Boxes','Tracers'},
-	MultipleOptions = true,
-	Flag = 'esptdropdown',
-	Callback = function(Options, nosound)
-		espType = Options
-		if not nosound then
-			playSound(1)
-		end
-	end,
-})
 
 local boxNAC = Color3.fromRGB(70, 53, 44)
 local boxCOL = Color3.fromRGB(255, 143, 52)
 
-local boxColor = gameplayTab:CreateColorPicker{
-	Name = 'ESP Color',
-	Color = Color3.fromRGB(255, 143, 52),
-	Flag = 'ESPColor',
-	Callback = function(Value)
-		boxCOL = Value
-	end
-}
-
-local boxNoaymbotColor = gameplayTab:CreateColorPicker{
-	Name = 'ESP No aimbot Color',
-	Color = Color3.fromRGB(70, 53, 44),
-	Flag = 'NAColor',
-	Callback = function(Value)
-		boxNAC = Value
-	end
-}
-
-local visualSection = gameplayTab:CreateSection('Rival Visuals')
-
-local evpop = gameplayTab:CreateDropdown{
-	Name = 'Rival Health',
-	Options = {'Off', 'With ESP', 'Always'},
-	CurrentOption = {'Always'},
-	MultipleOptions = false,
-	Flag = 'evpopdropdown',
-	Callback = function(Options, nosound)
-		evtype = Options[1]
-		popUpd()
-		if not nosound then
-			playSound(1)
+do
+	local espop = gameplayTab:CreateDropdown({
+		Name = 'Enabled ESPs',
+		Options = {'Boxes', 'Highlights', 'Tracers'},
+		CurrentOption = {'Boxes','Tracers'},
+		MultipleOptions = true,
+		Flag = 'esptdropdown',
+		Callback = function(Options, nosound)
+			espType = Options
+			if not nosound then
+				playSound(1)
+			end
+		end,
+	});
+	
+	local boxColor = gameplayTab:CreateColorPicker{
+		Name = 'ESP Color',
+		Color = Color3.fromRGB(255, 143, 52),
+		Flag = 'ESPColor',
+		Callback = function(Value)
+			boxCOL = Value
 		end
-	end,
-}
+	};
 
--- // Teammate
+	local boxNoaymbotColor = gameplayTab:CreateColorPicker{
+		Name = 'ESP No aimbot Color',
+		Color = Color3.fromRGB(70, 53, 44),
+		Flag = 'NAColor',
+		Callback = function(Value)
+			boxNAC = Value
+		end
+	};
+	
+	local visualSection = gameplayTab:CreateSection('Rival Visuals')
+
+	local evpop = gameplayTab:CreateDropdown{
+		Name = 'Rival Health',
+		Options = {'Off', 'With ESP', 'Always'},
+		CurrentOption = {'Always'},
+		MultipleOptions = false,
+		Flag = 'evpopdropdown',
+		Callback = function(Options, nosound)
+			evtype = Options[1]
+			popUpd()
+			if not nosound then
+				playSound(1)
+			end
+		end,
+	};
+	
+	local deviceDropdown = gameplayTab:CreateDropdown{
+		Name = 'Change Device',
+		Options = {'VR', 'Touch', 'Gamepad', 'MouseKeyboard'},
+		CurrentOption = {'MouseKeyboard'},
+		MultipleOptions = false,
+		Flag = 'devicedrop',
+		Callback = function(Options)
+			ReplicatedStorage.Remotes.Replication.Fighter.SetControls:FireServer(Options[1])
+		end,
+	}
+end;
 
 local nl = plr.PlayerScripts.UserInterface:WaitForChild('TeammateLabel')
-
--- // Device
-
-local deviceDropdown = gameplayTab:CreateDropdown{
-	Name = 'Change Device',
-	Options = {'VR', 'Touch', 'Gamepad', 'MouseKeyboard'},
-	CurrentOption = {'MouseKeyboard'},
-	MultipleOptions = false,
-	Flag = 'devicedrop',
-	Callback = function(Options)
-		ReplicatedStorage.Remotes.Replication.Fighter.SetControls:FireServer(Options[1])
-	end,
-}
 
 -- // Movement
 
@@ -1848,53 +1846,55 @@ function setJumpPhysics()
 	end
 end
 
-local slideJumpMult = gameplayTab:CreateSlider{
-	Name = 'Slide Jump Boost',
-	Range = {0, 100},
-	Increment = 1,
-	Suffix = '',
-	CurrentValue = 6,
-	Flag = 'slideSlider',
-	Callback = function(Value)
-		slide = lerpz(.7, 0, Value/100)
-	end,
-}
+do
+	local slideJumpMult = gameplayTab:CreateSlider{
+		Name = 'Slide Jump Boost',
+		Range = {0, 100},
+		Increment = 1,
+		Suffix = '',
+		CurrentValue = 6,
+		Flag = 'slideSlider',
+		Callback = function(Value)
+			slide = lerpz(.7, 0, Value/100)
+		end,
+	};
+	
+	-- // Areas
 
--- // Areas
+	local areas = gameplayTab:CreateSection'Areas'
 
-local areas = gameplayTab:CreateSection'Areas'
+	local shootingRange = gameplayTab:CreateToggle{
+		Name = 'Shooting Range',
+		CurrentValue = true,
+		Flag = 'srtoggle',
+		Callback = function(Value, nosound)
+			shra = Value
 
-local shootingRange = gameplayTab:CreateToggle{
-	Name = 'Shooting Range',
-	CurrentValue = true,
-	Flag = 'srtoggle',
-	Callback = function(Value, nosound)
-		shra = Value
+			if not nosound then
+				playSound(shra and 1 or .8)
+			end
+		end,
+	}
 
-		if not nosound then
-			playSound(shra and 1 or .8)
-		end
-	end,
-}
+	local ingame_ = gameplayTab:CreateToggle{
+		Name = 'Ingame',
+		CurrentValue = true,
+		Flag = 'ingtoggle',
+		Callback = function(Value, nosound)
+			igam = Value
 
-local ingame_ = gameplayTab:CreateToggle{
-	Name = 'Ingame',
-	CurrentValue = true,
-	Flag = 'ingtoggle',
-	Callback = function(Value, nosound)
-		igam = Value
-
-		if not nosound then
-			playSound(igam and 1 or .8)
-		end
-	end,
-}
+			if not nosound then
+				playSound(igam and 1 or .8)
+			end
+		end,
+	}
+end;
 
 -- // Gameplay
 
-local gameplaySection = gameplayTab:CreateSection('Gameplay','swords')
-
 do
+	local gameplaySection = gameplayTab:CreateSection('Gameplay','swords')
+
 	local autoReload = gameplayTab:CreateToggle{
 		Name = 'Auto Reload',
 		CurrentValue = false,
@@ -2199,7 +2199,7 @@ table.insert(initConnections, RunService.RenderStepped:Connect(function(dt)
 			local skyprops = {'Bk','Dn','Ft','Lf','Rt','Up','CelestialBodiesShown','MoonAngularSize','SkyboxOrientation','SunAngularSize','StarCount','SunTextureId','MoonTextureId'};
 			for _, v in skyprops do
 				pcall(function()
-					local prop = `Skybox{v}`;
+					local prop = 'Skybox'..v;
 					csky[prop] = selectedSky[prop];
 				end);
 			end;
