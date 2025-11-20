@@ -13,6 +13,13 @@ local Workspace         = game:GetService'Workspace'
 local Players           = game:GetService'Players'
 local coregui           = game:GetService'CoreGui'
 
+local root = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/';
+local file = '_econ_data.dat';
+
+local setclipboard = setclipboard or syn and syn.write_clipboard;
+local iswindowactive = iswindowactive or isrbxactive;
+local request = (syn and syn.request) or (fluxus and fluxus.request) or (http and http.request) or http_request or request;
+
 local SCRIPT_WHITELIST = {
 	9390007618; -- // Ylian
 	9502659782; -- // ConePAlt
@@ -20,6 +27,51 @@ local SCRIPT_WHITELIST = {
 	9711984939; -- // Econ07Rivel
 };
 
+-- // Key Obfuscation
+
+local numcode = {}
+
+local characters = {
+	[0] = '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+	'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+	"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+	'!', '#', '$', '%', '&', "'", '(', ')', '*', '+', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', ']', '^', '_', '`', '{', '|', '}', '~'
+}
+
+local numbers = {['0'] = 0};
+for i, character in ipairs(characters) do numbers[character] = i end;
+
+local base = #characters + 1;
+
+numcode.Encode = function(value)
+	value = tonumber(value);
+	if value == 0 then return '0' end;
+	local text = '';
+	if value < 1 then text = '-' value = -value end;
+	while value > 0 do
+		text ..= characters[value % base];
+		value = math.floor(value / base);
+	end;
+	return text;
+end;
+
+numcode.Decode = function(value)
+	local number = 0;
+	local power = 1;
+	for character in value:gmatch'.' do
+		if character == '-' then
+			power = -power;
+		else
+			number += numbers[character] * power;
+			power *= base;
+		end;
+	end;
+	return number;
+end;
+
+local min = 33;
+local to = string.char;
+local from = string.byte;
 local obfuscateSTR = function(str:string)
 	local saved = {};
 	local spl = str:split'';
@@ -28,16 +80,16 @@ local obfuscateSTR = function(str:string)
 	end);
 	for _, v in spl do
 		if not table.find(saved,v) then
-			table.insert(saved,v)
+			table.insert(saved,v);
 		end;
 	end;
 	local n = '';
 	for _, v in str:split'' do
-		n ..= utf8.char(table.find(saved,v)-1);
+		n ..= to(table.find(saved,v)+min);
 	end;
-	n = n:reverse()..str.char(1);
+	n = n:reverse()..str.char(0);
 	for _, v in saved do
-		local c = utf8.char(utf8.codepoint(v));
+		local c = to(utf8.codepoint(v)+min);
 		n ..= c;
 	end;
 	return n;
@@ -48,40 +100,82 @@ local deobfuscateSTR = function(str:string)
 	local nstr = '';
 	str = str:reverse();
 
-	local spl = str:split(str.char(1));
-	for i,s in spl do
-		if i == 1 then
-			for _, v in s:reverse():split'' do
-				local c = utf8.char(utf8.codepoint(v));
-				table.insert(dsaved,c);
-			end;
-		else
-			nstr ..= str.char(1)..s;
-		end;
+	local spl = str:split(str.char(0));
+	for _, v in spl[1]:reverse():split'' do
+		local c = to(from(v)-min);
+		table.insert(dsaved,c);
 	end;
+
+	nstr = spl[2];
 
 	local n = '';
 	for _, v in nstr:split'' do
-		local i = utf8.codepoint(v)+1;
+		local i = from(v)-min;
+		if not dsaved[i] then
+			warn(`<< Obfuscation >> save index not found: {i}`)
+			return;
+		end;
 		n ..= dsaved[i];
 	end;
-	return n:sub(2,-1);
+	return n;
 end;
 
-local keycontroller = loadstring(game:HttpGet'https://junkie-development.de/sdk/JunkieKeySystem.lua')();
+local getKeyFile = function()
+	local id = numcode.Encode(Players.LocalPlayer.UserId);
+	local time = numcode.Encode(os.time());
+	local key = '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';
+
+	local function chop(str:string,center:number)
+		return str:sub(1,center):reverse()..str:sub(center+1,-1);
+	end;
+
+	key = key:gsub('github_pat_','');
+
+	local pf = `{id},{chop(time,3)},{chop(key,20)}`;
+	local f = obfuscateSTR(pf);
+	return f;
+end;
+
+local decodeKeyFile = function(str:string)
+	str = deobfuscateSTR(str);
+
+	local function unchop(str:string,center:number)
+		return str:sub(1,center):reverse()..str:sub(center+1,-1);
+	end;
+
+	local spl = str:split',';
+	return {
+		id = numcode.Decode(spl[1]);
+		time = numcode.Decode(unchop(spl[2],3));
+		key = 'github_pat_'..unchop(spl[3],20);
+	};
+end;
+
+local isvalidkeyfile = function(key:{id:number,time:number,key:string})
+	local succ, response = pcall(function()
+		return request(
+			{Url = root..'KeyVerification'; Method = 'GET'; Headers = {Authorization = 'token '..key.key}
+			}).Body;
+	end);
+
+	return key.id == Players.LocalPlayer.UserId and os.time()-key.time <= 120 and succ;
+end;
+
+-- // Rest
+
 local admin = table.find(SCRIPT_WHITELIST,Players.LocalPlayer.UserId);
-local s, valid = pcall(function()
-	return keycontroller.verifyKey('371b5300-1cc6-433a-9b9b-f36f6e600943', _G.econ_key_reg,'Econ|Key');
-end);
 
 local URL_ROOT = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/'
 local ECON_TOKEN = _G.econ_gitkey and deobfuscateSTR(_G.econ_gitkey);
 
-if not admin or not ECON_TOKEN then
-	if not valid or not ECON_TOKEN then
-		Players.LocalPlayer:Kick();
-		return;
-	end;
+local str = isfile(file) and readfile(file);
+local s, dec = pcall(function()
+	return str and decodeKeyFile(str);
+end);
+
+if not dec or not isvalidkeyfile(dec) then
+	Players.LocalPlayer:Kick();
+	return;
 end;
 
 function getCorners(part, cframe, size)	
@@ -163,8 +257,6 @@ local newind = function()
 end;
 
 ----------- [ Executor Functions ] -----------
-
-local request = (syn and syn.request) or (fluxus and fluxus.request) or (http and http.request) or http_request or request
 
 --if not table.find(SCRIPT_WHITELIST,plr.UserId) then
 --	plr:Kick("You don't have permission to use Econ")
