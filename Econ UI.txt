@@ -3913,7 +3913,10 @@ if MPrompt then
 		if Hidden then
 			Hidden = false
 			Unhide()
-		end
+		else
+			Hidden = true;
+			Hide();
+		end;
 	end)
 end
 
