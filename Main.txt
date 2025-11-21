@@ -1,5 +1,3 @@
--- This script was made by @ConePartyy on Roblox. Don't use this without my permission
-
 ----------- [ Services ] -----------
 
 local ReplicatedStorage = game:GetService'ReplicatedStorage'
@@ -58,7 +56,7 @@ end;
 numcode.Decode = function(value)
 	local number = 0;
 	local power = 1;
-	for character in value:gmatch'.' do
+	for character in pairs(value:gmatch'.') do
 		if character == '-' then
 			power = -power;
 		else
@@ -72,36 +70,36 @@ end;
 local min = 33;
 local to = string.char;
 local from = string.byte;
-local obfuscateSTR = function(str:string)
+local obfuscateSTR = function(str)
 	local saved = {};
 	local spl = str:split'';
 	table.sort(spl,function(a,b)
 		return a:byte()+25 < b:byte()-60;
 	end);
-	for _, v in spl do
+	for _, v in pairs(spl) do
 		if not table.find(saved,v) then
 			table.insert(saved,v);
 		end;
 	end;
 	local n = '';
-	for _, v in str:split'' do
+	for _, v in pairs(str:split'') do
 		n ..= to(table.find(saved,v)+min);
 	end;
 	n = n:reverse()..str.char(0);
-	for _, v in saved do
+	for _, v in pairs(saved) do
 		local c = to(utf8.codepoint(v)+min);
 		n ..= c;
 	end;
 	return n;
 end;
 
-local deobfuscateSTR = function(str:string)
+local deobfuscateSTR = function(str)
 	local dsaved = {};
 	local nstr = '';
 	str = str:reverse();
 
 	local spl = str:split(str.char(0));
-	for _, v in spl[1]:reverse():split'' do
+	for _, v in pairs(spl[1]:reverse():split'') do
 		local c = to(from(v)-min);
 		table.insert(dsaved,c);
 	end;
@@ -109,10 +107,10 @@ local deobfuscateSTR = function(str:string)
 	nstr = spl[2];
 
 	local n = '';
-	for _, v in nstr:split'' do
+	for _, v in pairs(nstr:split'') do
 		local i = from(v)-min;
 		if not dsaved[i] then
-			warn(`<< Obfuscation >> save index not found: {i}`)
+			warn('<< Obfuscation >> save index not found: '..i)
 			return;
 		end;
 		n ..= dsaved[i];
@@ -122,24 +120,24 @@ end;
 
 local getKeyFile = function()
 	local id = numcode.Encode(Players.LocalPlayer.UserId);
-	local time = numcode.Encode(os.time());
+	local t = numcode.Encode(os.time());
 	local key = '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';
 
-	local function chop(str:string,center:number)
+	local function chop(str,center)
 		return str:sub(1,center):reverse()..str:sub(center+1,-1);
 	end;
 
 	key = key:gsub('github_pat_','');
 
-	local pf = `{id},{chop(time,3)},{chop(key,20)}`;
+	local pf = id..','..chop(t,3)..','..chop(key,20);
 	local f = obfuscateSTR(pf);
 	return f;
 end;
 
-local decodeKeyFile = function(str:string)
+local decodeKeyFile = function(str)
 	str = deobfuscateSTR(str);
 
-	local function unchop(str:string,center:number)
+	local function unchop(str,center)
 		return str:sub(1,center):reverse()..str:sub(center+1,-1);
 	end;
 
@@ -151,7 +149,7 @@ local decodeKeyFile = function(str:string)
 	};
 end;
 
-local isvalidkeyfile = function(key:{id:number,time:number,key:string})
+local isvalidkeyfile = function(key)
 	local succ, response = pcall(function()
 		return request(
 			{Url = root..'KeyVerification'; Method = 'GET'; Headers = {Authorization = 'token '..key.key}
@@ -178,41 +176,6 @@ end;
 local URL_ROOT = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/'
 local ECON_TOKEN = dec.key;
 
-function getCorners(part, cframe, size)	
-	local cf = cframe or part.CFrame
-	local size = size or part.Size
-	local p = cf.Position
-
-	local frontFaceCenter = (cf + cf.LookVector * size.Z/2)
-	local backFaceCenter = (cf - cf.LookVector * size.Z/2)
-
-	local topFrontEdgeCenter = frontFaceCenter + frontFaceCenter.UpVector * size.Y/2
-	local bottomFrontEdgeCenter = frontFaceCenter - frontFaceCenter.UpVector * size.Y/2
-	local topBackEdgeCenter = backFaceCenter + backFaceCenter.UpVector * size.Y/2
-	local bottomBackEdgeCenter = backFaceCenter - backFaceCenter.UpVector * size.Y/2
-
-	local zH = Vector3.zAxis*(size.Z/2)
-	local xH = Vector3.xAxis*(size.X/2)
-
-	local tbl = {}
-	local t = table.insert
-	local function centerStuff(add)
-		add = add or Vector3.zero
-		t(tbl, (p+zH+xH) + add)
-		t(tbl, (p-zH-xH) + add)
-		t(tbl, (p+xH-zH) + add)
-		t(tbl, (p-xH+zH) + add)
-	end
-
-	centerStuff()
-
-	for _, v in {2, -2} do
-		centerStuff(Vector3.yAxis*size.Y/v)
-	end
-
-	return tbl
-end
-
 local newind = function()
 	local CURR_FUNCS = {};
 	local ind = 0;
@@ -222,25 +185,25 @@ local newind = function()
 		local _curInd = ind+1;
 		ind += 1;
 
-		for i, func:()->() in CURR_FUNCS do
+		for i, func in pairs(CURR_FUNCS) do
 			func();
 		end;
 
 		CURR_FUNCS = {};
 
 		-- Runs the function whenever a new thing gets added
-		function _ret:FireUponChange(func:()->())
+		function _ret:FireUponChange(func)
 			table.insert(CURR_FUNCS,func);
 		end;
 
 		-- Disconnects the connection whenever a new thing gets added [Like Mekbok]
-		function _ret:Connect(connection:RBXScriptConnection)
+		function _ret:Connect(connection)
 			table.insert(CURR_FUNCS,function()
 				connection:Disconnect();
 			end);
 		end;
 
-		return function(_time:number,_func:()->())
+		return function(_time,_func)
 			if _func then
 				task.delay(_time,_func,ind == _curInd);
 				return;
@@ -273,10 +236,10 @@ local __GETURL = function(URL)
 	}}).Body
 end
 
-local __BULKLOADSTRING = function(strings:{})
+local __BULKLOADSTRING = function(strings)
 	local _stringToLoad = 'return {';
-	for name, str in strings do
-		_stringToLoad ..= `['{name}'] = function()\n{str}\nend;`;
+	for name, str in pairs(strings) do
+		_stringToLoad ..= "['"..name.."'] = function()\n"..str.."\nend;";
 	end;
 	return loadstring(_stringToLoad..'}')();
 end;
@@ -312,7 +275,7 @@ elseif not configFiles then
 	repeat wait() until configFiles
 end
 
-for _, name in configFiles do
+for _, name in pairs(configFiles) do
 	if name:sub(#name-4,-1) == fileType then
 		local readFile = readfile(name);
 		local suc, rep = pcall(function()
@@ -325,8 +288,6 @@ for _, name in configFiles do
 		else
 			warn('<< Econ >> Read failed for file: ',name,'Response:',rep)
 		end;
-	else
-		warn('<< Econ >> File: "'..name..'" is not a .rfld [ Not Supported ]');
 	end
 end
 
@@ -369,11 +330,11 @@ _camShaker[1].init(ECON_TOKEN)
 local _cursorSpring = _springMod.new(Vector3.zAxis,.5,8);
 local _movementSpring = _springMod.new(Vector3.zAxis,.5,8);
 
-local _aimShake = _camShaker[2].new(5,function(cf:CFrame)
+local _aimShake = _camShaker[2].new(5,function(cf)
 	_aimShakeOffset = cf.Position
 end)
 
-local _cursorShake = _camShaker[2].new(5,function(cf:CFrame)
+local _cursorShake = _camShaker[2].new(5,function(cf)
 	local p = cf.Position
 	_cursorShakeOffset = Vector2.new(math.round(p.X),math.round(p.Y))
 end)
@@ -423,7 +384,7 @@ local function playSound(sp, rep, vol)
 	new.PlaybackSpeed = sp or 1
 	new:Play()
 
-	new.Ended:Connect(function()
+	new.Ended:Once(function()
 		new:Destroy()
 	end)
 end
@@ -812,7 +773,7 @@ function moveMouseToWorldPosition(targetVector3,tchar,right,dt)
 		local rivalsens = (right and sens/ads or sens);
 		local delta = ((pos2 - screenCenter)/(UGS.MouseSensitivity/mysens)*lerp*extraDeltaMult)/rivalsens;
 
-		local function assertPos(val:boolean,pos)
+		local function assertPos(val,pos)
 			local oldDelta = delta;
 			if val then
 				delta += pos;
@@ -886,8 +847,8 @@ function __auto(right, needs, head)
 
 			-- // Movement Based Legit Settings
 
-			local vel = (targetRoot and targetRoot.Velocity or Vector3.zero)::Vector3;
-			local vel2 = (root and root.Velocity or Vector3.zero)::Vector3;
+			local vel = (targetRoot and targetRoot.Velocity or Vector3.zero);
+			local vel2 = (root and root.Velocity or Vector3.zero);
 
 			if movementSpringEnabled and targetRoot then
 				local max = 20;
@@ -1142,7 +1103,6 @@ ADD_AIMPREDICTION()
 homeTab:CreateDivider()
 
 function ADD_BLATANT()
-	homeTab:CreateParagraph({Title = 'Silent Aim Notice', Content = `If silent aim is on, throwables visual models [ Grenade ] will be incorrect`})
 	local triggerEnabled = homeTab:CreateToggle({
 		Name = 'Triggerbot Enabled [!]',
 		CurrentValue = false,
@@ -1579,7 +1539,7 @@ function ADD_CONFIG()
 				writefile('EconConfig',currentConfig)
 				EconField.CONE_FILE_NAME = './cone/'..currentConfig;
 
-				local _fullFilePath = `./cone/{currentConfig}{fileType}`;
+				local _fullFilePath = './cone/'..currentConfig..fileType;
 				if not isfile(_fullFilePath) then
 					repeat RunService.Stepped:Wait() until isfile(_fullFilePath);
 				end;
@@ -1620,16 +1580,16 @@ function ADD_CONFIG()
 		updConfigDropdown(true)
 
 		if suc then
-			EconField:Notify({
-				Title = isFile and 'Updated Config "'..newConfigName..'"' or 'New Config "'..newConfigName..'"',
-				Content = `Succesfully {isFile and 'Updated' or 'Added'} Config "{newConfigName}"`, 
-				Image = 6026568210,
-				Duration = 5,
-			})
+			--EconField:Notify({
+			--	Title = isFile and 'Updated Config "'..newConfigName..'"' or 'New Config "'..newConfigName..'"',
+			--	Content = 'Succesfully '..(isFile and 'Updated' or 'Added')..' Config "'..newConfigName..'"', 
+			--	Image = 6026568210,
+			--	Duration = 5,
+			--})
 		else
 			EconField:Notify({
 				Title = 'Config Add Fail';
-				Content = `An error occurred adding config: {rep}`, 
+				Content = 'An error occurred adding config: '..rep, 
 				Image = 6031071057,
 				Duration = 7,
 			})
@@ -1674,12 +1634,12 @@ function ADD_CONFIG()
 					table.remove(configsTable,i);
 				end;
 
-				EconField:Notify({
-					Title = 'Config Removed',
-					Content = `Succesfully Removed Config "{currentConfig}"`, 
-					Image = 6022668939,
-					Duration = 5,
-				})
+				--EconField:Notify({
+				--	Title = 'Config Removed',
+				--	Content = `Succesfully Removed Config "{currentConfig}"`, 
+				--	Image = 6022668939,
+				--	Duration = 5,
+				--})
 
 				currentConfig = configsTable[1];
 				updConfigDropdown(true);
@@ -1962,7 +1922,7 @@ do
 	graphicsTab:CreateSection('Skies','cloud')
 
 	local tb = {};
-	for _, v in skyObjects:GetChildren() do
+	for _, v in pairs(skyObjects:GetChildren()) do
 		table.insert(tb,v.Name);
 	end;
 
@@ -1983,7 +1943,7 @@ do
 		end;
 	};
 
-	for _, v in tb do
+	for _, v in pairs(tb) do
 		local frame = skydropdown.Frames[v];
 		if v ~= 'None' and v ~= 'Custom' then
 			frame.BG.Image = skyObjects[v].SkyboxFt;
@@ -2002,10 +1962,10 @@ do
 			if txt == l2 then return end;
 			l2 = txt;
 			local succ, sky = pcall(function()
-				return game:GetObjects(`{id}{txt:gsub(id,'')}`);
+				return game:GetObjects(id..txt:gsub(id,''));
 			end);
 			if succ then
-				for _, v in sky do
+				for _, v in pairs(sky) do
 					if v:IsA('Sky') then
 						sky = v;
 						break;
@@ -2197,7 +2157,7 @@ table.insert(initConnections, RunService.RenderStepped:Connect(function(dt)
 		local csky = game.Lighting:FindFirstChildWhichIsA('Sky');
 		if csky and csky.SkyboxFt ~= selectedSky.SkyboxFt then
 			local skyprops = {'Bk','Dn','Ft','Lf','Rt','Up','CelestialBodiesShown','MoonAngularSize','SkyboxOrientation','SunAngularSize','StarCount','SunTextureId','MoonTextureId'};
-			for _, v in skyprops do
+			for _, v in pairs(skyprops) do
 				pcall(function()
 					local prop = 'Skybox'..v;
 					csky[prop] = selectedSky[prop];
@@ -2207,7 +2167,7 @@ table.insert(initConnections, RunService.RenderStepped:Connect(function(dt)
 	end;
 	
 	if lightingSettings.apply then
-		for n, v in lightingSettings do
+		for n, v in pairs(lightingSettings) do
 			if n ~= 'apply' then
 				pcall(function()
 					game.Lighting[n] = v;
@@ -2224,7 +2184,7 @@ table.insert(initConnections, RunService.RenderStepped:Connect(function(dt)
 		HitboxHead = iH and 5 or iT and 6 or iM and Random.new():NextNumber(5,6);
 	};
 	
-	for n, v in hitboxPos do
+	for n, v in pairs(hitboxPos) do
 		hitboxPos[n] = v*silentAimDistance;
 	end;
 
@@ -2236,7 +2196,7 @@ table.insert(initConnections, RunService.RenderStepped:Connect(function(dt)
 
 	if permVars.lastSilentAim ~= selectedChar and typeof(permVars.lastSilentAim) == 'Instance' then
 		local piv = permVars.lastSilentAim:GetPivot();
-		for _, v:Instance in permVars.lastSilentAim:GetChildren() do
+		for _, v in pairs(permVars.lastSilentAim:GetChildren()) do
 			if hitboxPos[v.Name] then
 				local weld = v:FindFirstChildWhichIsA('WeldConstraint');
 				if weld then
@@ -2248,7 +2208,7 @@ table.insert(initConnections, RunService.RenderStepped:Connect(function(dt)
 	end;
 
 	if typeof(selectedChar) == 'Instance' and silentAimEnabled then
-		for _, v in selectedChar:GetChildren() do
+		for _, v in pairs(selectedChar:GetChildren()) do
 			local p = hitboxPos[v.Name]
 			if p then
 				local weld = v:FindFirstChildWhichIsA('WeldConstraint');
@@ -2404,7 +2364,7 @@ local function createbox(player)
 			}
 
 			local function deactivate()
-				for _, v in noF do
+				for _, v in pairs(noF) do
 					task.spawn(v);
 				end;
 			end;
@@ -2450,7 +2410,7 @@ local function createbox(player)
 							end;
 						}
 
-						for n, v in f do
+						for n, v in pairs(f) do
 							if table.find(espType,n) then
 								task.spawn(v);
 							else
