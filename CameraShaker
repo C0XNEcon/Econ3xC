@@ -5,7 +5,7 @@ CameraShaker.__index = CameraShaker
 
 local URL_ROOT = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/'
 local __GETURL = function(URL)
-	return game:HttpGet'URL_ROOT..URL';
+	return game:HttpGet(URL_ROOT..URL);
 end;
 
 ----------- [ Main ] -----------
