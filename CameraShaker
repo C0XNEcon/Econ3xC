@@ -3,15 +3,10 @@ CameraShaker.__index = CameraShaker
 
 ----------- [ Executor Functions ] -----------
 
-local ET = ''
-local request = (syn and syn.request) or (fluxus and fluxus.request) or (http and http.request) or http_request or request
-
 local URL_ROOT = 'https://raw.githubusercontent.com/C0XNEcon/Econ3xC/refs/heads/main/'
 local __GETURL = function(URL)
-	return request({Url = URL_ROOT..URL; Method = 'GET'; Headers = {
-		Authorization = 'token '..ET;
-	}}).Body
-end
+	return game:HttpGet'URL_ROOT..URL';
+end;
 
 ----------- [ Main ] -----------
 
@@ -144,10 +139,4 @@ function CameraShaker:StartShake(magnitude, roughness, fadeInTime, posInfluence,
 	return shakeInstance
 end
 
-local __RET = {}
-
-__RET.init = function(ECON_TOKEN)
-	ET = ECON_TOKEN
-end
-
-return {__RET,CameraShaker}
+return CameraShaker
