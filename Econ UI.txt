@@ -3581,6 +3581,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 	end)
 
 	if not success then warn('Rayfield had an issue creating settings.') end
+	
+	Window.UI = 
 
 	return Window
 end
@@ -3792,5 +3794,6 @@ if CEnabled and Main:FindFirstChild('Notice') then
 	TweenService:Create(Main.Notice.Title, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 0.1}):Play()
 end
 
+RayfieldLibrary.UI = Rayfield;
 RayfieldLibrary.Menu = Rayfield.Parent
 return RayfieldLibrary;
