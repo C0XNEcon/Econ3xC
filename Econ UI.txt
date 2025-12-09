@@ -584,7 +584,9 @@ local function loadWithTimeout(url: string, timeout: number?): ...any
 	local success, result = false, nil
 
 	local requestThread = task.spawn(function()
-		local fetchSuccess, fetchResult = pcall(game.HttpGet, game, url) -- game:HttpGet(url)
+		local fetchSuccess, fetchResult = pcall(function()
+			return game:HttpGet(url)
+		end);
 		-- If the request fails the content can be empty, even if fetchSuccess is true
 		if not fetchSuccess or #fetchResult == 0 then
 			if #fetchResult == 0 then
@@ -701,7 +703,7 @@ local TweenService = getService("TweenService") :: TweenService
 local Players = getService("Players") :: Players
 local CoreGui = getService("CoreGui")
 
-local Rayfield = game:GetObjects('rbxassetid://74880230223158')[1]
+local Rayfield = game:GetObjects('rbxassetid://113527867516365')[1]
 local buildAttempts = 0
 local correctBuild = false
 local warned
@@ -1859,7 +1861,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 		if not Passthrough then
 			local AttemptsRemaining = 5
 			Rayfield.Enabled = false
-			local KeyUI = useStudio and script.Parent:FindFirstChild('Key') or game:GetObjects("rbxassetid://133273158291665")[1]
+			local KeyUI = useStudio and script.Parent:FindFirstChild('Key')
 
 			KeyUI.Enabled = true
 
