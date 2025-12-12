@@ -28,10 +28,7 @@ return {
 				local items = ui.Hotbar.Container
 
 				funcs.handleSlot = function(v)
-					local spl = v.Name:split' - ';
-					if spl[1] ~= plr.Name then return end;
-
-					local _selected = _G.toskin[spl[2]]
+					local _selected = _G.toskin[v.Name]
 					if _selected then
 						local icon = v:FindFirstChild'Icon' :: ImageLabel
 						if icon then
