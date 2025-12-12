@@ -93,36 +93,36 @@ return {
 		end
 		
 		if not is then
-			local MAIN_UI = mainUI.Equipment.Weapons.Container.List.Container
+			--local MAIN_UI = mainUI.Equipment.Weapons.Container.List.Container
 
-			local function handle(v)
-				local b = v:FindFirstChild('Button')
-				b = b and b:FindFirstChild('Icon')
+			--local function handle(v)
+			--	local b = v:FindFirstChild('Button')
+			--	b = b and b:FindFirstChild('Icon')
 
-				local xico = b and b:FindFirstChild('UICorner')
-				local n = v.Name == 'EquipmentWeaponSlot'
-				if n and b and not xico then
-					local function calc()
-						local ts = UTILS.SKIN_MOD.its[b.Image]
-						local tog = UTILS.SKIN_INFO.skinToOg[ts] or ts
-						local tocur = _G.toskin[tog]
-						if tocur and tocur ~= 'Dont Change' then
-							b.Image = UTILS.SKIN_MOD.viewmodels[tocur].image
-						end
-					end
+			--	local xico = b and b:FindFirstChild('UICorner')
+			--	local n = v.Name == 'EquipmentWeaponSlot'
+			--	if n and b and not xico then
+			--		local function calc()
+			--			local ts = UTILS.SKIN_MOD.its[b.Image]
+			--			local tog = UTILS.SKIN_INFO.skinToOg[ts] or ts
+			--			local tocur = _G.toskin[tog]
+			--			if tocur and tocur ~= 'Dont Change' then
+			--				b.Image = UTILS.SKIN_MOD.viewmodels[tocur].image
+			--			end
+			--		end
 
-					calc()
-					b:GetPropertyChangedSignal('Image'):Connect(calc)
-				elseif n and b and xico then
+			--		calc()
+			--		b:GetPropertyChangedSignal('Image'):Connect(calc)
+			--	elseif n and b and xico then
 
-				end
-			end
+			--	end
+			--end
 
-			for _, v in MAIN_UI:GetChildren() do
-				handle(v)
-			end
+			--for _, v in MAIN_UI:GetChildren() do
+			--	handle(v)
+			--end
 
-			MAIN_UI.ChildAdded:Connect(handle)
+			--MAIN_UI.ChildAdded:Connect(handle)
 			
 			-- // UI 2
 			
