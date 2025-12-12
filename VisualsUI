@@ -1,41 +1,43 @@
 return {
 	init = function(UTILS:{})
 		local __RET = {}
-		
+
 		-- // Services
 
 		local players = game:GetService('Players')
 		local run = game:GetService('RunService')
 
 		-- // Vars
-		
+
 		local plr = players.LocalPlayer
 		local scripts = plr.PlayerScripts
 
 		local mainUI = plr.PlayerGui.MainGui.MainFrame
 		local fighterInterfaces = mainUI.FighterInterfaces
-		
+
 		local ECON_VARS = _G.ECON_VARS
 
 		local is = ECON_VARS.TIMES_EXECUTED > 1
-		
+
 		-- // Main
-		
+
 		__RET.__handleFighterInterface = function(ui)
 			if ui.Name == plr.Name then
 				local funcs = {}
 
-				local items = mainUI.ItemInterfaces
+				local items = ui.Hotbar.Container
 
 				funcs.handleSlot = function(v)
 					local spl = v.Name:split' - ';
 					if spl[1] ~= plr.Name then return end;
-					
+
 					local _selected = _G.toskin[v.Name]
 					if _selected then
-						local icon = v.Icon :: ImageLabel
-						icon.ResampleMode = Enum.ResamplerMode[_selected:find('Pixel') and 'Pixelated' or 'Default'] 
-						icon.Image = UTILS.SKIN_MOD.viewmodels[_selected].image
+						local icon = v:FindFirstChild'Icon' :: ImageLabel
+						if icon then
+							icon.ResampleMode = Enum.ResamplerMode[_selected:find('Pixel') and 'Pixelated' or 'Default'] 
+							icon.Image = UTILS.SKIN_MOD.viewmodels[_selected].image
+						end;
 					end
 				end
 
@@ -47,7 +49,7 @@ return {
 				end
 			end
 		end
-		
+
 		__RET.createSparklesFrame = function(f)
 			local __ret = {}
 
@@ -94,7 +96,7 @@ return {
 
 			return __ret
 		end
-		
+
 		if not is then
 			--local MAIN_UI = mainUI.Equipment.Weapons.Container.List.Container
 
@@ -126,9 +128,9 @@ return {
 			--end
 
 			--MAIN_UI.ChildAdded:Connect(handle)
-			
+
 			-- // UI 2
-			
+
 			local function checkfor(v)
 				task.spawn(function()
 					local typ = v.Name == 'PickWeapons' and 1 or v.Name == 'PickWeaponsList' and 2 or 0
@@ -213,13 +215,13 @@ return {
 
 			pages.ChildAdded:Connect(checkfor)
 		end
-		
+
 		for _, v in fighterInterfaces:GetChildren() do
 			__RET.__handleFighterInterface(v)
 		end
 
 		-- //
-		
+
 		return __RET
 	end,
 }
