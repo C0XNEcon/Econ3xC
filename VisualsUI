@@ -28,7 +28,7 @@ return {
 				local items = mainUI.ItemInterfaces
 
 				funcs.handleSlot = function(v)
-					local spl = v:split' - ';
+					local spl = v.Name:split' - ';
 					if spl[1] ~= plr.Name then return end;
 					
 					local _selected = _G.toskin[v.Name]
