@@ -25,9 +25,12 @@ return {
 			if ui.Name == plr.Name then
 				local funcs = {}
 
-				local items = ui.Items.Container
+				local items = mainUI.ItemInterfaces
 
 				funcs.handleSlot = function(v)
+					local spl = v:split' - ';
+					if spl[1] ~= plr.Name then return end;
+					
 					local _selected = _G.toskin[v.Name]
 					if _selected then
 						local icon = v.Icon :: ImageLabel
