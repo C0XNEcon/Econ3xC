@@ -31,7 +31,7 @@ return {
 					local spl = v.Name:split' - ';
 					if spl[1] ~= plr.Name then return end;
 
-					local _selected = _G.toskin[v.Name]
+					local _selected = _G.toskin[spl[2]]
 					if _selected then
 						local icon = v:FindFirstChild'Icon' :: ImageLabel
 						if icon then
