@@ -663,8 +663,8 @@ local function loadSettings()
 	local success, result =	pcall(function()
 		task.spawn(function()
 			if isfolder and isfolder(RayfieldFolder) then
-				if isfile and isfile(files.settings..ConfigurationExtension) then
-					file = readfile(files.settings..ConfigurationExtension)
+				if isfile and isfile(files.settings) then
+					file = readfile(files.settings)
 				end
 			end
 
@@ -1625,7 +1625,7 @@ local function updateSettings()
 			end
 		end
 		if writefile then
-			writefile(files.settings..ConfigurationExtension, encoded)
+			writefile(files.settings, encoded)
 		end
 	end
 end
