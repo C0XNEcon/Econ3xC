@@ -382,6 +382,13 @@ local RayfieldLibrary = {
 	CONE_FILE_NAME = nil;
 }
 
+local f = 'EconRC';
+local files = {
+	key = f..'/key.dat';
+	skins = f..'/misc/skins';
+	settings = f..'/misc/settings';
+};
+
 -- // Utils
 
 local run = game:GetService'RunService';
@@ -632,10 +639,12 @@ local InterfaceBuild = '3K3W'
 local Release = "Build 1.672"
 local RayfieldFolder = "Rayfield"
 local ConfigurationFolder = RayfieldFolder.."/Configurations"
-local ConfigurationExtension = ".rfld"
+local ConfigurationExtension = '.txt';
 local settingsTable = {
 	General = {
 		rayfieldOpen = {Type = 'bind', Value = 'K', Name = 'Econ Keybind'};
+		--sens = {Type = 'slider',Value=1,Range = {.05,4},Name='Sensitivity'};
+		--ads = {Type='slider',Value=.5,Range={.05,2},Name='ADS Sensitivity Multiplier'};
 	},
 }
 
@@ -654,8 +663,8 @@ local function loadSettings()
 	local success, result =	pcall(function()
 		task.spawn(function()
 			if isfolder and isfolder(RayfieldFolder) then
-				if isfile and isfile(RayfieldFolder..'/settings'..ConfigurationExtension) then
-					file = readfile(RayfieldFolder..'/settings'..ConfigurationExtension)
+				if isfile and isfile(files.settings..ConfigurationExtension) then
+					file = readfile(files.settings..ConfigurationExtension)
 				end
 			end
 
@@ -1616,7 +1625,7 @@ local function updateSettings()
 			end
 		end
 		if writefile then
-			writefile(RayfieldFolder..'/settings'..ConfigurationExtension, encoded)
+			writefile(files.settings..ConfigurationExtension, encoded)
 		end
 	end
 end
@@ -1672,6 +1681,18 @@ local function createSettings(window)
 					HoldToInteract = false,
 					Ext = true,
 					CallOnChange = true,
+					Callback = function(Value)
+						setting.Value = Value
+						updateSettings()
+					end,
+				})
+			elseif setting.Type == 'slider' then
+				setting.Element = newTab:CreateSlider({
+					Name = setting.Name,
+					CurrentValue = setting.Value,
+					Range = setting.Range,
+					Increment = .05;
+					Ext = true,
 					Callback = function(Value)
 						setting.Value = Value
 						updateSettings()
