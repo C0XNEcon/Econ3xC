@@ -32,6 +32,7 @@ local inf = {
         ["Glorious Spray"] = "Spray",
         ["Boneblade"] = "Gunblade",
         ["Hacker Rifle"] = "Energy Rifle",
+        ["Crystal Scythe"] = "Scythe",
         ["Pine Spray"] = "Spray",
         ["Water Uzi"] = "Uzi",
         ["Keyper"] = "Sniper",
@@ -411,7 +412,8 @@ local inf = {
             [5] = "Cryo Scythe",
             [6] = "Sakura Scythe",
             [7] = "Keythe",
-            [8] = "Bug Net"
+            [8] = "Crystal Scythe",
+            [9] = "Bug Net"
         },
         ["Slingshot"] = {
             [1] = "Goalpost",
