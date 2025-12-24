@@ -1834,7 +1834,6 @@ local wraps = {
     },
     ["Lapis"] = {
         ["g1"] = {
-            [1] = Enum.Material.SmoothPlastic,
             [2] = Color3.new(0.2549019753932953,0.2862745225429535,0.4470588266849518),
             [3] = 0,
             [4] = 0
@@ -2227,6 +2226,31 @@ local wraps = {
             [2] = Color3.new(0.6392157077789307,0.29411765933036804,0.29411765933036804),
             [3] = 0,
             [4] = 0
+        }
+    },
+    ["Polaris"] = {
+        ["g1"] = {
+            [1] = Enum.Material.Neon,
+            [2] = Color3.new(0.21568627655506134,0.42352941632270813,0.658823549747467),
+            [3] = 0,
+            [4] = 0,
+            [5] = "Polaris_1",
+            [7] = "Polaris"
+        },
+        ["rarity"] = "Mythical",
+        ["g2"] = {
+            [1] = Enum.Material.Metal,
+            [2] = Color3.new(0.06666667014360428,0.08235294371843338,0.20392157137393951),
+            [3] = 0,
+            [4] = 0,
+            [5] = "Polaris_2"
+        },
+        ["g3"] = {
+            [1] = Enum.Material.Neon,
+            [2] = Color3.new(0.4431372582912445,0.3960784375667572,0.8196078538894653),
+            [3] = 0.2,
+            [4] = 0,
+            [5] = "Polaris_3"
         }
     },
     ["Arbiter"] = {
@@ -5497,7 +5521,6 @@ local wraps = {
     },
     ["Pink Lemonade"] = {
         ["g1"] = {
-            [1] = Enum.Material.SmoothPlastic,
             [2] = Color3.new(1,0.3764705955982208,0.5960784554481506),
             [3] = 0,
             [4] = 0
@@ -5987,7 +6010,6 @@ local wraps = {
     },
     ["Playful"] = {
         ["g1"] = {
-            [1] = Enum.Material.SmoothPlastic,
             [2] = Color3.new(0.0784313753247261,0.26274511218070984,0.6901960968971252),
             [3] = 0,
             [4] = 0
@@ -6210,7 +6232,6 @@ local wraps = {
     },
     ["Sleet"] = {
         ["g1"] = {
-            [1] = Enum.Material.SmoothPlastic,
             [2] = Color3.new(0.32549020648002625,0.30980393290519714,0.4156862795352936),
             [3] = 0,
             [4] = 0
@@ -6427,7 +6448,6 @@ local wraps = {
     },
     ["Hot Cocoa"] = {
         ["g1"] = {
-            [1] = Enum.Material.SmoothPlastic,
             [2] = Color3.new(0.3176470696926117,0.2235294133424759,0.1764705926179886),
             [3] = 0,
             [4] = 0
@@ -6858,21 +6878,22 @@ local wraps = {
     [314] = "Festive Lights",
     [315] = "Ice Queen",
     [316] = "Borealis",
-    [317] = "MISSING_WRAP",
-    [318] = "Rivalry",
-    [319] = "Scribble",
-    [320] = "Net",
-    [321] = "Accretion",
-    [322] = "Eruption",
-    [323] = "Ultrablue",
-    [324] = "Only Six",
-    [325] = "Arcane",
-    [326] = "Invisible",
-    [327] = "Limefire",
-    [328] = "Peridot",
-    [329] = "Pixel Light",
-    [330] = "Ultra Zed",
-    [331] = "Virus"
+    [317] = "Polaris",
+    [318] = "MISSING_WRAP",
+    [319] = "Rivalry",
+    [320] = "Scribble",
+    [321] = "Net",
+    [322] = "Accretion",
+    [323] = "Eruption",
+    [324] = "Ultrablue",
+    [325] = "Only Six",
+    [326] = "Arcane",
+    [327] = "Invisible",
+    [328] = "Limefire",
+    [329] = "Peridot",
+    [330] = "Pixel Light",
+    [331] = "Ultra Zed",
+    [332] = "Virus"
 }
 local run = game:GetService('RunService')
 
