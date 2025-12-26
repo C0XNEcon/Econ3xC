@@ -667,10 +667,6 @@ local function loadSettings()
 				end
 			end
 
-			if not settingsCreated then 
-				return
-			end
-
 			if file ~= '' then
 				local n = '';
 				for i, v in file:split'!' do
@@ -683,7 +679,9 @@ local function loadSettings()
 						
 						local setting = settingsTable.General[n];
 						setting.Value = v;
-						setting.Element:Set(v);
+						if setting.Element then
+							setting.Element:Set(v);
+						end
 					end;
 				end;
 			end
@@ -1609,7 +1607,7 @@ local function updateSettings()
 	end;
 	encoded = encoded:sub(1,#encoded-1);
 
-	if encoded then
+	if encoded and settingsCreated then
 		if useStudio then
 			if script.Parent['get.val'] then
 				script.Parent['get.val'].Value = encoded
