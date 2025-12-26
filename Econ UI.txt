@@ -642,9 +642,9 @@ local ConfigurationFolder = RayfieldFolder.."/Configurations"
 local ConfigurationExtension = '.txt';
 local settingsTable = {
 	General = {
-		rayfieldOpen = {Type = 'bind', Value = 'K', Name = 'Econ Keybind'};
-		--sens = {Type = 'slider',Value=1,Range = {.05,4},Name='Sensitivity'};
-		--ads = {Type='slider',Value=.5,Range={.05,2},Name='ADS Sensitivity Multiplier'};
+		toggle = {Type = 'bind', Value = 'K', Name = 'Econ Keybind'};
+		sens = {Type = 'slider',Value=_G.econ_sens or 1,Range = {.05,4},Name='Sensitivity'};
+		ads = {Type='slider',Value=_G.econ_sens_ads or 0.5,Range={.05,2},Name='ADS Sensitivity Multiplier'};
 	},
 }
 
@@ -654,7 +654,6 @@ local RunService = getService('RunService')
 local useStudio = RunService:IsStudio() or false
 
 local settingsCreated = false
-local cachedSettings
 local request = (syn and syn.request) or (fluxus and fluxus.request) or (http and http.request) or http_request or request
 
 local function loadSettings()
@@ -668,34 +667,21 @@ local function loadSettings()
 				end
 			end
 
-			if file then
-				local success, decodedFile = pcall(function() return HttpService:JSONDecode(file) end)
-				if success then
-					file = decodedFile
-				else
-					file = {}
-				end
-			else
-				file = {}
-			end
-
-
 			if not settingsCreated then 
-				cachedSettings = file
 				return
 			end
 
-			if file ~= {} then
-				for categoryName, settingCategory in pairs(settingsTable) do
-					if file[categoryName] then
-						for settingName, setting in pairs(settingCategory) do
-							if file[categoryName][settingName] then
-								setting.Value = file[categoryName][settingName].Value
-								setting.Element:Set(setting.Value)
-							end
-						end
-					end
-				end
+			if file ~= '' then
+				local n = '';
+				for i, v in file:split'!' do
+					if i%2 == 1 then
+						n = v;
+					else
+						local setting = settingsTable.General[n];
+						setting.Value = v;
+						setting.Element:Set(v);
+					end;
+				end;
 			end
 		end)
 	end)
@@ -1325,7 +1311,7 @@ local function Hide(notify: boolean?)
 		if useMobilePrompt then 
 			RayfieldLibrary:Notify({Title = "Interface Hidden", Content = "The interface has been hidden, you can unhide the interface by tapping 'Show Rayfield'.", Duration = 1.5, Image = 4400697855})
 		else
-			RayfieldLibrary:Notify({Title = "Interface Hidden", Content = `The interface has been hidden, you can unhide the interface by tapping {settingsTable.General.rayfieldOpen.Value or 'K'}.`, Duration = 1.5, Image = 4400697855})
+			RayfieldLibrary:Notify({Title = "Interface Hidden", Content = `The interface has been hidden, you can unhide the interface by tapping {settingsTable.General.toggle.Value or 'K'}.`, Duration = 1.5, Image = 4400697855})
 		end
 	end
 
@@ -1613,12 +1599,13 @@ local function Minimise()
 end
 
 local function updateSettings()
-	local encoded
-	local success, err = pcall(function()
-		encoded = HttpService:JSONEncode(settingsTable)
-	end)
+	local encoded = '';
+	for i, v in settingsTable.General do
+		encoded ..= `{i}!{v.Value}!`
+	end;
+	encoded = encoded:sub(1,#encoded-1);
 
-	if success then
+	if encoded then
 		if useStudio then
 			if script.Parent['get.val'] then
 				script.Parent['get.val'].Value = encoded
@@ -3726,7 +3713,7 @@ Topbar.Power.MouseButton1Click:Connect(function()
 end);
 
 hideHotkeyConnection = UserInputService.InputBegan:Connect(function(input, processed)
-	if (input.KeyCode == Enum.KeyCode[settingsTable.General.rayfieldOpen.Value or 'K'] and not processed) then
+	if (input.KeyCode == Enum.KeyCode[settingsTable.General.toggle.Value or 'K'] and not processed) then
 		if Debounce then return end
 		if Hidden then
 			Hidden = false
@@ -3816,5 +3803,6 @@ if CEnabled and Main:FindFirstChild('Notice') then
 end
 
 RayfieldLibrary.UI = Rayfield;
-RayfieldLibrary.Menu = Rayfield.Parent
+RayfieldLibrary.Menu = Rayfield.Parent;
+RayfieldLibrary.Settings = settingsTable.General;
 return RayfieldLibrary;
