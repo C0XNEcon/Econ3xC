@@ -677,6 +677,10 @@ local function loadSettings()
 					if i%2 == 1 then
 						n = v;
 					else
+						if tonumber(v) then
+							v = tonumber(v);
+						end;
+						
 						local setting = settingsTable.General[n];
 						setting.Value = v;
 						setting.Element:Set(v);
