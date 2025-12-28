@@ -522,7 +522,7 @@ local _ui_blur = {
 				BrickColor = BrickColor.new('Institutional white');
 			}
 
-			DOF.Enabled = DOF.Name == 'DepthOfField' and fr.Visible;
+			DOF.Enabled = RayfieldLibrary.IsVisible and RayfieldLibrary:IsVisible();
 
 			local zIndex = 1 - 0.05*frame.ZIndex;
 
@@ -661,10 +661,8 @@ local function loadSettings()
 
 	local success, result =	pcall(function()
 		task.spawn(function()
-			if isfolder and isfolder(RayfieldFolder) then
-				if isfile and isfile(files.settings) then
-					file = readfile(files.settings)
-				end
+			if isfile and isfile(files.settings) then
+				file = readfile(files.settings)
 			end
 
 			if file ~= '' then
@@ -3613,7 +3611,7 @@ function RayfieldLibrary:SetVisibility(visibility: boolean)
 end
 
 function RayfieldLibrary:IsVisible(): boolean
-	return not Hidden
+	return not Hidden and not Minimised;
 end
 
 local hideHotkeyConnection
