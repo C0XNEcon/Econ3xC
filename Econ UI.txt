@@ -3308,7 +3308,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 	end
 	Topbar.ChangeSize.ImageTransparency = 1
 	Topbar.Power.ImageTransparency = 1
-
+	Topbar.Visible = true;
+	
 	if dragBar then
 		TweenService:Create(dragBarCosmetic, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0.7}):Play()
 	end
