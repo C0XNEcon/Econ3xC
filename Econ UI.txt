@@ -2599,6 +2599,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 			local specialUnselected = Color3.fromRGB(157, 142, 74);
 			local specialSelected = Color3.fromRGB(197, 173, 76);
+			
+			local is_open = false;
 
 			local function SetDropdownOptions()
 				local frs = {}
@@ -2621,10 +2623,11 @@ function RayfieldLibrary:CreateWindow(Settings)
 					DropdownOption.Visible = true
 
 					frs[Option] = DropdownOption
-
-					DropdownOption.BackgroundTransparency = 1
-					DropdownOption.UIStroke.Transparency = 1
-					DropdownOption.Title.TextTransparency = 1
+					
+					local t = is_open and 0 or 1
+					DropdownOption.BackgroundTransparency = t
+					DropdownOption.UIStroke.Transparency = t
+					DropdownOption.Title.TextTransparency = t
 
 					--local Dropdown = Tab:CreateDropdown({
 					--	Name = "Dropdown Example",
@@ -2753,6 +2756,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 						TweenService:Create(DropdownOpt.Title, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
 					end
 				end
+				is_open = false;
 				TweenService:Create(Dropdown.List, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {ScrollBarImageTransparency = 1}):Play()
 				TweenService:Create(Dropdown.Toggle, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Rotation = 180}):Play()	
 				task.wait(0.35)
@@ -2763,6 +2767,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 			function DropdownSettings:Open()
 				TweenService:Create(Dropdown, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(1, -10, 0, 180)}):Play()
 				Dropdown.List.Visible = true
+				is_open = true;
 				TweenService:Create(Dropdown.List, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {ScrollBarImageTransparency = 0.7}):Play()
 				TweenService:Create(Dropdown.Toggle, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Rotation = 0}):Play()	
 				for _, DropdownOpt in ipairs(Dropdown.List:GetChildren()) do
