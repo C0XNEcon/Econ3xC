@@ -2639,7 +2639,12 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 					--	end,
 					--})
-
+					
+					if not table.find(DropdownSettings.CurrentOption, Option) then
+						droption.BackgroundColor3 = IsSpecial and specialUnselected or SelectedTheme.DropdownUnselected
+					else
+						droption.BackgroundColor3 = IsSpecial and specialSelected or  SelectedTheme.DropdownSelected
+					end
 
 					DropdownOption.Interact.ZIndex = 50
 					DropdownOption.Interact.MouseButton1Click:Connect(function()
