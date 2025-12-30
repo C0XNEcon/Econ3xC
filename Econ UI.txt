@@ -2641,9 +2641,9 @@ function RayfieldLibrary:CreateWindow(Settings)
 					--})
 					
 					if not table.find(DropdownSettings.CurrentOption, Option) then
-						droption.BackgroundColor3 = IsSpecial and specialUnselected or SelectedTheme.DropdownUnselected
+						DropdownOption.BackgroundColor3 = IsSpecial and specialUnselected or SelectedTheme.DropdownUnselected
 					else
-						droption.BackgroundColor3 = IsSpecial and specialSelected or  SelectedTheme.DropdownSelected
+						DropdownOption.BackgroundColor3 = IsSpecial and specialSelected or  SelectedTheme.DropdownSelected
 					end
 
 					DropdownOption.Interact.ZIndex = 50
