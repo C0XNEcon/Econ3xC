@@ -1,3 +1,13 @@
+--[[
+
+| >> Original "Rayfield" by Sirius Menu << | https://docs.sirius.menu/rayfield
+| >> Edited and optimized by EconRC
+
+-- You are free to use this tweaked version of Rayfield, I used Rayfield 
+   and its fair for this to be publicly available.
+
+]]
+
 local RayfieldLibrary = {
 	Flags = {},
 	Theme = {
@@ -565,7 +575,7 @@ local _ui_blur = {
 		end;
 
 		UpdateOrientation(true);
-		run:BindToRenderStep(uid, 200, UpdateOrientation);
+		run:BindToRenderStep(uid, 10, UpdateOrientation);
 
 		return root;
 	end;
@@ -2631,17 +2641,6 @@ function RayfieldLibrary:CreateWindow(Settings)
 					DropdownOption.UIStroke.Transparency = t
 					DropdownOption.Title.TextTransparency = t
 
-					--local Dropdown = Tab:CreateDropdown({
-					--	Name = "Dropdown Example",
-					--	Options = {"Option 1","Option 2"},
-					--	CurrentOption = {"Option 1"},
-					--  MultipleOptions = true,
-					--	Flag = "Dropdown1",
-					--	Callback = function(TableOfOptions)
-
-					--	end,
-					--})
-					
 					if not table.find(DropdownSettings.CurrentOption, Option) then
 						DropdownOption.BackgroundColor3 = IsSpecial and specialUnselected or SelectedTheme.DropdownUnselected
 					else
