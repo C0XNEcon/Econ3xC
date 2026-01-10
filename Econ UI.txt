@@ -1056,37 +1056,40 @@ local function LoadConfiguration(Configuration,applySetting)
 				name = v;
 			else
 				local flag = RayfieldLibrary.NFlags[name] or RayfieldLibrary.Flags[name];
-				local _type = flag.Type;
-				local _fromtype = {
-					ColorPicker = function()
-						return UnpackColor(v);
-					end;
-					Dropdown = function()
-						if v:sub(1,1) == '-' then
-							local splits = v:sub(2,-1):split',';
-							local all = {};
-							for _, v in splits do
-								table.insert(all,flag.OptionFlags[numcode.Decode(v)]);
-							end;
-							return all;
-						else
-							return v;
+				if flag then
+					local _type = flag.Type;
+					local _fromtype = {
+						ColorPicker = function()
+							return UnpackColor(v);
 						end;
-					end;
-					Number = function()
-						return numcode.Decode(v)/1000;
-					end;
-					Toggle = function()
-						return v == string.char(34);
-					end;
-				};
-				
-				if not _fromtype[_type] then
-					data[flag.Flag] = v;
-				else
-					data[flag.Flag] = _fromtype[_type]();
-				end;
+						Dropdown = function()
+							if v:sub(1,1) == '-' then
+								local splits = v:sub(2,-1):split',';
+								local all = {};
+								for _, v in splits do
+									table.insert(all,flag.OptionFlags[numcode.Decode(v)]);
+								end;
+								return all;
+							else
+								return v;
+							end;
+						end;
+						Number = function()
+							return numcode.Decode(v)/1000;
+						end;
+						Toggle = function()
+							return v == string.char(34);
+						end;
+					};
 
+					if not _fromtype[_type] then
+						data[flag.Flag] = v;
+					else
+						data[flag.Flag] = _fromtype[_type]();
+					end;
+				else
+					error('<< Econ CFG Loading >> No flag named "'..name..'"',2)
+				end;
 				name = nil;
 			end;
 		end;
@@ -3684,9 +3687,10 @@ function RayfieldLibrary:LoadConfiguration(...)
 
 	if success and loaded and not notified then
 	elseif not success and not notified then
-		warn('Rayfield Configurations Error | '..tostring(result))
-		warn(config)
 		RayfieldLibrary:Notify({Title = "Econ Configurations", Content = "We've encountered an issue loading your configuration correctly.\n\nCheck the Developer Console for more information.", Image = 4384402990})
+		warn('Rayfield Configurations Error | '..tostring(result))
+		warn(RayfieldLibrary.CONE_FILE_NAME)
+		warn(readfile(RayfieldLibrary.CONE_FILE_NAME..ConfigurationExtension))
 	end
 
 	globalLoaded = true
