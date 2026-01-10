@@ -1149,7 +1149,9 @@ local function SaveConfiguration(_,specificLocation,contents)
 						if v.OptionFlagsInd then
 							local f = '-';
 							for _, x in v.CurrentOption do
-								f ..= numcode.Encode(v.OptionFlagsInd[x])..','
+								if x and #x > 0 then
+									f ..= numcode.Encode(v.OptionFlagsInd[x])..','
+								end;
 							end;
 							val = v.OptionFlagsInd and f:sub(1,#f-1);
 						else
