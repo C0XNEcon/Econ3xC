@@ -10,6 +10,7 @@
 
 local RayfieldLibrary = {
 	Flags = {},
+	NFlags = {};
 	Theme = {
 		Default = {
 			TextColor = Color3.fromRGB(240, 240, 240),
@@ -392,6 +393,8 @@ local RayfieldLibrary = {
 	CONE_FILE_NAME = nil;
 }
 
+local save_lock = false;
+
 local f = 'EconRC';
 local files = {
 	key = f..'/key.dat';
@@ -697,7 +700,7 @@ local function loadSettings()
 	end)
 
 	if not success then 
-		warn(result)
+		warn('L.701',result)
 	end
 end
 
@@ -955,96 +958,217 @@ local function makeDraggable(object, dragObject, enableTaptic, tapticOffset)
 	end)
 end
 
+local numcode = {}
+
+local characters = {
+	[0] = '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+	'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+	"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+	'!', '#', '$', '%', '&', "'", '(', ')', '*', '+', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', ']', '^', '_', '`', '{', '|', '}', '~'
+}
+
+local numbers = {['0'] = 0};
+for i, character in ipairs(characters) do numbers[character] = i end;
+
+local base = #characters + 1;
+
+numcode.Encode = function(value)
+	value = tonumber(value);
+	if value == 0 then return '0' end;
+	local text = '';
+	if value < 1 then text = '-' value = -value end;
+	while value > 0 do
+		text ..= characters[value % base];
+		value = math.floor(value / base);
+	end;
+	return text;
+end;
+
+numcode.Decode = function(value)
+	local number = 0;
+	local power = 1;
+	for character in value:gmatch'.' do
+		if character == '-' then
+			power = -power;
+		else
+			number += numbers[character] * power;
+			power *= base;
+		end;
+	end;
+	return number;
+end;
+
 local function PackColor(Color)
-	return {R = Color.R * 255, G = Color.G * 255, B = Color.B * 255}
+	local newnum = function(n)
+		return numcode.Encode(math.round(n*255));
+	end;
+	return `{newnum(Color.R)}"{newnum(Color.G)}"{newnum(Color.B)}`
 end    
 
-local function UnpackColor(Color)
-	return Color3.fromRGB(Color.R, Color.G, Color.B)
+local function UnpackColor(str)
+	if typeof(str) == 'table' then
+		return Color3.fromRGB(str.R,str.G,str.B);
+	end;
+	
+	local oldnum = function(n)
+		return numcode.Decode(n);
+	end;
+	local spl = str:split'"';
+	return Color3.fromRGB(oldnum(spl[1]), oldnum(spl[2]), oldnum(spl[3]));
 end
 
-local function LoadConfiguration(Configuration,applySetting)
-	local success, Data = pcall(function() return HttpService:JSONDecode(Configuration) end)
-	local changed
+local function LoadConfiguration(Configuration,applySetting)		
+	save_lock = true;
 
-	if not success then warn('Rayfield had an issue decoding the configuration file, please try delete the file and reopen Rayfield.') return end
+	if Configuration:sub(1,1) == '{' then
+		local success, Data = pcall(function() return HttpService:JSONDecode(Configuration) end)
+		local changed
 
-	for FlagName, Flag in pairs(RayfieldLibrary.Flags) do
-		local FlagValue = Data[FlagName]
+		if not success then warn('Rayfield had an issue decoding the configuration file, please try delete the file and reopen Rayfield.') return end
 
-		if (typeof(FlagValue) == 'boolean' and FlagValue == false) or FlagValue then
-			task.spawn(function()
-				if Flag.Type == "ColorPicker" then
-					changed = true
-					Flag:Set(UnpackColor(FlagValue), true)
-				else
-					if (Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color) ~= FlagValue or applySetting then 
+		for FlagName, Flag in pairs(RayfieldLibrary.Flags) do
+			local FlagValue = Data[FlagName]
+			
+			if (typeof(FlagValue) == 'boolean' and FlagValue == false) or FlagValue then
+				task.spawn(function()
+					if Flag.Type == "ColorPicker" then
 						changed = true
-						Flag:Set(FlagValue, true) 	
+						Flag:Set(UnpackColor(FlagValue), true)
+					else
+						if (Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color) ~= FlagValue or applySetting then 
+							changed = true
+							Flag:Set(FlagValue, true) 	
+						end
 					end
-				end
-			end)
+				end)
+			end
 		end
-	end
 
-	return changed
+		save_lock = false;
+		return changed
+	else
+		local changed;
+		local data = {};
+		
+		local name;
+		for i, v in pairs(Configuration:split('!') or {}) do
+			if not name then
+				name = v;
+			else
+				local flag = RayfieldLibrary.NFlags[name] or RayfieldLibrary.Flags[name];
+				local _type = flag.Type;
+				local _fromtype = {
+					ColorPicker = function()
+						return UnpackColor(v);
+					end;
+					Dropdown = function()
+						if v:sub(1,1) == '-' then
+							local splits = v:sub(2,-1):split',';
+							local all = {};
+							for _, v in splits do
+								table.insert(all,flag.OptionFlags[numcode.Decode(v)]);
+							end;
+							return all;
+						else
+							return v;
+						end;
+					end;
+					Number = function()
+						return numcode.Decode(v)/1000;
+					end;
+					Toggle = function()
+						return v == string.char(34);
+					end;
+				};
+				
+				if not _fromtype[_type] then
+					data[flag.Flag] = v;
+				else
+					data[flag.Flag] = _fromtype[_type]();
+				end;
+
+				name = nil;
+			end;
+		end;
+
+		for FlagName, Flag in pairs(RayfieldLibrary.Flags) do
+			local FlagValue = data[FlagName]
+
+			if (typeof(FlagValue) == 'boolean' and not FlagValue) or FlagValue then
+				task.spawn(function()
+					if Flag.Type == "ColorPicker" then
+						changed = true
+						Flag:Set(FlagValue, true)
+					else
+						if (Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color) ~= FlagValue or applySetting then 
+							changed = true
+							Flag:Set(FlagValue, true) 	
+						end
+					end
+				end)
+			end
+		end
+
+		save_lock = false;
+		return changed
+	end;
 end
 
 local zlodconf = LoadConfiguration
 
 local function SaveConfiguration(_,specificLocation,contents)
 	if not RayfieldLibrary.CONE_FILE_NAME then return end
+	if save_lock then return end;
+	
 	if debugX then
 		print('Saving')
 	end
 
 	local loc = (specificLocation or RayfieldLibrary.CONE_FILE_NAME .. ConfigurationExtension)
-	local Data = {}
+	
+	local data = '';
+	local enc = function(val)
+		local types = {
+			number = function()
+				return numcode.Encode(math.round(val*1000));
+			end;
+		};
+		return types[typeof(val)] and types[typeof(val)]() or val;
+	end;
+	
 	if not contents then
-		for i, v in pairs(RayfieldLibrary.Flags) do
+		for i, v in pairs(RayfieldLibrary.NFlags) do
 			if not v.Ext then
-				if v.Type == "ColorPicker" then
-					Data[i] = PackColor(v.Color)
+				local val;
+				if v.Color then
+					val = PackColor(v.Color);
 				else
 					if typeof(v.CurrentValue) == 'boolean' then
-						if v.CurrentValue == false then
-							Data[i] = false
-						else
-							Data[i] = v.CurrentValue or v.CurrentKeybind or v.CurrentOption or v.Color
-						end
+						val = v.CurrentValue and string.char(34) or string.char(35);
 					else
-						Data[i] = v.CurrentValue or v.CurrentKeybind or v.CurrentOption or v.Color
-					end
-				end
-			end
-		end
-	end
-
-	if encode then
-		warn(loc,tostring(HttpService:JSONEncode(Data)))
-	end
-
-	if useStudio then
-		if script.Parent:FindFirstChild('configuration') then script.Parent.configuration:Destroy() end
-
-		local ScreenGui = Instance.new("ScreenGui")
-		ScreenGui.Parent = script.Parent
-		ScreenGui.Name = 'configuration'
-
-		local TextBox = Instance.new("TextBox")
-		TextBox.Parent = ScreenGui
-		TextBox.Size = UDim2.new(0, 800, 0, 50)
-		TextBox.AnchorPoint = Vector2.new(0.5, 0)
-		TextBox.Position = UDim2.new(0.5, 0, 0, 30)
-		TextBox.Text = HttpService:JSONEncode(Data)
-		TextBox.ClearTextOnFocus = false
-	end
-
+						if v.OptionFlagsInd then
+							local f = '-';
+							for _, x in v.CurrentOption do
+								f ..= numcode.Encode(v.OptionFlagsInd[x])..','
+							end;
+							val = v.OptionFlagsInd and f:sub(1,#f-1);
+						else
+							val = v.CurrentOption and v.CurrentOption[1] or 
+								v.CurrentKeybind or 
+								enc(v.CurrentValue);
+						end;
+					end;
+				end;
+				data ..= `{i}!{val}!`;
+			end;
+		end;
+	end;
+	
 	if debugX then
-		warn(HttpService:JSONEncode(Data))
+		warn(data)
 	end
 
-	writefile(loc, contents or tostring(HttpService:JSONEncode(Data)))
+	writefile(loc, contents or data)
 end
 
 local inputRequesting = false
@@ -2223,6 +2347,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 			if Settings.ConfigurationSaving then
 				if Settings.ConfigurationSaving.Enabled and ColorPickerSettings.Flag then
 					RayfieldLibrary.Flags[ColorPickerSettings.Flag] = ColorPickerSettings
+					RayfieldLibrary.NFlags[ColorPickerSettings.NewFlag or ColorPickerSettings.Flag] = ColorPickerSettings;
 				end
 			end
 
@@ -2491,19 +2616,20 @@ function RayfieldLibrary:CreateWindow(Settings)
 			function InputSettings:Set(text, any, any2)
 				Input.InputFrame.InputBox.Text = text
 				InputSettings.CurrentValue = text
-
+				
+				if not InputSettings.Ext then
+					task.spawn(SaveConfiguration);
+				end
+				
 				local Success, Response = pcall(function()
 					InputSettings.Callback(text, any, any2)
 				end)
-
-				if not InputSettings.Ext then
-					SaveConfiguration()
-				end
 			end
 
 			if Settings.ConfigurationSaving then
 				if Settings.ConfigurationSaving.Enabled and InputSettings.Flag then
 					RayfieldLibrary.Flags[InputSettings.Flag] = InputSettings
+					RayfieldLibrary.NFlags[InputSettings.NewFlag or InputSettings.Flag] = InputSettings;
 				end
 			end
 
@@ -2517,12 +2643,31 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 		-- Dropdown
 		function Tab:CreateDropdown(DropdownSettings)
+			DropdownSettings.Type = "Dropdown";
+			
 			local Dropdown = Elements.Template.Dropdown:Clone()
 			if string.find(DropdownSettings.Name,"closed") then
 				Dropdown.Name = "Dropdown"
 			else
 				Dropdown.Name = DropdownSettings.Name
 			end
+			
+			local new = {};
+			for i, v in DropdownSettings.Options do
+				table.insert(new,typeof(i) == 'number' and v or i);
+			end;
+			
+			if not DropdownSettings.Options[1] and #new > 0 then
+				local fl = {};
+				for i,v in DropdownSettings.Options do
+					fl[v] = i;
+				end;
+				
+				DropdownSettings.OptionFlags = fl;
+				DropdownSettings.OptionFlagsInd = table.clone(DropdownSettings.Options);
+			end;
+			
+			DropdownSettings.Options = new;
 			Dropdown.Title.Text = DropdownSettings.Name
 			Dropdown.Visible = true
 			Dropdown.Parent = TabPage
@@ -2809,13 +2954,14 @@ function RayfieldLibrary:CreateWindow(Settings)
 				else
 					Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
 				end
-
+				
+				task.spawn(SaveConfiguration);
 
 				local Success, Response = pcall(function()
 					DropdownSettings.Callback(NewOption, any, any2)
 				end)
 				if not Success then
-					warn(Response)
+					warn(DropdownSettings.Name,Response)
 				end
 
 				for _, droption in ipairs(Dropdown.List:GetChildren()) do
@@ -2828,8 +2974,6 @@ function RayfieldLibrary:CreateWindow(Settings)
 						end
 					end
 				end
-
-				SaveConfiguration()
 			end
 
 			function DropdownSettings:Refresh(optionsTable: table) -- updates a dropdown with new options from optionsTable
@@ -2845,6 +2989,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 			if Settings.ConfigurationSaving then
 				if Settings.ConfigurationSaving.Enabled and DropdownSettings.Flag then
 					RayfieldLibrary.Flags[DropdownSettings.Flag] = DropdownSettings
+					RayfieldLibrary.NFlags[DropdownSettings.NewFlag or DropdownSettings.Flag] = DropdownSettings;
 				end
 			end
 
@@ -2957,7 +3102,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 				KeybindSettings.CurrentKeybind = tostring(NewKeybind)
 				Keybind.KeybindFrame.KeybindBox:ReleaseFocus()
 				if not KeybindSettings.Ext then
-					SaveConfiguration()
+					task.spawn(SaveConfiguration);
 				end
 
 				if KeybindSettings.CallOnChange then
@@ -2968,6 +3113,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 			if Settings.ConfigurationSaving then
 				if Settings.ConfigurationSaving.Enabled and KeybindSettings.Flag then
 					RayfieldLibrary.Flags[KeybindSettings.Flag] = KeybindSettings
+					RayfieldLibrary.NFlags[KeybindSettings.NewFlag or KeybindSettings.Flag] = KeybindSettings;
 				end
 			end
 
@@ -2981,6 +3127,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 		-- Toggle
 		function Tab:CreateToggle(ToggleSettings)
+			ToggleSettings.Type = "Toggle"
 			local ToggleValue = {}
 
 			local Toggle = Elements.Template.Toggle:Clone()
@@ -3086,7 +3233,11 @@ function RayfieldLibrary:CreateWindow(Settings)
 					TweenService:Create(Toggle, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {BackgroundColor3 = SelectedTheme.ElementBackground}):Play()
 					TweenService:Create(Toggle.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Exponential), {Transparency = 0}):Play()	
 				end
-
+				
+				if not ToggleSettings.Ext then
+					task.spawn(SaveConfiguration);	
+				end;
+				
 				local Success, Response = pcall(function()
 					if debugX then warn('Running toggle \''..ToggleSettings.Name..'\' (:Set)') end
 
@@ -3096,16 +3247,13 @@ function RayfieldLibrary:CreateWindow(Settings)
 				if not Success then
 					warn(Response)
 				end
-
-				if not ToggleSettings.Ext then
-					SaveConfiguration()
-				end
 			end
 
 			if not ToggleSettings.Ext then
 				if Settings.ConfigurationSaving then
 					if Settings.ConfigurationSaving.Enabled and ToggleSettings.Flag then
 						RayfieldLibrary.Flags[ToggleSettings.Flag] = ToggleSettings
+						RayfieldLibrary.NFlags[ToggleSettings.NewFlag or ToggleSettings.Flag] = ToggleSettings;
 					end
 				end
 			end
@@ -3136,6 +3284,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 		-- Slider
 		function Tab:CreateSlider(SliderSettings)
+			SliderSettings.Type = "Number"
 			local SLDragging = false
 			local Slider = Elements.Template.Slider:Clone()
 			Slider.Name = SliderSettings.Name
@@ -3255,7 +3404,12 @@ function RayfieldLibrary:CreateWindow(Settings)
 
 				TweenService:Create(Slider.Main.Progress, TweenInfo.new(0.45, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Size = UDim2.new(0, Slider.Main.AbsoluteSize.X * ((NewVal + SliderSettings.Range[1]) / (SliderSettings.Range[2] - SliderSettings.Range[1])) > 5 and Slider.Main.AbsoluteSize.X * (NewVal / (SliderSettings.Range[2] - SliderSettings.Range[1])) or 5, 1, 0)}):Play()
 				Slider.Main.Information.Text = tostring(NewVal) .. " " .. (SliderSettings.Suffix or "")
-
+				
+				SliderSettings.CurrentValue = NewVal
+				if not SliderSettings.Ext then
+					task.spawn(SaveConfiguration);
+				end;
+				
 				local Success, Response = pcall(function()
 					SliderSettings.Callback(NewVal, any, any2)
 				end)
@@ -3263,16 +3417,12 @@ function RayfieldLibrary:CreateWindow(Settings)
 				if not Success then
 					warn(Response)
 				end
-
-				SliderSettings.CurrentValue = NewVal
-				if not SliderSettings.Ext then
-					SaveConfiguration()
-				end
 			end
 
 			if Settings.ConfigurationSaving then
 				if Settings.ConfigurationSaving.Enabled and SliderSettings.Flag then
 					RayfieldLibrary.Flags[SliderSettings.Flag] = SliderSettings
+					RayfieldLibrary.NFlags[SliderSettings.NewFlag or SliderSettings.Flag] = SliderSettings;
 				end
 			end
 
