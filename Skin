@@ -1947,15 +1947,15 @@ local mod = {
         ["animsReverse"] = {
             ["distortion_sprint"] = "sprint",
             ["distortion_equip"] = "equip",
+            ["distortion_inspect2"] = "inspect",
             ["distortion_shoot1"] = "Shoot1",
-            ["distortion_inspect"] = "inspect",
             ["distortion_idle"] = "idle"
         },
         ["anims"] = {
             ["sprint"] = "distortion_sprint",
             ["idle"] = "distortion_idle",
             ["equip"] = "distortion_equip",
-            ["inspect"] = "distortion_inspect",
+            ["inspect"] = "distortion_inspect2",
             ["Shoot1"] = "distortion_shoot1"
         },
         ["rootoffset"] = 0, 0, -0.375, 1, 0, 0, 0, 0.999048233, -0.0436193869, 0, 0.0436193869, 0.999048233,
