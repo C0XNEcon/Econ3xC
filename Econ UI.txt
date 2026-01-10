@@ -578,8 +578,8 @@ local _ui_blur = {
 		end;
 
 		UpdateOrientation(true);
-		run:BindToRenderStep(uid, 10, UpdateOrientation);
-
+		run.RenderStepped:Connect(UpdateOrientation);
+		
 		return root;
 	end;
 };
