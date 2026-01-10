@@ -1088,7 +1088,7 @@ local function LoadConfiguration(Configuration,applySetting)
 						data[flag.Flag] = _fromtype[_type]();
 					end;
 				else
-					error('<< Econ CFG Loading >> No flag named "'..name..'"',2)
+					error('No Econ flag named "'..name..'"',2)
 				end;
 				name = nil;
 			end;
