@@ -1229,7 +1229,8 @@ function RayfieldLibrary:InputRequest(data) -- // RequestInput
 			TweenService:Create(inputUI.Input.UIStroke, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
 			TweenService:Create(inputBox, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
 			TweenService:Create(inputUI.Hide, TweenInfo.new(0.4, Enum.EasingStyle.Exponential), {ImageTransparency = 1}):Play()
-
+			
+			warn(txt)
 			if txt and data.Receive then
 				task.spawn(data.Receive,txt);
 			end;
