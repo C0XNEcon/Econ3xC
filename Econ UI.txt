@@ -1017,35 +1017,37 @@ local function UnpackColor(str)
 	return Color3.fromRGB(oldnum(spl[1]), oldnum(spl[2]), oldnum(spl[3]));
 end
 
-local function LoadConfiguration(Configuration,applySetting)		
-	save_lock = true;
+local function LoadConfiguration(Configuration,applySetting,testValid)		
+	save_lock = not testValid;
 
 	if Configuration:sub(1,1) == '{' then
 		local success, Data = pcall(function() return HttpService:JSONDecode(Configuration) end)
 		local changed
 
 		if not success then warn('Rayfield had an issue decoding the configuration file, please try delete the file and reopen Rayfield.') return end
+		
+		if not testValid then
+			for FlagName, Flag in pairs(RayfieldLibrary.Flags) do
+				local FlagValue = Data[FlagName]
 
-		for FlagName, Flag in pairs(RayfieldLibrary.Flags) do
-			local FlagValue = Data[FlagName]
-			
-			if (typeof(FlagValue) == 'boolean' and FlagValue == false) or FlagValue then
-				task.spawn(function()
-					if Flag.Type == "ColorPicker" then
-						changed = true
-						Flag:Set(UnpackColor(FlagValue), true)
-					else
-						if (Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color) ~= FlagValue or applySetting then 
+				if (typeof(FlagValue) == 'boolean' and FlagValue == false) or FlagValue then
+					task.spawn(function()
+						if Flag.Type == "ColorPicker" then
 							changed = true
-							Flag:Set(FlagValue, true) 	
+							Flag:Set(UnpackColor(FlagValue), true)
+						else
+							if (Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color) ~= FlagValue or applySetting then 
+								changed = true
+								Flag:Set(FlagValue, true) 	
+							end
 						end
-					end
-				end)
+					end)
+				end
 			end
 		end
 
 		save_lock = false;
-		return changed
+		return testValid or changed
 	else
 		local changed;
 		local data = {};
@@ -1057,63 +1059,70 @@ local function LoadConfiguration(Configuration,applySetting)
 			else
 				local flag = RayfieldLibrary.NFlags[name] or RayfieldLibrary.Flags[name];
 				if flag then
-					local _type = flag.Type;
-					local _fromtype = {
-						ColorPicker = function()
-							return UnpackColor(v);
-						end;
-						Dropdown = function()
-							if v:sub(1,1) == '-' then
-								local splits = v:sub(2,-1):split',';
-								local all = {};
-								for _, v in splits do
-									table.insert(all,flag.OptionFlags[numcode.Decode(v)]);
-								end;
-								return all;
-							else
-								return v;
+					if not testValid then
+						local _type = flag.Type;
+						local _fromtype = {
+							ColorPicker = function()
+								return UnpackColor(v);
 							end;
-						end;
-						Number = function()
-							return numcode.Decode(v)/1000;
-						end;
-						Toggle = function()
-							return v == string.char(34);
-						end;
-					};
+							Dropdown = function()
+								if v:sub(1,1) == '-' then
+									local splits = v:sub(2,-1):split',';
+									local all = {};
+									for _, v in splits do
+										table.insert(all,flag.OptionFlags[numcode.Decode(v)]);
+									end;
+									return all;
+								else
+									return v;
+								end;
+							end;
+							Number = function()
+								return numcode.Decode(v)/1000;
+							end;
+							Toggle = function()
+								return v == string.char(34);
+							end;
+						};
 
-					if not _fromtype[_type] then
-						data[flag.Flag] = v;
-					else
-						data[flag.Flag] = _fromtype[_type]();
+						if not _fromtype[_type] then
+							data[flag.Flag] = v;
+						else
+							data[flag.Flag] = _fromtype[_type]();
+						end;
 					end;
 				else
-					error('No Econ flag named "'..name..'"',2)
+					if testValid then
+						return;
+					else
+						error('No Econ flag named "'..name..'"',2);
+					end;
 				end;
 				name = nil;
 			end;
 		end;
-
-		for FlagName, Flag in pairs(RayfieldLibrary.Flags) do
-			local FlagValue = data[FlagName]
-
-			if (typeof(FlagValue) == 'boolean' and not FlagValue) or FlagValue then
-				task.spawn(function()
-					if Flag.Type == "ColorPicker" then
-						changed = true
-						Flag:Set(FlagValue, true)
-					else
-						if (Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color) ~= FlagValue or applySetting then 
+		
+		if not testValid then
+			for FlagName, Flag in pairs(RayfieldLibrary.Flags) do
+				local FlagValue = data[FlagName];
+				if (typeof(FlagValue) == 'boolean' and not FlagValue) or FlagValue then
+					task.spawn(function()
+						if Flag.Type == "ColorPicker" then
 							changed = true
-							Flag:Set(FlagValue, true) 	
-						end
-					end
-				end)
-			end
-		end
-
+							Flag:Set(FlagValue, true)
+						else
+							if (Flag.CurrentValue or Flag.CurrentKeybind or Flag.CurrentOption or Flag.Color) ~= FlagValue or applySetting then 
+								changed = true
+								Flag:Set(FlagValue, true)
+							end;
+						end;
+					end);
+				end;
+			end;
+		end;
+		
 		save_lock = false;
-		return changed
+		return testValid or changed
 	end;
 end
 
@@ -2650,6 +2659,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 		function Tab:CreateDropdown(DropdownSettings)
 			DropdownSettings.Type = "Dropdown";
 			
+			local loaded = false;
+
 			local Dropdown = Elements.Template.Dropdown:Clone()
 			if string.find(DropdownSettings.Name,"closed") then
 				Dropdown.Name = "Dropdown"
@@ -2763,6 +2774,124 @@ function RayfieldLibrary:CreateWindow(Settings)
 			local specialSelected = Color3.fromRGB(197, 173, 76);
 			
 			local is_open = false;
+			
+			local load_options = function()
+				local frs = {}
+				for _, Option in reverseTable(DropdownSettings.Options) do
+					local DropdownOption = Elements.Template.Dropdown.List.Template:Clone()
+					local IsSpecial = DropdownSettings.SpecialOptions and table.find(DropdownSettings.SpecialOptions,Option)
+
+					if IsSpecial then
+						DropdownOption:AddTag'Special'
+
+						local stroke = Instance.new('UIStroke',DropdownOption.Title);
+						stroke.Thickness = 3;
+						stroke.Color = Color3.new(0,0,0);
+						stroke.Transparency = .95
+					end
+
+					DropdownOption.Name = Option
+					DropdownOption.Title.Text = Option
+					DropdownOption.Parent = Dropdown.List
+					DropdownOption.Visible = true
+
+					frs[Option] = DropdownOption
+
+					local t = is_open and 0 or 1
+					DropdownOption.BackgroundTransparency = t
+					DropdownOption.UIStroke.Transparency = t
+					DropdownOption.Title.TextTransparency = t
+
+					if not table.find(DropdownSettings.CurrentOption, Option) then
+						DropdownOption.BackgroundColor3 = IsSpecial and specialUnselected or SelectedTheme.DropdownUnselected
+					else
+						DropdownOption.BackgroundColor3 = IsSpecial and specialSelected or  SelectedTheme.DropdownSelected
+					end
+
+					DropdownOption.Interact.ZIndex = 50
+					DropdownOption.Interact.MouseButton1Click:Connect(function()
+						if not DropdownSettings.MultipleOptions and table.find(DropdownSettings.CurrentOption, Option) then 
+							return
+						end
+
+						if table.find(DropdownSettings.CurrentOption, Option) then
+							table.remove(DropdownSettings.CurrentOption, table.find(DropdownSettings.CurrentOption, Option))
+							if DropdownSettings.MultipleOptions then
+								if #DropdownSettings.CurrentOption == 1 then
+									Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
+								elseif #DropdownSettings.CurrentOption == 0 then
+									Dropdown.Selected.Text = "None"
+								else
+									Dropdown.Selected.Text = "Various"
+								end
+							else
+								Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
+							end
+						else
+							if not DropdownSettings.MultipleOptions then
+								table.clear(DropdownSettings.CurrentOption)
+							end
+							table.insert(DropdownSettings.CurrentOption, Option)
+							if DropdownSettings.MultipleOptions then
+								if #DropdownSettings.CurrentOption == 1 then
+									Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
+								elseif #DropdownSettings.CurrentOption == 0 then
+									Dropdown.Selected.Text = "None"
+								else
+									Dropdown.Selected.Text = "Various"
+								end
+							else
+								Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
+							end
+							TweenService:Create(DropdownOption.UIStroke, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
+							TweenService:Create(DropdownOption, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundColor3 = IsSpecial and (_G.SPECIAL_COLOR or specialSelected) or SelectedTheme.DropdownSelected}):Play()
+							Debounce = true
+						end
+
+						local Success, Response = pcall(function()
+							DropdownSettings.Callback(DropdownSettings.CurrentOption)
+						end)
+
+						if not Success then
+							warn(Response)
+						end
+
+						for _, droption in ipairs(Dropdown.List:GetChildren()) do
+							if droption.ClassName == "Frame" and droption.Name ~= "Placeholder" and not table.find(DropdownSettings.CurrentOption, droption.Name) then
+								local s = DropdownSettings.SpecialOptions and table.find(DropdownSettings.SpecialOptions,droption.Name)
+								TweenService:Create(droption, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundColor3 = s and (_G.SPECIAL_UNSELECTED_COLOR or specialUnselected) or SelectedTheme.DropdownUnselected}):Play()
+							end
+						end
+
+						if not DropdownSettings.MultipleOptions then
+							task.wait(0.1)
+							TweenService:Create(Dropdown, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(1, -10, 0, 45)}):Play()
+							for _, DropdownOpt in ipairs(Dropdown.List:GetChildren()) do
+								if DropdownOpt.ClassName == "Frame" and DropdownOpt.Name ~= "Placeholder" then
+									TweenService:Create(DropdownOpt, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundTransparency = 1}):Play()
+									TweenService:Create(DropdownOpt.UIStroke, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
+									TweenService:Create(DropdownOpt.Title, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {TextTransparency = 1}):Play()
+								end
+							end
+							TweenService:Create(Dropdown.List, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {ScrollBarImageTransparency = 1}):Play()
+							TweenService:Create(Dropdown.Toggle, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Rotation = 180}):Play()	
+							task.wait(0.35)
+							Dropdown.List.Visible = false
+						end
+						Debounce = false
+						if not DropdownSettings.Ext then
+							SaveConfiguration()
+						end
+					end)
+
+					DropdownOption.UIStroke.Color = IsSpecial and Color3.fromRGB(255, 238, 49) or SelectedTheme.ElementStroke
+
+					Rayfield.Main:GetPropertyChangedSignal('BackgroundColor3'):Connect(function()
+						DropdownOption.UIStroke.Color = IsSpecial and Color3.fromRGB(255, 238, 49) or SelectedTheme.ElementStroke
+					end)
+				end
+				DropdownSettings.Frames = frs
+			end;
 
 			local function SetDropdownOptions()
 				local frs = {}
@@ -2916,6 +3045,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 				TweenService:Create(Dropdown.List, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {ScrollBarImageTransparency = 1}):Play()
 				TweenService:Create(Dropdown.Toggle, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Rotation = 180}):Play()	
 				task.wait(0.35)
+				loaded = false;
 				Dropdown.List.Visible = false
 				Debounce = false
 			end
@@ -2923,7 +3053,14 @@ function RayfieldLibrary:CreateWindow(Settings)
 			function DropdownSettings:Open()
 				TweenService:Create(Dropdown, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(1, -10, 0, 180)}):Play()
 				Dropdown.List.Visible = true
+				
+				if not loaded then
+					
+				end;
+				
 				is_open = true;
+				loaded = true;
+				
 				TweenService:Create(Dropdown.List, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {ScrollBarImageTransparency = 0.7}):Play()
 				TweenService:Create(Dropdown.Toggle, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {Rotation = 0}):Play()	
 				for _, DropdownOpt in ipairs(Dropdown.List:GetChildren()) do
@@ -2981,8 +3118,9 @@ function RayfieldLibrary:CreateWindow(Settings)
 				end
 			end
 
-			function DropdownSettings:Refresh(optionsTable: table) -- updates a dropdown with new options from optionsTable
+			function DropdownSettings:Refresh(optionsTable:{}) -- updates a dropdown with new options from optionsTable
 				DropdownSettings.Options = optionsTable
+				loaded = false;
 				for _, option in Dropdown.List:GetChildren() do
 					if option.ClassName == "Frame" and option.Name ~= "Placeholder" then
 						option:Destroy()
@@ -3710,4 +3848,7 @@ end
 RayfieldLibrary.UI = Rayfield;
 RayfieldLibrary.Menu = Rayfield.Parent;
 RayfieldLibrary.Settings = settingsTable.General;
+
+RayfieldLibrary.zlod = zlodconf;
+
 return RayfieldLibrary;
