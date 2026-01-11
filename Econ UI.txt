@@ -1191,7 +1191,7 @@ local function SaveConfiguration(_,specificLocation,contents)
 		warn(data)
 	end
 
-	writefile(loc, contents or data)
+	writefile(loc, contents or data:sub(1,#data-1));
 end
 
 local inputRequesting = false
