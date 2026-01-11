@@ -1024,7 +1024,14 @@ local function LoadConfiguration(Configuration,applySetting,testValid)
 		local success, Data = pcall(function() return HttpService:JSONDecode(Configuration) end)
 		local changed
 
-		if not success then warn('Rayfield had an issue decoding the configuration file, please try delete the file and reopen Rayfield.') return end
+		if not success then 
+			if testValid then
+				error('JSONDecode failed')
+			else
+				warn('Rayfield had an issue decoding the configuration file, please try delete the file and reopen Rayfield.')
+			end;
+			return
+		end
 		
 		if not testValid then
 			for FlagName, Flag in pairs(RayfieldLibrary.Flags) do
@@ -1092,11 +1099,7 @@ local function LoadConfiguration(Configuration,applySetting,testValid)
 						end;
 					end;
 				else
-					if testValid then
-						return;
-					else
-						error('No Econ flag named "'..name..'"',2);
-					end;
+					error('No Econ flag named "'..name..'"',2);
 				end;
 				name = nil;
 			end;
