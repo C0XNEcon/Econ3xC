@@ -1026,7 +1026,7 @@ local function LoadConfiguration(Configuration,applySetting,testValid)
 
 		if not success then 
 			if testValid then
-				error('JSONDecode failed',2)
+				return error('JSONDecode failed',2)
 			else
 				warn('Rayfield had an issue decoding the configuration file, please try delete the file and reopen Rayfield.')
 			end;
@@ -1099,7 +1099,7 @@ local function LoadConfiguration(Configuration,applySetting,testValid)
 						end;
 					end;
 				else
-					error('No Econ flag named "'..name..'"',2);
+					return error('No Econ flag named "'..name..'"',2);
 				end;
 				name = nil;
 			end;
