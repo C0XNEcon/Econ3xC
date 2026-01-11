@@ -1060,7 +1060,13 @@ local function LoadConfiguration(Configuration,applySetting,testValid)
 		local data = {};
 		
 		local name;
-		for i, v in pairs(Configuration:split('!') or {}) do
+		local s = Configuration:split('!');
+		
+		if #s%2==1 then
+			error('Uneven flags',2);
+		end;
+		
+		for i, v in pairs(s) do
 			if not name then
 				name = v;
 			else
