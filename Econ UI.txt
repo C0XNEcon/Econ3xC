@@ -1059,6 +1059,10 @@ local function LoadConfiguration(Configuration,applySetting,testValid)
 		local changed;
 		local data = {};
 		
+		if Configuration:sub(#Configuration,#Configuration) == '!' then
+			Configuration = Configuration:sub(1,#Configuration-1);
+		end;
+		
 		local name;
 		local s = Configuration:split('!');
 		
