@@ -683,7 +683,7 @@ local settingsTable = {
 		open = {Type='toggle',Value=true,Name = 'Auto Open'};
 	},
 	Advanced = {
-		devmode = {Type='toggle',Value=true,Name = 'Debug Mode'};
+		devmode = {Type='toggle',Value=false,Name = 'Debug Mode'};
 	};
 }
 
