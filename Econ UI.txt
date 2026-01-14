@@ -677,10 +677,14 @@ local ConfigurationFolder = RayfieldFolder.."/Configurations"
 local ConfigurationExtension = '.txt';
 local settingsTable = {
 	General = {
-		toggle = {Type = 'bind', Value = 'K', Name = 'Econ Keybind'};
 		sens = {Type = 'slider',Value=_G.econ_sens or 1,Range = {.05,4},Name='Sensitivity'};
 		ads = {Type='slider',Value=_G.econ_sens_ads or 0.5,Range={.05,2},Name='ADS Sensitivity Multiplier'};
+		toggle = {Type = 'bind', Value = 'K', Name = 'Econ Keybind'};
+		open = {Type='toggle',Value=true,Name = 'Auto Open'};
 	},
+	Advanced = {
+		devmode = {Type='toggle',Value=true,Name = 'Debug Mode'};
+	};
 }
 
 local HttpService = getService('HttpService')
@@ -710,7 +714,16 @@ local function loadSettings()
 							v = tonumber(v);
 						end;
 						
-						local setting = settingsTable.General[n];
+						local to = {
+							['"'] = true;
+							['#'] = false;
+						};
+						
+						if to[v] ~= nil then
+							v = to[v];
+						end;
+						
+						local setting = settingsTable.General[n] or settingsTable.Advanced[n];
 						setting.Value = v;
 						if setting.Element then
 							setting.Element:Set(v);
@@ -722,7 +735,7 @@ local function loadSettings()
 	end)
 
 	if not success then 
-		warn('L.701',result)
+		warn('L.729',result)
 	end
 end
 
@@ -1817,8 +1830,14 @@ end
 
 local function updateSettings()
 	local encoded = '';
-	for i, v in settingsTable.General do
-		encoded ..= `{i}!{v.Value}!`
+	for i, v in settingsTable do
+		for i, v in v do
+			local to = {
+				[true] = '"';
+				[false] = '#';
+			};
+			encoded ..= `{i}!{to[v.Value] or v.Value}!`
+		end
 	end;
 	encoded = encoded:sub(1,#encoded-1);
 
@@ -3813,7 +3832,7 @@ end
 
 RayfieldLibrary.UI = Rayfield;
 RayfieldLibrary.Menu = Rayfield.Parent;
-RayfieldLibrary.Settings = settingsTable.General;
+RayfieldLibrary.Settings = settingsTable;
 
 RayfieldLibrary.zlod = zlodconf;
 
