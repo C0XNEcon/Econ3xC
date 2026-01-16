@@ -677,8 +677,8 @@ local ConfigurationFolder = RayfieldFolder.."/Configurations"
 local ConfigurationExtension = '.txt';
 local settingsTable = {
 	General = {
-		sens = {Type = 'slider',Value=_G.econ_sens or 1,Range = {.05,4},Name='Sensitivity'};
-		ads = {Type='slider',Value=_G.econ_sens_ads or 0.5,Range={.05,2},Name='ADS Sensitivity Multiplier'};
+		sens = {Type = 'slider',Value=getgenv().econ_sens or 1,Range = {.05,4},Name='Sensitivity'};
+		ads = {Type='slider',Value=getgenv().econ_sens_ads or 0.5,Range={.05,2},Name='ADS Sensitivity Multiplier'};
 		toggle = {Type = 'bind', Value = 'K', Name = 'Econ Keybind'};
 		open = {Type='toggle',Value=true,Name = 'Auto Open'};
 	},
@@ -1500,8 +1500,8 @@ local function Hide(notify: boolean?)
 		MPrompt.Visible = true
 	end
 	
-	if _G.econ_to_close then
-		task.spawn(_G.econ_to_close.Close);
+	if getgenv().econ_to_close then
+		task.spawn(getgenv().econ_to_close.Close);
 	end;
 
 	Main['[ MODAL ]'].Visible = false
@@ -1668,7 +1668,7 @@ local function Unhide()
 	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = useMobileSizing and UDim2.new(0, 500, 0, 275) or UDim2.new(0, 500, 0, 475)}):Play()
 	TweenService:Create(Main.Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {Size = UDim2.new(0, 500, 0, 45)}):Play()
 	TweenService:Create(Main.Shadow.Image, TweenInfo.new(0.7, Enum.EasingStyle.Exponential), {ImageTransparency = 0.6}):Play()
-	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = (_G.tr or .4)}):Play()
+	TweenService:Create(Main, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = (getgenv().tr or .4)}):Play()
 	TweenService:Create(Main.Topbar, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
 	TweenService:Create(Main.Topbar.Divider, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
 	TweenService:Create(Main.Topbar.CornerRepair, TweenInfo.new(0.5, Enum.EasingStyle.Exponential), {BackgroundTransparency = 0}):Play()
@@ -2951,7 +2951,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 									Dropdown.Selected.Text = DropdownSettings.CurrentOption[1]
 								end
 								TweenService:Create(DropdownOption.UIStroke, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {Transparency = 1}):Play()
-								TweenService:Create(DropdownOption, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundColor3 = IsSpecial and (_G.SPECIAL_COLOR or specialSelected) or SelectedTheme.DropdownSelected}):Play()
+								TweenService:Create(DropdownOption, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundColor3 = IsSpecial and (getgenv().SPECIAL_COLOR or specialSelected) or SelectedTheme.DropdownSelected}):Play()
 							end
 
 							local Success, Response = pcall(function()
@@ -2965,7 +2965,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 							for _, droption in ipairs(Dropdown.List:GetChildren()) do
 								if droption.ClassName == "Frame" and droption.Name ~= "Placeholder" and not table.find(DropdownSettings.CurrentOption, droption.Name) then
 									local s = DropdownSettings.SpecialOptions and table.find(DropdownSettings.SpecialOptions,droption.Name)
-									TweenService:Create(droption, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundColor3 = s and (_G.SPECIAL_UNSELECTED_COLOR or specialUnselected) or SelectedTheme.DropdownUnselected}):Play()
+									TweenService:Create(droption, TweenInfo.new(0.3, Enum.EasingStyle.Exponential), {BackgroundColor3 = s and (getgenv().SPECIAL_UNSELECTED_COLOR or specialUnselected) or SelectedTheme.DropdownUnselected}):Play()
 								end
 							end
 							
@@ -3023,8 +3023,8 @@ function RayfieldLibrary:CreateWindow(Settings)
 					end
 				end
 				
-				if _G.econ_to_close == DropdownSettings then
-					_G.econ_to_close = nil;
+				if getgenv().econ_to_close == DropdownSettings then
+					getgenv().econ_to_close = nil;
 				end;
 				
 				is_open = false;
@@ -3048,10 +3048,10 @@ function RayfieldLibrary:CreateWindow(Settings)
 					load_options();
 				end;
 				
-				if _G.econ_to_close and _G.econ_to_close ~= DropdownSettings then
-					task.spawn(_G.econ_to_close.Close);
+				if getgenv().econ_to_close and getgenv().econ_to_close ~= DropdownSettings then
+					task.spawn(getgenv().econ_to_close.Close);
 				end;
-				_G.econ_to_close = DropdownSettings;
+				getgenv().econ_to_close = DropdownSettings;
 				
 				is_open = true;
 				loaded = true;
