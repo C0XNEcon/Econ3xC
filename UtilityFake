@@ -16,7 +16,7 @@ function debris(thing, dur)
 	end)
 end
 
-local animlib = _G.animLib
+local animlib = getgenv().animLib
 
 local plr = game:GetService('Players').LocalPlayer
 local scripts = plr.PlayerScripts
@@ -24,8 +24,8 @@ local weaponSounds = scripts.Modules.ClientReplicatedClasses.ClientFighter.Clien
 
 -- // Globals
 
-_G.ffunc = function(name, anim, dur)
-	if anim and not table.find(_G.silenced, anim) then
+getgenv().ffunc = function(name, anim, dur)
+	if anim and not table.find(getgenv().silenced, anim) then
 		local stopped = false
 
 		local z = anim.Stopped:Once(function()
@@ -34,19 +34,19 @@ _G.ffunc = function(name, anim, dur)
 
 		local waitResult = wait(dur)
 		if z then z:Disconnect() end
-		return anim and anim.IsPlaying and not stopped and not table.find(_G.silenced, anim) and waitResult
+		return anim and anim.IsPlaying and not stopped and not table.find(getgenv().silenced, anim) and waitResult
 	end
 end
 
-_G.durr = .92
-_G.silenced = _G.silenced or {}
-_G.si = _G.si or {}
-_G.soundToWeapon = _G.soundToWeapon or {}
+getgenv().durr = .92
+getgenv().silenced = getgenv().silenced or {}
+getgenv().si = getgenv().si or {}
+getgenv().soundToWeapon = getgenv().soundToWeapon or {}
 
 -- // Functions
 
 function ut:_AnimationWait(name, anim, dur)
-	return _G.ffunc(name, anim, dur)
+	return getgenv().ffunc(name, anim, dur)
 end
 
 function ut:CreateSound(id, vol, speed, pos, play, dur, mind, maxd, soundserv, extra)
@@ -65,7 +65,7 @@ function ut:CreateSound(id, vol, speed, pos, play, dur, mind, maxd, soundserv, e
 		end
 	end
 
-	_G.soundToWeapon[s] = id.model
+	getgenv().soundToWeapon[s] = id.model
 
 	s:AddTag('IsOurs')
 	s.Parent = weaponSounds
@@ -96,7 +96,7 @@ function ut:CreateSpectatorSound(id, vol, speed, pos, play, dur, mind, maxd, sou
 		end
 	end
 
-	_G.soundToWeapon[s] = id.model
+	getgenv().soundToWeapon[s] = id.model
 
 	s:AddTag('IsOurs')
 	s.Parent = weaponSounds
