@@ -12,7 +12,7 @@ return {
 		local plr = players.LocalPlayer
 
 		local ID_CHANGED_FUNCS = {}
-		local ECON_VARS = _G.ECON_VARS
+		local ECON_VARS = getgenv().ECON_VARS
 
 		local initConnections = ECON_VARS.INIT_CONS
 		local loadedids = {}
@@ -283,7 +283,7 @@ return {
 
 				local con2
 				local con = char.ChildAdded:Connect(function(v)
-					if not table.find(_G.ECON_VARS.CHAR_UGC, v) then
+					if not table.find(getgenv().ECON_VARS.CHAR_UGC, v) then
 						hand(v)
 					end
 				end)
@@ -313,11 +313,11 @@ return {
 								end
 							end
 
-							table.insert(_G.ECON_VARS.CHAR_UGC, v)
+							table.insert(getgenv().ECON_VARS.CHAR_UGC, v)
 							caa(char, v)
 						else 
 							local cl = v:Clone() :: BodyColors
-							table.insert(_G.ECON_VARS.CHAR_UGC, cl)
+							table.insert(getgenv().ECON_VARS.CHAR_UGC, cl)
 							cl.Parent = char
 						end
 					end
@@ -356,20 +356,20 @@ return {
 
 					local content, isReady = getIcon()
 
-					if not _G.ECON_VARS.PLR_ICONS[_headshot] then
-						_G.ECON_VARS.PLR_ICONS[_headshot] = _headshot.Image
+					if not getgenv().ECON_VARS.PLR_ICONS[_headshot] then
+						getgenv().ECON_VARS.PLR_ICONS[_headshot] = _headshot.Image
 					end
 
 					local function hn(changedim)
-						if string.find(_G.ECON_VARS.PLR_ICONS[_headshot], tostring(plr.UserId)) then
+						if string.find(getgenv().ECON_VARS.PLR_ICONS[_headshot], tostring(plr.UserId)) then
 							_display.Text = dn
 							_username.Text = '@'..usn
 							if isReady and _headshot.Image ~= content then
-								_G.ignorenext = true
+								getgenv().ignorenext = true
 								_headshot.Image = content
 							end
 						else
-							local str = string.sub(_G.ECON_VARS.PLR_ICONS[_headshot], 56, -1)
+							local str = string.sub(getgenv().ECON_VARS.PLR_ICONS[_headshot], 56, -1)
 							local id = tonumber(string.sub(str, 1, string.find(str, '&')-1))
 							local p = players:GetPlayerByUserId(id)
 							if id and p then
@@ -389,10 +389,10 @@ return {
 									b.Name = 'OPic'
 
 									local function calc()
-										if string.find(_G.ECON_VARS.PLR_ICONS[_headshot], tostring(plr.UserId)) then
+										if string.find(getgenv().ECON_VARS.PLR_ICONS[_headshot], tostring(plr.UserId)) then
 											local ts = UTILS.SKIN_MOD.its[b.Image]
 											local tog = UTILS.SKIN_INFO.skinToOg[ts] or ts
-											local tocur = _G.toskin[tog]
+											local tocur = getgenv().toskin[tog]
 											if tocur and tocur ~= 'Dont Change' then
 												b.Image = UTILS.SKIN_MOD.viewmodels[tocur].image
 											end
@@ -420,10 +420,10 @@ return {
 
 					table.insert(ID_CHANGED_FUNCS, hn)
 					table.insert(prcons, _headshot:GetPropertyChangedSignal('Image'):Connect(function()
-						if not _G.ignorenext then
-							_G.ECON_VARS.PLR_ICONS[_headshot] = _headshot.Image
+						if not getgenv().ignorenext then
+							getgenv().ECON_VARS.PLR_ICONS[_headshot] = _headshot.Image
 						else
-							_G.ignorenext = false
+							getgenv().ignorenext = false
 						end
 
 						hn(true)
@@ -483,7 +483,6 @@ return {
 							table.insert(initConnections, z)
 						end
 					end
-
 
 					local z = con.ChildAdded:Connect(h)
 					table.insert(pacons, z)
