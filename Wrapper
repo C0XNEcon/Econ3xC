@@ -6912,37 +6912,37 @@ function mod:getAll()
 	return nameWraps
 end
 
-_G.speed = .008
+getgenv().speed = .008
 
 local ITEM_WRAPS = {}
 
 local save = {'Material','MaterialVariant','Color','Transparency','Reflectance'};
 
-if not _G.EconWrap then
-	_G.EconWrap = {
+if not getgenv().EconWrap then
+	getgenv().EconWrap = {
 		saved = {};
 	};
 end;
 
-local econwrap = _G.EconWrap;
+local econwrap = getgenv().EconWrap;
 
 function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 	-- ONLY PARTS WITH WRAP GROUP ATTRIBUTE ARE AFFECTED
 	-- INVERTED: 2 > 1 | 1 > 2 | 3 > 3
-	
+
 	local CURR = ITEM_WRAPS[item]
 	if CURR and CURR[2] == wrapx and CURR[3] == inverted then return end
-	
+
 	local wrap = wraps[wrapx]
 
 	if not wrap and wrapx ~= 'None' then return end
-	
+
 	local CURR_IND = CURR and CURR[1]+1 or 1
 
 	local function IS_CURRENT()
 		return ITEM_WRAPS[item][1] == CURR_IND
 	end
-	
+
 	ITEM_WRAPS[item] = {CURR_IND,wrapx,inverted}
 
 	local invertedT = {
@@ -6952,15 +6952,15 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 	}
 
 	local new = {}
-	_G.cn = new
-	
+	getgenv().cn = new
+
 	-- MATERIAL, COLOR, TRANSPARENCY, REFLECTANCE, TEXTURES (#TABLES ARE WRAP GROUPS 1-3)
 
 	for _, v in item:GetDescendants() do
 		local wg = v:GetAttribute'WrapGroup'
 		if wg then
 			wg = tonumber(wg);
-			
+
 			if v:IsA'BasePart' then
 				if econwrap.saved[v] then
 					for n, s in econwrap.saved[v].Properties do
@@ -7038,7 +7038,7 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 			end;
 		end;
 	end
-	
+
 	local TweenService_upvr = game:GetService('TweenService')
 
 	local funcs = {
@@ -7091,7 +7091,7 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 				if #new > 0 and new[1].Parent and IS_CURRENT() then
 					_shift = (_shift + 1 * (math.sin(tick() * 1) ^ 20 * 0.75 + 0.25))-- % 0.2
 					for i, v in new do
-						v.OffsetStudsU = _shift * (v.Name == 'Left' and 1 or -1) * _G.speed
+						v.OffsetStudsU = _shift * (v.Name == 'Left' and 1 or -1) * getgenv().speed
 					end
 				else
 					z:Disconnect()
@@ -7143,14 +7143,14 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 							v.Transparency = clamped_2
 						end;
 					};
-					
+
 					if nameFuncs[v.Name] then
 						nameFuncs[v.Name]();
 					end;
 				end
 			end)
 		end;Encroached = function()
-			
+
 		end;Kirby = function()
 			local z
 			z = run.Heartbeat:Connect(function()
@@ -7161,6 +7161,25 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 							v.OffsetStudsU = tick() * speed * dir.X % v.StudsPerTileU
 						end
 					end
+				else
+					z:Disconnect()
+				end
+			end)
+		end; ['Festive Lights'] = function()
+			local _last_remainder = '';
+			local z
+			z = run.Heartbeat:Connect(function()
+				if #new > 0 and new[1].Parent and IS_CURRENT() then
+					local var13 = math.floor(tick() * 1) % #new + 1
+					if var13 ~= _last_remainder then
+						_last_remainder = var13
+						for i, v in new do
+							local t = i == _last_remainder and 0 or 1;
+							for _, v in v do
+								v.Transparency = i
+							end
+						end
+					end	
 				else
 					z:Disconnect()
 				end
