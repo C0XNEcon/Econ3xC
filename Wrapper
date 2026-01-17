@@ -7166,14 +7166,25 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 				end
 			end)
 		end; ['Festive Lights'] = function()
+	local _textures = {{},{},{}};
+			for _, v in new do
+				if v.Name == "SolidRed" or v.Name == "RedLightsInner" then
+					table.insert(_textures[1], v)
+				elseif v.Name == "SolidYellow" or v.Name == "YellowLightsInner" then
+					table.insert(_textures[2], v)
+				elseif v.Name == "SolidGreen" or v.Name == "GreenLightsInner" then
+					table.insert(_textures[3], v)
+				end
+			end
+			
 			local _last_remainder = '';
 			local z
 			z = run.Heartbeat:Connect(function()
 				if #new > 0 and new[1].Parent and IS_CURRENT() then
-					local var13 = math.floor(tick() * 1) % #new + 1
+					local var13 = math.floor(tick() * 1) % #_textures + 1
 					if var13 ~= _last_remainder then
 						_last_remainder = var13
-						for i, v in new do
+						for i, v in _textures do
 							local t = i == _last_remainder and 0 or 1;
 							for _, v in v do
 								v.Transparency = i
