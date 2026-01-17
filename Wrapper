@@ -7187,7 +7187,7 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 						for i, v in _textures do
 							local t = i == _last_remainder and 0 or 1;
 							for _, v in v do
-								v.Transparency = i
+								v.Transparency = t
 							end
 						end
 					end	
