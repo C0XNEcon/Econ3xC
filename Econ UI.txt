@@ -681,6 +681,7 @@ local settingsTable = {
 		ads = {Type='slider',Value=getgenv().econ_sens_ads or 0.5,Range={.05,2},Name='ADS Sensitivity Multiplier'};
 		toggle = {Type = 'bind', Value = 'K', Name = 'Econ Keybind'};
 		open = {Type='toggle',Value=true,Name = 'Auto Open'};
+		tb = {Type='toggle',Value=false,Name='PC Topbar Button'};
 	},
 	Advanced = {
 		devmode = {Type='toggle',Value=false,Name = 'Debug Mode'};
@@ -1894,6 +1895,9 @@ local function createSettings(window)
 					Ext = true,
 					Callback = function(Value)
 						setting.Value = Value
+						if setting.Name == 'Topbar Button' then
+							getgenv().ECON_TOPBAR_CALLBACK(Value);
+						end;
 						updateSettings()
 					end,
 				})
