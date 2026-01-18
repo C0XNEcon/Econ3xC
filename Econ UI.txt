@@ -1895,7 +1895,7 @@ local function createSettings(window)
 					Ext = true,
 					Callback = function(Value)
 						setting.Value = Value
-						if setting == settingsTable.General.tb then
+						if getgenv().ECON_TOPBAR_CALLBACK and setting == settingsTable.General.tb then
 							getgenv().ECON_TOPBAR_CALLBACK(Value);
 						end;
 						updateSettings()
