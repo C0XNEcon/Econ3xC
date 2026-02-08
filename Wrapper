@@ -6953,6 +6953,9 @@ function mod:wrapThis(item : Model, wrapx, inverted, ogw, ogt)
 
 	local new = {}
 	getgenv().cn = new
+	if getgenv().testmaterial then
+		getgenv().testmaterial(item.Name,wrapx)
+	end;
 
 	-- MATERIAL, COLOR, TRANSPARENCY, REFLECTANCE, TEXTURES (#TABLES ARE WRAP GROUPS 1-3)
 
