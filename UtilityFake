@@ -57,7 +57,7 @@ function ut:CreateSound(id, vol, speed, pos, play, dur, mind, maxd, soundserv, e
 	s.RollOffMinDistance = mind and typeof(mind) == 'number' and mind or 50
 	s.RollOffMaxDistance = maxd or 400
 	s.RollOffMode = Enum.RollOffMode.Inverse
-	s.SoundGroup = SoundService_upvr[soundserv or 'Other']
+	s.SoundGroup = SoundService_upvr[soundserv or 'Master']
 
 	if extra then
 		for i, v in pairs(extra) do
@@ -88,7 +88,7 @@ function ut:CreateSpectatorSound(id, vol, speed, pos, play, dur, mind, maxd, sou
 	s.RollOffMinDistance = mind and typeof(mind) == 'number' and mind or 50
 	s.RollOffMaxDistance = maxd or 400
 	s.RollOffMode = Enum.RollOffMode.Inverse
-	s.SoundGroup = SoundService_upvr[soundserv or 'Other']
+	s.SoundGroup = SoundService_upvr[soundserv or 'Master']
 
 	if extra then
 		for i, v in pairs(extra) do
