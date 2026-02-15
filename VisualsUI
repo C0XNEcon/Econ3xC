@@ -29,7 +29,7 @@ return {
 
 				funcs.handleSlot = function(v)
 					local _selected = getgenv().toskin[v.Name]
-					if _selected then
+					if getgenv().enabled_skin and _selected then
 						local icon = v:FindFirstChild'Icon' :: ImageLabel
 						if icon then
 							icon.ResampleMode = Enum.ResamplerMode[_selected:find('Pixel') and 'Pixelated' or 'Default'] 
@@ -155,7 +155,7 @@ return {
 											local ts = UTILS.SKIN_MOD.its[b.Image]
 											local tog = UTILS.SKIN_INFO.skinToOg[ts] or ts
 											local tocur = getgenv().toskin[tog]
-											if tocur and tocur ~= 'Dont Change' then
+											if getgenv().enabled_skin and tocur and tocur ~= 'Dont Change' then
 												b.Image = UTILS.SKIN_MOD.viewmodels[tocur].image
 											end
 										end
@@ -183,7 +183,7 @@ return {
 											local ts = UTILS.SKIN_MOD.its[b.Image]
 											local tog = UTILS.SKIN_INFO.skinToOg[ts] or ts
 											local tocur = getgenv().toskin[tog]
-											if tocur and tocur ~= 'Dont Change' then
+											if getgenv().enabled_skin and tocur and tocur ~= 'Dont Change' then
 												b.Image = UTILS.SKIN_MOD.viewmodels[tocur].image
 											end
 										end
