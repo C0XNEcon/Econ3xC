@@ -1147,6 +1147,7 @@ local function LoadConfiguration(Configuration,applySetting,testValid)
 				else
 					local whoops = {
 						'esk';
+						'.a';
 					};
 					if not table.find(whoops,name) then
 						return error('No Econ flag named "'..name..'"',2);
