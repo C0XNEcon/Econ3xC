@@ -1145,7 +1145,12 @@ local function LoadConfiguration(Configuration,applySetting,testValid)
 						end;
 					end;
 				else
-					return error('No Econ flag named "'..name..'"',2);
+					local whoops = {
+						'esk';
+					};
+					if not table.find(whoops,name) then
+						return error('No Econ flag named "'..name..'"',2);
+					end
 				end;
 				name = nil;
 			end;
