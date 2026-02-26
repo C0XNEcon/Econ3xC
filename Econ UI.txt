@@ -1236,14 +1236,14 @@ local function SaveConfiguration(_,specificLocation,contents)
 			end;
 		end;
 		
-		data = `[=[{data}]=]`
+		data = `[=[{data:sub(1,#data-1)}]=]`
 	end;
 	
 	if debugX then
 		warn(data)
 	end
 
-	writefile(loc, contents or data:sub(1,#data-1));
+	writefile(loc, contents or data);
 end
 
 local inputRequesting = false
