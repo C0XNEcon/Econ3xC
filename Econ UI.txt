@@ -1059,6 +1059,10 @@ local function LoadConfiguration(Configuration,applySetting,testValid)
 	if Configuration:find('%[%[') and Configuration:find(']]') then
 		Configuration = Configuration:sub(Configuration:find('%[%[')+3,Configuration:find(']]')-1);
 	end
+	
+	if Configuration:find('%[=%[') and Configuration:find(']=]') then
+		Configuration = Configuration:sub(Configuration:find('%[=%[')+3,Configuration:find(']=]')-1);
+	end
 
 	if Configuration:sub(1,1) == '{' then
 		local success, Data = pcall(function() return HttpService:JSONDecode(Configuration) end)
