@@ -1056,8 +1056,8 @@ end
 local function LoadConfiguration(Configuration,applySetting,testValid)		
 	save_lock = not testValid;
 	
-	if Configuration:find('%[=%[') and Configuration:find(']=]') then
-		Configuration = Configuration:sub(Configuration:find('%[=%[')+3,Configuration:find(']=]')-1);
+	if Configuration:find('%[%[') and Configuration:find(']]') then
+		Configuration = Configuration:sub(Configuration:find('%[%[')+3,Configuration:find(']]')-1);
 	end
 
 	if Configuration:sub(1,1) == '{' then
@@ -1236,7 +1236,7 @@ local function SaveConfiguration(_,specificLocation,contents)
 			end;
 		end;
 		
-		data = `[=[{data:sub(1,#data-1)}]=]`
+		data = `[[{data:sub(1,#data-1)}]]`
 	end;
 	
 	if debugX then
