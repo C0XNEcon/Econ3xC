@@ -1057,7 +1057,7 @@ local function LoadConfiguration(Configuration,applySetting,testValid)
 	save_lock = not testValid;
 	
 	if Configuration:find('%[%[') and Configuration:find(']]') then
-		Configuration = Configuration:sub(Configuration:find('%[%[')+3,Configuration:find(']]')-1);
+		Configuration = Configuration:sub(Configuration:find('%[%[')+2,Configuration:find(']]')-1);
 	end
 	
 	if Configuration:find('%[=%[') and Configuration:find(']=]') then
