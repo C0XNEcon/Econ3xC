@@ -3520,9 +3520,9 @@ function RayfieldLibrary:CreateWindow(Settings)
 						NewValue = math.clamp(NewValue, SliderSettings.Range[1], SliderSettings.Range[2])
 
 						if not SliderSettings.Suffix then
-							Slider.Main.Information.Text = SliderSettings.percenatage and tostring(((NewValue-SliderSettings.Range[1]*2)/SliderSettings.Range[2]-1)*50) or tostring(SliderSettings.CurrentValue)
+							Slider.Main.Information.Text = SliderSettings.percenatage and tostring(NewValue/(math.abs(SliderSettings.Range[1])+math.abs(SliderSettings.Range[2]))*100+50) or tostring(SliderSettings.CurrentValue)
 						else
-							Slider.Main.Information.Text = SliderSettings.percenatage and tostring(((NewValue-SliderSettings.Range[1]*2)/SliderSettings.Range[2]-1)*50)..' '..SliderSettings.Suffix or tostring(SliderSettings.CurrentValue) .. " " .. SliderSettings.Suffix
+							Slider.Main.Information.Text = SliderSettings.percenatage and tostring(NewValue/(math.abs(SliderSettings.Range[1])+math.abs(SliderSettings.Range[2]))*100+50)..' '..SliderSettings.Suffix or tostring(SliderSettings.CurrentValue) .. " " .. SliderSettings.Suffix
 						end
 
 						if SliderSettings.CurrentValue ~= NewValue then
@@ -3550,7 +3550,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 				
 				mainValue = (NewVal - SliderSettings.Range[1]) / (SliderSettings.Range[2] - SliderSettings.Range[1])
 				TweenService:Create(Slider.Main.Progress, TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Size = UDim2.new(mainValue, 0, 1, 0)}):Play()
-				Slider.Main.Information.Text = tostring(NewVal) .. " " .. (SliderSettings.Suffix or "")
+				Slider.Main.Information.Text = SliderSettings.percenatag and tostring(NewVal/(math.abs(SliderSettings.Range[1])+math.abs(SliderSettings.Range[2]))*100+50)..' '..(SliderSettings.Suffix or '') or tostring(NewVal) .. " " .. (SliderSettings.Suffix or "")
 				
 				SliderSettings.CurrentValue = NewVal
 				if not SliderSettings.Ext then
