@@ -973,7 +973,7 @@ local function makeDraggable(object, dragObject, enableTaptic, tapticOffset)
 		end
 	end)
 
-	local renderStepped = RunService.RenderStepped:Connect(function()
+	local renderStepped = RunService.Heartbeat:Connect(function()
 		if dragging and not Hidden then
 			local position = UserInputService:GetMouseLocation() + relative + offset
 			if enableTaptic and tapticOffset then
@@ -1697,7 +1697,7 @@ local function Unhide()
 
 	Main['[ MODAL ]'].Visible = true
 
-	mouseShownCon = RunService.RenderStepped:Connect(function()
+	mouseShownCon = RunService.Stepped:Connect(function()
 		UserInputService.MouseIconEnabled = true
 	end)
 
@@ -2324,7 +2324,22 @@ function RayfieldLibrary:CreateWindow(Settings)
 				end
 
 			end)
-
+			
+			-- DRAGGING CONNECTIONS
+			
+			local upd_loop;
+			local loop;
+			local test_enabled = function()
+				if mainDragging or sliderDragging then
+					if not loop then
+						loop = run.Stepped:Connect(upd_loop);
+					end
+				elseif loop then
+					loop:Disconnect()
+					loop = nil;
+				end;
+			end;
+			
 			UserInputService.InputEnded:Connect(function(input, gameProcessed) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then 
 					mainDragging = false
 					sliderDragging = false
@@ -2345,6 +2360,9 @@ function RayfieldLibrary:CreateWindow(Settings)
 			Slider.SliderPoint.MouseButton1Down:Connect(function()
 				sliderDragging = true 
 			end)
+			
+			-- M<AIN
+			
 			local h,s,v = ColorPickerSettings.Color:ToHSV()
 			local color = Color3.fromHSV(h,s,v) 
 			local hex = string.format("#%02X%02X%02X",color.R*0xFF,color.G*0xFF,color.B*0xFF)
@@ -2420,8 +2438,10 @@ function RayfieldLibrary:CreateWindow(Settings)
 				rgbBoxes(ColorPicker.RGB.BInput.InputBox,"B")
 				pcall(function()ColorPickerSettings.Callback(Color3.fromHSV(h,s,v))end)
 			end)
-
-			RunService.RenderStepped:connect(function()
+			
+			-- OMFG THIS SCRIPT SUCKS
+			
+			upd_loop = function()
 				if mainDragging then 
 					local localX = math.clamp(mouse.X-Main.AbsolutePosition.X,0,Main.AbsoluteSize.X)
 					local localY = math.clamp(mouse.Y-Main.AbsolutePosition.Y,0,Main.AbsoluteSize.Y)
@@ -2463,7 +2483,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 						SaveConfiguration()
 					end
 				end
-			end)
+			end
 
 			if Settings.ConfigurationSaving then
 				if Settings.ConfigurationSaving.Enabled and ColorPickerSettings.Flag then
@@ -3205,29 +3225,19 @@ function RayfieldLibrary:CreateWindow(Settings)
 			UserInputService.InputBegan:Connect(function(input, processed)
 				if CheckingForKey then
 					if input.KeyCode ~= Enum.KeyCode.Unknown then
-						local SplitMessage = string.split(tostring(input.KeyCode), ".")
-						local NewKeyNoEnum = SplitMessage[3]
-						Keybind.KeybindFrame.KeybindBox.Text = tostring(NewKeyNoEnum)
-						KeybindSettings.CurrentKeybind = tostring(NewKeyNoEnum)
+						local name = input.KeyCode.Name
+						Keybind.KeybindFrame.KeybindBox.Text = name
+						KeybindSettings.CurrentKeybind = name
 						Keybind.KeybindFrame.KeybindBox:ReleaseFocus()
 						if not KeybindSettings.Ext then
 							SaveConfiguration()
 						end
 
 						if KeybindSettings.CallOnChange then
-							KeybindSettings.Callback(tostring(NewKeyNoEnum))
+							KeybindSettings.Callback(name)
 						end
 					end
 				elseif not KeybindSettings.CallOnChange and KeybindSettings.CurrentKeybind ~= nil and (input.KeyCode == Enum.KeyCode[KeybindSettings.CurrentKeybind] and not processed) then -- Test
-					local Held = true
-					local Connection
-					Connection = input.Changed:Connect(function(prop)
-						if prop == "UserInputState" then
-							Connection:Disconnect()
-							Held = false
-						end
-					end)
-
 					if not KeybindSettings.HoldToInteract then
 						local Success, Response = pcall(KeybindSettings.Callback)
 						if not Success then
@@ -3235,6 +3245,16 @@ function RayfieldLibrary:CreateWindow(Settings)
 						end
 					else
 						task.wait(0.25)
+						
+						local Held = true
+						local Connection
+						Connection = input.Changed:Connect(function(prop)
+							if prop == 'UserInputState' then
+								Connection:Disconnect()
+								Held = false
+							end
+						end)
+
 						if Held then
 							local Loop; Loop = RunService.Stepped:Connect(function()
 								if not Held then
