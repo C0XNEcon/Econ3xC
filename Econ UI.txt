@@ -3712,7 +3712,7 @@ Main.Search.Input:GetPropertyChangedSignal('Text'):Connect(function()
 	end
 
 	for _, element in ipairs(Elements.UIPageLayout.CurrentPage:GetChildren()) do
-		if element.ClassName ~= 'UIListLayout' and element.Name ~= 'Placeholder' and element.Name ~= 'SearchTitle-fsefsefesfsefesfesfThanks' then
+		if element.ClassName ~= 'UIListLayout' and element.Name ~= 'UIPadding' and element.Name ~= 'Placeholder' and element.Name ~= 'SearchTitle-fsefsefesfsefesfesfThanks' then
 			if element.Name == 'SectionTitle' then
 				if #Main.Search.Input.Text == 0 then
 					element.Visible = true
