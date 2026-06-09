@@ -2343,22 +2343,27 @@ function RayfieldLibrary:CreateWindow(Settings)
 			UserInputService.InputEnded:Connect(function(input, gameProcessed) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then 
 					mainDragging = false
 					sliderDragging = false
+					test_enabled()
 				end end)
 			Main.MouseButton1Down:Connect(function()
 				if opened then
 					mainDragging = true 
+					test_enabled()
 				end
 			end)
 			Main.MainPoint.MouseButton1Down:Connect(function()
 				if opened then
 					mainDragging = true 
+					test_enabled()
 				end
 			end)
 			Slider.MouseButton1Down:Connect(function()
 				sliderDragging = true 
+				test_enabled()
 			end)
 			Slider.SliderPoint.MouseButton1Down:Connect(function()
 				sliderDragging = true 
+				test_enabled()
 			end)
 			
 			-- M<AIN
@@ -3449,6 +3454,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 			Slider.Title.Text = SliderSettings.Name
 			Slider.Visible = true
 			Slider.Parent = TabPage
+			SliderSettings.obj = Slider
 
 			Slider.BackgroundTransparency = 1
 			Slider.UIStroke.Transparency = 1
