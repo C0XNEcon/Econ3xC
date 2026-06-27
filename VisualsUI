@@ -23,27 +23,29 @@ return {
 
 		__RET.__handleFighterInterface = function(ui)
 			if ui.Name == plr.Name then
-				local funcs = {}
+				pcall(function()
+					local funcs = {}
 
-				local items = ui.Hotbar.Container
+					local items = ui.BottomRight.Container.Hotbar.Container
 
-				funcs.handleSlot = function(v)
-					local _selected = getgenv().toskin[v.Name]
-					if getgenv().enabled_skin and _selected then
-						local icon = v:FindFirstChild'Icon' :: ImageLabel
-						if icon then
-							icon.ResampleMode = Enum.ResamplerMode[_selected:find('Pixel') and 'Pixelated' or 'Default'] 
-							icon.Image = UTILS.SKIN_MOD.viewmodels[_selected].image
-						end;
+					funcs.handleSlot = function(v)
+						local _selected = getgenv().toskin[v.Name]
+						if getgenv().enabled_skin and _selected then
+							local icon = v:FindFirstChild'Icon' :: ImageLabel
+							if icon then
+								icon.ResampleMode = Enum.ResamplerMode[_selected:find('Pixel') and 'Pixelated' or 'Default'] 
+								icon.Image = UTILS.SKIN_MOD.viewmodels[_selected].image
+							end;
+						end
 					end
-				end
 
-				-- //
+					-- //
 
-				items.ChildAdded:Connect(funcs.handleSlot)
-				for _, v in items:GetChildren() do
-					funcs.handleSlot(v)
-				end
+					items.ChildAdded:Connect(funcs.handleSlot)
+					for _, v in items:GetChildren() do
+						funcs.handleSlot(v)
+					end
+				end);
 			end
 		end
 
