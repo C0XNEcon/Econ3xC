@@ -584,7 +584,12 @@ local _ui_blur = {
 					parts
 				);
 			else
-				root.Parent = game:GetService('CoreGui').HUI
+				local hui = game:GetService('CoreGui'):FindFirstChild'HUI';
+				if not hui then
+					hui = Instance.new('Folder',game:GetService('CoreGui'))
+					hui.Name = 'HUI'
+				end
+				root.Parent = hui
 			end;
 
 			if fetchProps then
