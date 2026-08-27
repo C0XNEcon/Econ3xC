@@ -65,7 +65,7 @@ function ut:CreateSound(id, vol, speed, pos, play, dur, mind, maxd, soundserv, e
 		end
 	end
 
-	getgenv().soundToWeapon[s] = id.model
+	getgenv().soundToWeapon[s] = id and id.model
 
 	s:AddTag('IsOurs')
 	s.Parent = weaponSounds
@@ -96,7 +96,7 @@ function ut:CreateSpectatorSound(id, vol, speed, pos, play, dur, mind, maxd, sou
 		end
 	end
 
-	getgenv().soundToWeapon[s] = id.model
+	getgenv().soundToWeapon[s] = id and id.model
 
 	s:AddTag('IsOurs')
 	s.Parent = weaponSounds
