@@ -30,7 +30,7 @@ return {
 
 					funcs.handleSlot = function(v)
 						local _selected = getgenv().toskin[v.Name]
-						if getgenv().enabled_skin and _selected then
+						if getgenv().enabled_skin and _selected and _selected ~= 'Dont Change' then
 							local icon = v:FindFirstChild'Icon' :: ImageLabel
 							if icon then
 								icon.ResampleMode = Enum.ResamplerMode[_selected:find('Pixel') and 'Pixelated' or 'Default'] 
@@ -97,39 +97,6 @@ return {
 		end
 
 		if not is then
-			--local MAIN_UI = mainUI.Equipment.Weapons.Container.List.Container
-
-			--local function handle(v)
-			--	local b = v:FindFirstChild('Button')
-			--	b = b and b:FindFirstChild('Icon')
-
-			--	local xico = b and b:FindFirstChild('UICorner')
-			--	local n = v.Name == 'EquipmentWeaponSlot'
-			--	if n and b and not xico then
-			--		local function calc()
-			--			local ts = UTILS.SKIN_MOD.its[b.Image]
-			--			local tog = UTILS.SKIN_INFO.skinToOg[ts] or ts
-			--			local tocur = getgenv().toskin[tog]
-			--			if tocur and tocur ~= 'Dont Change' then
-			--				b.Image = UTILS.SKIN_MOD.viewmodels[tocur].image
-			--			end
-			--		end
-
-			--		calc()
-			--		b:GetPropertyChangedSignal('Image'):Connect(calc)
-			--	elseif n and b and xico then
-
-			--	end
-			--end
-
-			--for _, v in MAIN_UI:GetChildren() do
-			--	handle(v)
-			--end
-
-			--MAIN_UI.ChildAdded:Connect(handle)
-
-			-- // UI 2
-
 			local function checkfor(v)
 				task.spawn(function()
 					local typ = v.Name == 'PickWeapons' and 1 or v.Name == 'PickWeaponsList' and 2 or 0
