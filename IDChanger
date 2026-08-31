@@ -1,8 +1,6 @@
 return {
 	init = function(UTILS:{})
 		local __RET = {}
-		
-		-- // Services
 
 		local players = game:GetService('Players')
 		local run = game:GetService('RunService')
