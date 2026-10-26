@@ -1,3 +1,30 @@
+local getgenv = getgenv;
+
+--
+
+local attribute = {};
+local all = getgenv().all or {};
+local dis = getgenv().dis or {};
+getgenv().dis = dis;
+getgenv().all = all;
+
+function attribute:set(x,v,a)
+	if not dis[x] then
+		dis[x] = x.Destroying:Once(function()
+			all[x] = nil;
+			dis[x] = nil;
+		end);
+	end;
+
+	all[x] = all[x] or {};
+	all[x][v] = a;
+end;
+function attribute:get(x,v)
+	return all[x] and all[x][v];
+end;
+
+--
+
 return {
 	init = function(UTILS:{})
 		local __RET = {}
@@ -100,11 +127,11 @@ return {
 			local function checkfor(v)
 				task.spawn(function()
 					local typ = v.Name == 'PickWeapons' and 1 or v.Name == 'PickWeaponsList' and 2 or 0
-					if typ>0 and not v:HasTag('Econ') then
+					if typ>0 and not attribute:has(v,'e') then
 						local chosen = v:WaitForChild('ChosenWeapons')
 						local list = typ == 1 and v:WaitForChild('List') or v:WaitForChild('ListContainer').List
-
-						v:AddTag'Econ'
+						
+						attribute:set(v,'e',true);
 
 						local cons = {}
 
@@ -174,7 +201,6 @@ return {
 			end
 
 			local pages = mainUI.Pages
-
 			if pages:FindFirstChild('PickWeapons') then
 				checkfor(pages.PickWeapons)
 			end
