@@ -127,7 +127,7 @@ return {
 			local function checkfor(v)
 				task.spawn(function()
 					local typ = v.Name == 'PickWeapons' and 1 or v.Name == 'PickWeaponsList' and 2 or 0
-					if typ>0 and not attribute:has(v,'e') then
+					if typ>0 and not attribute:get(v,'e') then
 						local chosen = v:WaitForChild('ChosenWeapons')
 						local list = typ == 1 and v:WaitForChild('List') or v:WaitForChild('ListContainer').List
 						
