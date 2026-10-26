@@ -1,3 +1,26 @@
+local attribute = {};
+local all = getgenv().all or {};
+local dis = getgenv().dis or {};
+getgenv().dis = dis;
+getgenv().all = all;
+
+function attribute:set(x,v,a)
+	if not dis[x] then
+		dis[x] = x.Destroying:Once(function()
+			all[x] = nil;
+			dis[x] = nil;
+		end);
+	end;
+	
+	all[x] = all[x] or {};
+	all[x][v] = a;
+end;
+function attribute:get(x,v)
+	return all[x] and all[x][v];
+end;
+
+--
+
 local ut = {
 	EnergyPistolsShootSoundCooldown = 0;
 }
@@ -66,8 +89,8 @@ function ut:CreateSound(id, vol, speed, pos, play, dur, mind, maxd, soundserv, e
 	end
 
 	getgenv().soundToWeapon[s] = id.model
-
-	s:AddTag('IsOurs')
+	
+	attribute:set(s,'io',true);
 	s.Parent = weaponSounds
 
 	s:Play()
@@ -97,8 +120,8 @@ function ut:CreateSpectatorSound(id, vol, speed, pos, play, dur, mind, maxd, sou
 	end
 
 	getgenv().soundToWeapon[s] = id.model
-
-	s:AddTag('IsOurs')
+	
+	attribute:set(s,'io',true);
 	s.Parent = weaponSounds
 
 	s:Play()
