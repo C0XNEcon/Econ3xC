@@ -74,7 +74,6 @@ local function add_animation(name, id, length, speed, idkserver, stamp, extraInf
 	end;
 end;
 
-add_animation(a1, a2, a3, a4, a5, a6, a7)
 add_animation("fists_equip", "rbxassetid://12557487419", 0.55, nil, true)
 add_animation("fists_idle", "rbxassetid://12557500357", nil, nil, true)
 add_animation("fists_sprint", "rbxassetid://12644426893", nil, nil, true)
